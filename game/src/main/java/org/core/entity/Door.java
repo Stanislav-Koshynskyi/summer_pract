@@ -12,7 +12,6 @@ public class Door extends Entity {
     private DoorState state;
     private float openingTimer;
     private final float openingDuration;
-    private final Rect worldAABB;
 
     public Door(String doorId, float x, float y, float width, float height,
                 DoorState initialState, float openingDuration) {
@@ -21,7 +20,6 @@ public class Door extends Entity {
         this.state = initialState;
         this.openingDuration = openingDuration;
         this.openingTimer = 0f;
-        this.worldAABB = new Rect(x, y, width, height);
     }
 
     public void requestOpen() {
