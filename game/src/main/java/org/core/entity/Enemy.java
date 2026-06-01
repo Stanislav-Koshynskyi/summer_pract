@@ -18,6 +18,8 @@ public class Enemy extends Entity {
     private Weapon currentWeapon;
     private final EnemyProfile profile;
 
+    private final String enemyId;
+
     private AIState currentState;
     private float facingAngle;
 
@@ -31,11 +33,12 @@ public class Enemy extends Entity {
     private List<Vec2> currentPath;
 
     public Enemy(float x, float y, float width, float height,
-                 EnemyProfile profile, Weapon weapon) {
+                 EnemyProfile profile, Weapon weapon, String enemyId) {
         super(x, y, width, height);
         this.profile = profile;
         this.hp = profile.getHp();
         this.currentWeapon = weapon;
+        this.enemyId = enemyId;
         this.alive = true;
         this.bodyInvestigated = false;
         this.currentState = AIState.PATROL;
