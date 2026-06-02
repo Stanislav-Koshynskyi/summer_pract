@@ -105,7 +105,7 @@ public class LevelState {
     public boolean isEnemyAlive(String enemyId) {
         if (enemyId == null) return false;
         for (Enemy e : enemies) {
-            if (enemyId.equals(e.getProfile().getEnemyTypeId()) && e.isAlive()) return true;
+            if (enemyId.equals(e.getEnemyId()) && e.isAlive()) return true;
         }
         return false;
     }
