@@ -5,6 +5,7 @@ import lombok.Setter;
 
 @Getter
 public class Entity {
+    @Setter
     private float x, y;
     private final float width, height; // hitbox size
     @Setter
@@ -28,5 +29,17 @@ public class Entity {
     public void setVelocity(float vx,float vy){
         velocityX = vx;
         velocityY = vy;
+    }
+    public float getLeft(){
+        return x - width / 2f;
+    }
+    public float getRight(){
+        return x + width / 2f;
+    }
+    public float getTop(){
+        return y + height / 2f;
+    }
+    public float getBottom(){
+        return y - height / 2f;
     }
 }

@@ -6,9 +6,6 @@ public enum TileType {
     FLOOR(true, false, false, 1.0f),
     WALL(false, true, true, 0.33f),
     LOW_OBSTACLE(true, false, false, 1.0f),
-    DOOR_OPEN(true, false, false, 1.0f),
-    DOOR_CLOSED(false, true, true, 0.33f),
-    DOOR_OPENING(false, false, true, 1.0f),
     VENT(true, true, true, 1.0f);
 
     private final boolean canPass;
