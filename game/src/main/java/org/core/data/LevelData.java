@@ -1,5 +1,6 @@
 package org.core.data;
 
+import org.core.enums.GoalType;
 import org.core.geometry.WorldGeometry;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class LevelData {
     public List<WeaponPickupData> weaponPickups;
     public List<ExitData> exits;
 
-    public String goalType;
+    public GoalType goalType;
     public String targetEnemyId;
 
     public String levelId;
@@ -29,7 +30,7 @@ public class LevelData {
                     List<WaypointData> waypoints,
                     List<WeaponPickupData> weaponPickups,
                     List<ExitData> exits,
-                    String goalType,
+                    GoalType goalType,
                     String targetEnemyId) {
         this.worldGeometry = worldGeometry;
         this.playerSpawn = playerSpawn;
