@@ -81,7 +81,7 @@ public class RayCastSystem {
         }
 
         Blocker closestTarget = null;
-        float closestDist = maxDistance;
+        float closestDist = tileHitDist;
         Vec2 closestPoint = null;
 
         for (Blocker blocker : blockers) {
