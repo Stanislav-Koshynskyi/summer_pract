@@ -29,34 +29,34 @@ public class LevelStats {
     @Getter
     private float elapsedTime;
 
-    void recordEnemyAlerted(String enemyId) {
+    public void recordEnemyAlerted(String enemyId) {
         alertedIds.add(enemyId);
         alertCount++;
     }
 
-    void recordEnemyEnteredAttack(String enemyId) {
+   public void recordEnemyEnteredAttack(String enemyId) {
         alertedIds.add(enemyId);
         attackIds.add(enemyId);
         alertCount++;
     }
 
-    void recordEnemyEnteredSearchInvestigate(String enemyId) {
+    public void recordEnemyEnteredSearchInvestigate(String enemyId) {
         alertedIds.add(enemyId);
         searchIds.add(enemyId);
         alertCount++;
     }
 
-    void recordGunshot(boolean suppressed) {
+    public void recordGunshot(boolean suppressed) {
         if (suppressed) suppressedShotFired = true;
         else gunshotFired = true;
     }
 
-    void recordKill(boolean silent) {
+    public void recordKill(boolean silent) {
         killCount++;
         if (silent) silentKillCount++;
     }
 
-    void addElapsedTime(float delta) {
+    public void addElapsedTime(float delta) {
         elapsedTime += delta;
     }
 
