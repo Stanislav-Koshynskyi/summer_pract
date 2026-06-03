@@ -10,12 +10,17 @@ import org.core.entity.*;
 import org.core.enums.*;
 import org.core.event.*;
 
+import org.core.math.Vec2;
+import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
+import org.core.weapon.Weapon;
+import org.core.weapon.WeaponFireContext;
+import org.core.weapon.WeaponSystem;
+
 public class GameController {
 
     private LevelState levelState;
-    // ---------- Доступ до стану ----------
     @Getter
     private GameStateView stateView;
     private CollisionSystem collisionSystem;
@@ -26,19 +31,23 @@ public class GameController {
     private boolean pendingShoot;
     private boolean pendingInteract;
     private MovementMode pendingMovementMode;
+    private final WeaponSystem weaponSystem;
+    private final RayCastSystem rayCastSystem;
 
-    // Заглушки для реєстрів (поки не використовуються, але будуть потрібні)
     private final Object weaponRegistry;
     private final Object enemyProfileRegistry;
     private final Map<AimBehaviorType, ?> aimBehaviors;
 
     public GameController(Object weaponRegistry,
                           Object enemyProfileRegistry,
-                          Map<AimBehaviorType, ?> aimBehaviors) {
+                          Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem,
+                          RayCastSystem rayCastSystem) {
         this.weaponRegistry = weaponRegistry;
         this.enemyProfileRegistry = enemyProfileRegistry;
         this.aimBehaviors = aimBehaviors;
         this.pendingMovementMode = MovementMode.WALK;
+        this.weaponSystem = weaponSystem;
+        this.rayCastSystem = rayCastSystem;
     }
 
 
@@ -121,10 +130,22 @@ public class GameController {
         }
 
         // Крок 9. WeaponSystem – cooldowns, hitscan, apply damage
-        // TODO: MVP-0 – реалізувати hitscan
-
+        // TODO: реалізувати автоматичну стрільбу
+        player.getCurrentWeapon().updateCooldown(delta);
         if (pendingShoot) {
-            // TODO: WeaponSystem.shoot(player)
+            Weapon weapon = player.getCurrentWeapon();
+            if (weapon.canFire()){
+                Vec2 from = new Vec2(player.getX(), player.getY());
+                Vec2 target = Vec2.fromAngleDeg(player.getFacingAngle());
+                WeaponFireContext context = new WeaponFireContext(
+                        rayCastSystem, player, from, target,
+                        weapon.getDefinition().getRange(),
+                        Set.of(player),
+                        weapon.getDefinition().getDamage()
+                );
+                List<GameEvent> events = weaponSystem.useWeapon(context, weapon);
+                levelState.getGameEvents().addAll(events);
+            }
             pendingShoot = false;
         }
         // Крок 10. Перевірити deaths → перемістити в corpses

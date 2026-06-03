@@ -2,6 +2,7 @@ package org.core.raycast;
 
 
 import org.core.collision.Blocker;
+import org.core.enums.RayCastType;
 import org.core.enums.TileType;
 import org.core.geometry.WorldGeometry;
 import org.core.math.Rect;

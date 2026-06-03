@@ -5,7 +5,7 @@ import org.core.entity.Entity;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
-import org.core.raycast.RayCastType;
+import org.core.enums.RayCastType;
 
 import java.util.Set;
 @Getter

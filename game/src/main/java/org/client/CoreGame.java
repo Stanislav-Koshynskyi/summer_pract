@@ -12,10 +12,13 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+import org.content.weapon_behavior.SimpleRayCastBehavior;
 import org.core.data.*;
 import org.core.entity.*;
+import org.core.enums.WeaponType;
 import org.core.state.*;
 import org.core.weapon.Weapon;
+import org.core.weapon.WeaponDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +54,19 @@ public class CoreGame extends ApplicationAdapter {
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
         levelState = new LevelState();
-        Weapon weapon = new Weapon();
+        Weapon weapon = new Weapon(
+                new WeaponDefinition(
+                        "test",
+                        WeaponType.HITSCAN,
+                        1,
+                        100,
+                        1,
+                        10,
+                        false,
+                        false,
+                        new SimpleRayCastBehavior()
+                )
+        );
 
         Player player = new Player(levelData.playerSpawn.x, levelData.playerSpawn.y, 20f, 20f, weapon);
 
