@@ -15,6 +15,10 @@ import lombok.Setter;
 import org.core.data.*;
 import org.core.entity.*;
 import org.core.state.*;
+import org.core.weapon.Weapon;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoreGame extends ApplicationAdapter {
 
@@ -22,7 +26,11 @@ public class CoreGame extends ApplicationAdapter {
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
     private CameraInputController cameraController;
+    private SpriteBatch spriteBatch;
+    @Setter
+    private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
+    private LevelState levelState;
 
     @Override
     public void create() {
@@ -39,6 +47,31 @@ public class CoreGame extends ApplicationAdapter {
 
         //cameraController = new CameraInputController(camera);
         //Gdx.input.setInputProcessor(cameraController);
+
+        LevelTmxLoader levelLoader = new LevelTmxLoader();
+        LevelData levelData = levelLoader.parseMapObjects(map);
+        levelState = new LevelState();
+        Weapon weapon = new Weapon();
+
+        Player player = new Player(levelData.playerSpawn.x, levelData.playerSpawn.y, 20f, 20f, weapon);
+
+        List<Enemy> enemies = new ArrayList<>();
+        List<Door> doors = new ArrayList<>();
+        List<WeaponPickup> pickups = new ArrayList<>();
+
+        levelState.reset(
+                levelData.worldGeometry,
+                player,
+                enemies,
+                doors,
+                pickups,
+                levelData.goalType,
+                levelData.targetEnemyId
+        );
+
+        this.gameStateView = new GameStateView(levelState);
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     @Override
@@ -62,12 +95,25 @@ public class CoreGame extends ApplicationAdapter {
         camera.update();
         renderer.setView(camera);
         renderer.render();
+
+        if (gameStateView != null) {
+            org.core.math.Vec2 playerPos = gameStateView.getPlayerPosition();
+
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(Color.BLACK);
+
+            shapeRenderer.circle(playerPos.x, playerPos.y, 16f);
+
+            shapeRenderer.end();
+        }
     }
 
     @Override
     public void dispose () {
         map.dispose();
         renderer.dispose();
+        shapeRenderer.dispose();
     }
 
 }
