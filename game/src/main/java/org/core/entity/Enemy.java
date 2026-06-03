@@ -1,8 +1,10 @@
 package org.core.entity;
 
 import lombok.Getter;
+import org.core.collision.Blocker;
 import org.core.definition.EnemyProfile;
 import org.core.enums.AIState;
+import org.core.math.Rect;
 import org.core.math.Vec2;
 import org.core.weapon.Weapon;
 
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class Enemy extends Entity implements Damageable{
+public class Enemy extends Entity implements Damageable, Blocker {
     private int hp;
     private boolean alive = true;
     private boolean bodyInvestigated = false;
@@ -56,5 +58,35 @@ public class Enemy extends Entity implements Damageable{
     }
     public void setReactionTimer(float reactionTimer) {
         this.reactionTimer = Math.max(0f, reactionTimer);
+    }
+
+    @Override
+    public Rect getBounds() {
+        return Rect.fromCenter(getX(), getY(), getWidth(), getHeight());
+    }
+
+    @Override
+    public boolean blocksMovement() {
+        return false;
+    }
+
+    @Override
+    public boolean blocksVision() {
+        return true;
+    }
+
+    @Override
+    public boolean blocksProjectile() {
+        return true;
+    }
+
+    @Override
+    public boolean blocksSound() {
+        return false;
+    }
+
+    @Override
+    public float getSoundAttenuationFactor() {
+        return 1;
     }
 }

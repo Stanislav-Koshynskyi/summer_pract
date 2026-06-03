@@ -2,10 +2,12 @@ package org.core.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.core.collision.Blocker;
 import org.core.enums.MovementMode;
+import org.core.math.Rect;
 import org.core.weapon.Weapon;
 
-public class Player extends Entity implements Damageable{
+public class Player extends Entity implements Damageable, Blocker {
 
     @Getter
     private Weapon currentWeapon;
@@ -51,6 +53,35 @@ public class Player extends Entity implements Damageable{
     }
     public boolean isAlive(){
         return isAlive;
+    }
+    @Override
+    public Rect getBounds() {
+        return Rect.fromCenter(getX(), getY(), getWidth(), getHeight());
+    }
+
+    @Override
+    public boolean blocksMovement() {
+        return false;
+    }
+
+    @Override
+    public boolean blocksVision() {
+        return true;
+    }
+
+    @Override
+    public boolean blocksProjectile() {
+        return true;
+    }
+
+    @Override
+    public boolean blocksSound() {
+        return false;
+    }
+
+    @Override
+    public float getSoundAttenuationFactor() {
+        return 1;
     }
 }
 
