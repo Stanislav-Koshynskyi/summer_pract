@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class Enemy extends Entity {
+public class Enemy extends Entity implements Damageable{
     private int hp;
     private boolean alive = true;
     private boolean bodyInvestigated = false;

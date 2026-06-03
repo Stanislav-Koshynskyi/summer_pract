@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.core.enums.MovementMode;
 import org.core.weapon.Weapon;
 
-public class Player extends Entity {
+public class Player extends Entity implements Damageable{
 
     @Getter
     private Weapon currentWeapon;
@@ -21,6 +21,8 @@ public class Player extends Entity {
     @Getter
     private float facingAngle;
 
+    private boolean isAlive;
+
     public Player(float x, float y, float width, float height,
                   Weapon defaultWeapon) {
         super(x, y, width, height);
@@ -28,6 +30,7 @@ public class Player extends Entity {
         this.currentWeapon = defaultWeapon;
         this.movementMode = MovementMode.WALK;
         this.facingAngle = 0f;
+        this.isAlive = true;
     }
 
     public void aimAt(float worldX, float worldY) {
@@ -41,6 +44,13 @@ public class Player extends Entity {
     public void setCurrentWeapon(Weapon weapon) {
         this.currentWeapon = weapon != null ? weapon : defaultWeapon;
     }
-
+    public void applyDamage(int i){
+        if (isAlive){
+            isAlive = false;
+        }
+    }
+    public boolean isAlive(){
+        return isAlive;
+    }
 }
 
