@@ -562,18 +562,19 @@ Read-only wrapper над живими об'єктами core. Безпечний
 
 **Мінімальний список для MVP:**
 
-| Подія | Поля | Використання |
-|---|---|---|
-| `ShotFiredEvent` | `from`, `hitPoint`, `weaponId`, `isSuppressed` | лінія пострілу (рендер кілька кадрів) + звук пострілу |
-| `EnemyDiedEvent` | `position`, `enemyId` | анімація смерті + звук смерті |
-| `SilentKillEvent` | `position` | анімація тихого вбивства + тихий звук |
-| `PlayerDiedEvent` | `position` | death flash + звук + тригер GameOverScreen |
-| `DoorStateChangedEvent` | `doorId`, `newState` | анімація дверей + звук відкриття/закриття |
-| `FootstepEvent` | `position`, `movementMode`, `isPlayer` | звук кроку + опціонально пилова анімація |
-| `WeaponPickedUpEvent` | `weaponId`, `position` | звук підбору + flash на HUD |
-| `WeaponDroppedEvent` | `weaponId`, `position`, `isEmpty` | звук дропу; `isEmpty` для візуальної відмінності |
-| `EnemyAlertedEvent` | `enemyId`, `position`, `newState` | `"!"` або `"?"` над ворогом + alert звук |
-| `LevelCompletedEvent` | `outcome` | тригер ResultScreen |
+| Подія                   | Поля                                           | Використання |
+|-------------------------|------------------------------------------------|---|
+| `ShotFiredEvent`        | `from`, `hitPoint`, `weaponId`, `isSuppressed` | лінія пострілу (рендер кілька кадрів) + звук пострілу |
+| `MeleeAttackEvent`      | `attackerX`, `attackerY`, `directionDeg`, `weaponId`, `hitPoints` | анімація ближнього бою + звук |
+| `EnemyDiedEvent`        | `position`, `enemyId`                          | анімація смерті + звук смерті |
+| `SilentKillEvent`       | `position`                                     | анімація тихого вбивства + тихий звук |
+| `PlayerDiedEvent`       | `position`                                     | death flash + звук + тригер GameOverScreen |
+| `DoorStateChangedEvent` | `doorId`, `newState`                           | анімація дверей + звук відкриття/закриття |
+| `FootstepEvent`         | `position`, `movementMode`, `isPlayer`         | звук кроку + опціонально пилова анімація |
+| `WeaponPickedUpEvent`   | `weaponId`, `position`                         | звук підбору + flash на HUD |
+| `WeaponDroppedEvent`    | `weaponId`, `position`, `isEmpty`              | звук дропу; `isEmpty` для візуальної відмінності |
+| `EnemyAlertedEvent`     | `enemyId`, `position`, `newState`              | `"!"` або `"?"` над ворогом + alert звук |
+| `LevelCompletedEvent`   | `outcome`                                      | тригер ResultScreen |
 
 **Правило розподілу подій vs GameStateView:**
 - `GameEvent` — для одноразових ефектів що живуть кілька кадрів (звук, спалах, лінія пострілу, іконка над головою)
