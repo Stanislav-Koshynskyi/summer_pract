@@ -16,11 +16,14 @@ public class EnemyProfile {
     private final float aimMemoryDuration;
     private final float preferredAttackRange;
     private final AimBehaviorType aimBehaviorType;
+    private final float patrolFovAngle;
+    private final float alertFovAngle;
 
     public EnemyProfile(String enemyTypeId, int hp, float patrolSpeed,
                         float chaseSpeed, float visionRange, float reactionTime,
                         float shotCommitDuration, float aimMemoryDuration,
-                        float preferredAttackRange, AimBehaviorType aimBehaviorType) {
+                        float preferredAttackRange, AimBehaviorType aimBehaviorType, float patrolFovAngle,
+                        float alertFovAngle) {
         this.enemyTypeId = enemyTypeId;
         this.hp = hp;
         this.patrolSpeed = patrolSpeed;
@@ -31,5 +34,7 @@ public class EnemyProfile {
         this.aimMemoryDuration = aimMemoryDuration;
         this.preferredAttackRange = preferredAttackRange;
         this.aimBehaviorType = aimBehaviorType;
+        this.patrolFovAngle = patrolFovAngle;
+        this.alertFovAngle = alertFovAngle;
     }
 }
