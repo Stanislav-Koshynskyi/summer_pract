@@ -1,17 +1,20 @@
 package org.core.event;
 
+import org.core.math.Vec2;
+
+import java.util.List;
+
 public class ShotFiredEvent extends GameEvent {
     public float fromX, fromY;
-    public float hitPointX, hitPointY;
     public String weaponId;
+    List<Vec2> targets;
     public boolean isSuppressed;
 
-    public ShotFiredEvent(float fromX, float fromY, float hitPointX, float hitPointY,
+    public ShotFiredEvent(float fromX, float fromY, List<Vec2> targets,
                          String weaponId, boolean isSuppressed) {
         this.fromX = fromX;
         this.fromY = fromY;
-        this.hitPointX = hitPointX;
-        this.hitPointY = hitPointY;
+        this.targets = targets;
         this.weaponId = weaponId;
         this.isSuppressed = isSuppressed;
     }
