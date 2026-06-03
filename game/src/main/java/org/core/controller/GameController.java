@@ -144,7 +144,9 @@ public class GameController {
                         weapon.getDefinition().getDamage()
                 );
                 List<GameEvent> events = weaponSystem.useWeapon(context, weapon);
-                levelState.getGameEvents().addAll(events);
+                for (GameEvent e : events){
+                    levelState.addGameEvent(e);
+                }
             }
             pendingShoot = false;
         }
