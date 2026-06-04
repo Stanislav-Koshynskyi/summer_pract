@@ -2,6 +2,7 @@ package org.client;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,15 +11,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
-import org.content.weapon_behavior.SimpleRayCastBehavior;
+import org.core.controller.GameController;
 import org.core.data.*;
+import org.core.definition.EnemyProfile;
 import org.core.entity.*;
-import org.core.enums.WeaponType;
+import org.core.enums.AimBehaviorType;
+import org.core.raycast.RayCastSystem;
 import org.core.state.*;
-import org.core.weapon.Weapon;
-import org.core.weapon.WeaponDefinition;
+import org.core.weapon.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +37,8 @@ public class CoreGame extends ApplicationAdapter {
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
     private LevelState levelState;
+    private GameController gameController;
+    private final Vector3 mouseInWorld = new Vector3();
 
     @Override
     public void create() {
@@ -51,40 +56,37 @@ public class CoreGame extends ApplicationAdapter {
         //cameraController = new CameraInputController(camera);
         //Gdx.input.setInputProcessor(cameraController);
 
+        // тестовий профіль, щоб програма не падала
+        EnemyProfile testEnemyProfile = new EnemyProfile(
+                "1",
+                100,
+                120f,
+                220f,
+                300f,
+                0.5f,
+                0.4f,
+                3.0f,
+                200f,
+                AimBehaviorType.values()[0],
+                90f,
+                130f,
+                16f,
+                16f,
+                23f
+        );
+
+        WeaponSystem weaponSystem = new WeaponSystem();
+        RayCastSystem rayCastSystem = new RayCastSystem(null, null);
+
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
         levelState = new LevelState();
-        Weapon weapon = new Weapon(
-                new WeaponDefinition(
-                        "test",
-                        WeaponType.HITSCAN,
-                        1,
-                        100,
-                        1,
-                        10,
-                        false,
-                        false,
-                        new SimpleRayCastBehavior()
-                )
-        );
 
-        Player player = new Player(levelData.playerSpawn.x, levelData.playerSpawn.y, 20f, 20f, weapon);
+        gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem,
+                rayCastSystem);
+        gameController.loadLevel(levelData);
 
-        List<Enemy> enemies = new ArrayList<>();
-        List<Door> doors = new ArrayList<>();
-        List<WeaponPickup> pickups = new ArrayList<>();
-
-        levelState.reset(
-                levelData.worldGeometry,
-                player,
-                enemies,
-                doors,
-                pickups,
-                levelData.goalType,
-                levelData.targetEnemyId
-        );
-
-        this.gameStateView = new GameStateView(levelState);
+        this.gameStateView = gameController.getStateView();
 
         shapeRenderer = new ShapeRenderer();
     }
@@ -101,7 +103,23 @@ public class CoreGame extends ApplicationAdapter {
     }
 
     private void logic() {
-        // Placeholder
+        if (gameController == null) return;
+
+        float speed = 200f;
+        float dt = Gdx.graphics.getDeltaTime();
+        float dx = 0f;
+        float dy = 0f;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * dt;
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) dy -= speed * dt;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) dx += speed * dt;
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) dx -= speed * dt;
+
+        gameController.movePlayer(dx, dy);
+        mouseInWorld.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        camera.unproject(mouseInWorld);
+        gameController.aimPlayer(mouseInWorld.x, mouseInWorld.y);
+        gameController.update(Gdx.graphics.getDeltaTime());
     }
 
     private void draw() {
@@ -119,7 +137,24 @@ public class CoreGame extends ApplicationAdapter {
             shapeRenderer.setColor(Color.BLACK);
 
             shapeRenderer.circle(playerPos.x, playerPos.y, 16f);
+            shapeRenderer.end();
 
+            float dirX = mouseInWorld.x - playerPos.x;
+            float dirY = mouseInWorld.y - playerPos.y;
+            float distance = (float) Math.sqrt(dirX * dirX + dirY * dirY);
+
+            if (distance > 0) {
+                dirX /= distance;
+                dirY /= distance;
+            }
+
+            float laserLength = 400f;
+            float targetX = playerPos.x + dirX * laserLength;
+            float targetY = playerPos.y + dirY * laserLength;
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.RED);
+            shapeRenderer.line(playerPos.x, playerPos.y, targetX, targetY);
             shapeRenderer.end();
         }
     }
