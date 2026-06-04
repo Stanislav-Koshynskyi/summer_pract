@@ -9,4 +9,5 @@ public interface Blocker {
     boolean blocksProjectile();
     boolean blocksSound();
     float getSoundAttenuationFactor();
+    default float getPathCost() { return 0f; }
 }
