@@ -72,18 +72,17 @@ public class CoreGame extends ApplicationAdapter {
                 130f,
                 16f,
                 16f,
-                23f
+                23f,
+                123f
         );
 
         WeaponSystem weaponSystem = new WeaponSystem();
-        RayCastSystem rayCastSystem = new RayCastSystem(null, null);
 
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
         levelState = new LevelState();
 
-        gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem,
-                rayCastSystem);
+        gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
         gameController.loadLevel(levelData);
 
         this.gameStateView = gameController.getStateView();

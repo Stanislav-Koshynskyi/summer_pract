@@ -21,13 +21,15 @@ public class EnemyProfile {
     private final float width;
     private final float height;
     private final float closeRevealRadius;
+    private final float turnRate; // градусів за секунду
 
 
     public EnemyProfile(String enemyTypeId, int hp, float patrolSpeed,
                         float chaseSpeed, float visionRange, float reactionTime,
                         float shotCommitDuration, float aimMemoryDuration,
                         float preferredAttackRange, AimBehaviorType aimBehaviorType, float patrolFovAngle,
-                        float alertFovAngle, float width, float height, float closeRevealRadius) {
+                        float alertFovAngle, float width, float height, float closeRevealRadius,
+                        float turnRate) {
         this.enemyTypeId = enemyTypeId;
         this.hp = hp;
         this.patrolSpeed = patrolSpeed;
@@ -43,5 +45,6 @@ public class EnemyProfile {
         this.width = width;
         this.height = height;
         this.closeRevealRadius = closeRevealRadius;
+        this.turnRate = turnRate;
     }
 }

@@ -11,6 +11,7 @@ import org.core.weapon.Weapon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 public class Enemy extends Entity implements Damageable, Blocker {
@@ -35,10 +36,22 @@ public class Enemy extends Entity implements Damageable, Blocker {
     private float knockbackVelocityX, knockbackVelocityY;
     @Setter
     private float lastKnownPlayerX, lastKnownPlayerY;
+    @Getter
+    @Setter
     private List<Vec2> currentPath;
+    private final List<Vec2> patrolPath;
 
-    public Enemy(float x, float y, float width, float height,
-                 EnemyProfile profile, Weapon weapon, String enemyId) {
+    @Getter
+    @Setter
+    private float intendedDx, intendedDy;
+    @Getter
+    @Setter
+    private float searchAngle;
+    @Getter
+    @Setter
+    private int currentPatrolIndex = 0;
+
+    public Enemy(float x, float y, float width, float height, EnemyProfile profile, Weapon weapon, String enemyId, List<Vec2> patrolPath) {
         super(x, y, width, height);
         this.profile = profile;
         this.hp = profile.getHp();
@@ -48,17 +61,21 @@ public class Enemy extends Entity implements Damageable, Blocker {
         this.bodyInvestigated = false;
         this.currentState = AIState.PATROL;
         this.facingAngle = 0f;
-        this.currentPath = new ArrayList<>();
+        this.patrolPath = patrolPath;
+        this.currentPath = new ArrayList<>(patrolPath);
     }
-    public void applyDamage(int damage){
+
+    public void applyDamage(int damage) {
         hp = Math.max(0, hp - damage);
         if (hp == 0) {
             alive = false;
         }
     }
+
     public void changeState(AIState state) {
         currentState = state;
     }
+
     public void setReactionTimer(float reactionTimer) {
         this.reactionTimer = Math.max(0f, reactionTimer);
     }
@@ -92,39 +109,75 @@ public class Enemy extends Entity implements Damageable, Blocker {
     public float getSoundAttenuationFactor() {
         return 1;
     }
+
     public float getCurrentFovAngle() {
         return currentState == AIState.PATROL ? profile.getPatrolFovAngle() : profile.getAlertFovAngle();
     }
-    public void updateReactionTimer(float delta){
+
+    public void updateReactionTimer(float delta) {
         reactionTimer -= delta;
     }
-    public void updateAimMemoryTimer(float delta){
+
+    public void updateAimMemoryTimer(float delta) {
         aimMemoryTimer -= delta;
     }
-    public void updateShotCommitTimer(float delta){
+
+    public void updateShotCommitTimer(float delta) {
         shotCommitTimer -= delta;
     }
-    public boolean isReactionTimer(){
+
+    public boolean isReactionTimer() {
         return reactionTimer <= 0;
     }
-    public boolean isAimMemoryTimer(){
+
+    public boolean isAimMemoryTimer() {
         return aimMemoryTimer <= 0;
     }
-    public boolean isShotCommitTimer(){
+
+    public boolean isShotCommitTimer() {
         return shotCommitTimer <= 0;
     }
-    public void resetReactionTimer(){
+
+    public void resetReactionTimer() {
         reactionTimer = profile.getReactionTime();
     }
-    public void resetAimMemoryTimer(){
+
+    public void resetAimMemoryTimer() {
         aimMemoryTimer = profile.getAimMemoryDuration();
     }
-    public void resetShotCommitTimer(){
+
+    public void resetShotCommitTimer() {
         shotCommitTimer = profile.getShotCommitDuration();
     }
-    public void setLastKnownPlayerPosition(float x, float y){
+
+    public void setLastKnownPlayerPosition(float x, float y) {
         lastKnownPlayerX = x;
         lastKnownPlayerY = y;
     }
 
+    public void rotateTowards(float targetAngleDeg, float delta) {
+        float diff = Vec2.angleDiff(this.facingAngle, targetAngleDeg);
+        float maxTurn = profile.getTurnRate() * delta;
+        if (Math.abs(diff) <= maxTurn) {
+            this.facingAngle = targetAngleDeg;
+        } else {
+            this.facingAngle += Math.signum(diff) * maxTurn;
+        }
+        facingAngle = facingAngle % 360;
+        if (facingAngle > 180)
+            facingAngle -= 360;
+        else if (facingAngle < -180)
+            facingAngle += 360;
+    }
+    public void setIntendMove(float dx, float dy){
+        intendedDx = dx;
+        intendedDy = dy;
+    }
+    public Vec2 getCurrentPatrolTarget(){
+        if (patrolPath.isEmpty()) return null;
+        return patrolPath.get(currentPatrolIndex % patrolPath.size());
+    }
+    public void goToNextPatrolPoint(){
+        currentPatrolIndex++;
+    }
 }

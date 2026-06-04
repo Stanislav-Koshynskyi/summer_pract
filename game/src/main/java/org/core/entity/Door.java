@@ -2,11 +2,12 @@ package org.core.entity;
 
 import lombok.Getter;
 import org.core.collision.Blocker;
+import org.core.collision.PathBlocker;
 import org.core.enums.DoorState;
 import org.core.math.Rect;
 
 @Getter
-public class Door extends Entity implements Blocker {
+public class Door extends Entity implements PathBlocker {
     public static final float DEFAULT_OPENING_DURATION      = 0.35f;
     public static final float DEFAULT_SOUND_ATTENUATION     = 0.33f; // CLOSED блокує звук
 
@@ -72,5 +73,26 @@ public class Door extends Entity implements Blocker {
     public String toString() {
         return String.format("Door(id=%s, state=%s, pos=(%.0f,%.0f), size=(%.0f,%.0f))",
                 doorId, state, getX(), getY(), getWidth(), getHeight());
+    }
+
+    @Override
+    public boolean isTraversable() {
+        return state != DoorState.LOCKED;
+    }
+
+    @Override
+    public float getPathCost() {
+        switch (state) {
+            case LOCKED -> {
+                return Float.POSITIVE_INFINITY;
+            }
+            case CLOSED, OPENING -> {
+                return 5f;
+            }
+            case null, default ->
+            {
+                return 1f;
+            }
+        }
     }
 }

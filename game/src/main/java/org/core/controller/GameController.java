@@ -3,6 +3,9 @@ package org.core.controller;
 import java.util.*;
 
 import lombok.Getter;
+import org.core.ai.EnemyAI;
+import org.core.ai.PathFinder;
+import org.core.ai.VisionSystem;
 import org.core.behavior.WeaponBehavior;
 import org.core.collision.Blocker;
 import org.core.collision.CollisionSystem;
@@ -12,6 +15,7 @@ import org.core.entity.*;
 import org.core.enums.*;
 import org.core.event.*;
 
+import org.core.geometry.WorldGeometry;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
@@ -36,7 +40,11 @@ public class GameController {
     private boolean pendingInteract;
     private MovementMode pendingMovementMode;
     private final WeaponSystem weaponSystem;
-    private final RayCastSystem rayCastSystem;
+    private RayCastSystem rayCastSystem;
+
+    private VisionSystem visionSystem;
+    private EnemyAI enemyAI;
+    private PathFinder pathfinder;
 
     private final Object weaponRegistry;
     private final Object enemyProfileRegistry;
@@ -44,18 +52,46 @@ public class GameController {
 
     public GameController(Object weaponRegistry,
                           Object enemyProfileRegistry,
-                          Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem,
-                          RayCastSystem rayCastSystem) {
+                          Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem) {
         this.weaponRegistry = weaponRegistry;
         this.enemyProfileRegistry = enemyProfileRegistry;
         this.aimBehaviors = aimBehaviors;
         this.pendingMovementMode = MovementMode.WALK;
         this.weaponSystem = weaponSystem;
-        this.rayCastSystem = rayCastSystem;
     }
 
 
     public void loadLevel(LevelData data) {
+
+        List<Door> doors = new ArrayList<>();
+        List<Blocker> blockers = new ArrayList<>();
+
+        for (DoorData dd : data.doors) {
+            Door door = new Door(dd.doorId, dd.x, dd.y, dd.width, dd.height, dd.initialState);
+            doors.add(door);
+            blockers.add(door);
+        }
+        // поки заглушка, потім обробити з спавнпойнтів
+        List<Enemy> enemies = new ArrayList<>();
+        for (EnemySpawnData d : data.enemySpawns){
+            enemies.add(
+                    new Enemy(
+                            d.x, d.y, 16f, 16f,
+                            (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
+                            null, // заглушка, потім дістанемо зброю за id
+                            d.enemyId,
+                            List.of()
+                    ));
+        }
+
+        // сейм
+        List<WeaponPickup> pickups = new ArrayList<>();
+        for (WeaponPickupData w: data.weaponPickups){
+            pickups.add(new WeaponPickup(
+                w.x, w.y, "test", null, false, "test"
+            ));
+        }
+        rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
         WeaponBehavior weaponBehavior = new WeaponBehavior() {
             @Override
             public List<RayCastResult> fire(WeaponFireContext context) {
@@ -75,37 +111,9 @@ public class GameController {
                         false,
                         false,
                         weaponBehavior
-                        ))
+                ))
         );
         player.setMovementMode(pendingMovementMode);
-
-        List<Door> doors = new ArrayList<>();
-        List<Blocker> blockers = new ArrayList<>();
-
-        for (DoorData dd : data.doors) {
-            Door door = new Door(dd.doorId, dd.x, dd.y, dd.width, dd.height, dd.initialState);
-            doors.add(door);
-            blockers.add(door);
-        }
-        // поки заглушка, потім обробити з спавнпойнтів
-        List<Enemy> enemies = new ArrayList<>();
-        for (EnemySpawnData d : data.enemySpawns){
-            enemies.add(
-                    new Enemy(
-                            d.x, d.y, 16f, 16f,
-                            (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
-                            null, // заглушка, потім дістанемо зброю за id
-                            d.enemyId
-                    ));
-        }
-
-        // сейм
-        List<WeaponPickup> pickups = new ArrayList<>();
-        for (WeaponPickupData w: data.weaponPickups){
-            pickups.add(new WeaponPickup(
-                w.x, w.y, "test", null, false, "test"
-            ));
-        }
 
         GoalType goalType = data.goalType;
         if (levelState == null) {
@@ -118,7 +126,14 @@ public class GameController {
 
         stateView = new GameStateView(levelState);
 
+
+        visionSystem = new VisionSystem(rayCastSystem, data.worldGeometry);
+        pathfinder = new PathFinder(data.worldGeometry, collisionSystem, blockers);
+        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder);
         clearPendingCommands();
+
+
+
     }
 
     public void update(float delta) {
@@ -143,9 +158,13 @@ public class GameController {
         // Крок 3. FootstepEmitter – згенерувати footstep SoundEvents
         // Крок 4. HearingSystem – обробити SoundEventQueue
         // Крок 5. VisionSystem – оновити видимість
-        // Крок 6. EnemyAI – оновити FSM, path target, movement intent і fire requests
 
-        // Крок 7. CollisionSystem – застосувати player/enemy movement і knockback
+        enemyAI.update(delta);
+
+
+        for (Enemy enemy: levelState.getEnemies()){
+            collisionSystem.move(enemy, enemy.getIntendedDx(), enemy.getIntendedDy());
+        }
 
         if (pendingDx != 0f || pendingDy != 0f) {
             collisionSystem.move(player, pendingDx, pendingDy);
