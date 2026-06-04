@@ -3,6 +3,7 @@ package org.core.controller;
 import java.util.*;
 
 import lombok.Getter;
+import org.core.behavior.WeaponBehavior;
 import org.core.collision.Blocker;
 import org.core.collision.CollisionSystem;
 import org.core.data.*;
@@ -12,10 +13,12 @@ import org.core.enums.*;
 import org.core.event.*;
 
 import org.core.math.Vec2;
+import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
 import org.core.weapon.Weapon;
+import org.core.weapon.WeaponDefinition;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
 
@@ -53,10 +56,26 @@ public class GameController {
 
 
     public void loadLevel(LevelData data) {
+        WeaponBehavior weaponBehavior = new WeaponBehavior() {
+            @Override
+            public List<RayCastResult> fire(WeaponFireContext context) {
+                return List.of();
+            }
+        };
         Player player = new Player(
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
-                null // defaultWeapon буде підставлено пізніше, коли з'явиться WeaponRegistry
+                new Weapon(new WeaponDefinition(
+                        "1",
+                        WeaponType.MELEE,
+                        20,
+                        20f,
+                        20f,
+                        12,
+                        false,
+                        false,
+                        weaponBehavior
+                        ))
         );
         player.setMovementMode(pendingMovementMode);
 
