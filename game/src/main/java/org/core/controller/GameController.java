@@ -83,6 +83,7 @@ public class GameController {
                             List.of()
                     ));
         }
+        blockers.addAll(enemies);
 
         // сейм
         List<WeaponPickup> pickups = new ArrayList<>();
@@ -114,6 +115,7 @@ public class GameController {
                 ))
         );
         player.setMovementMode(pendingMovementMode);
+        blockers.add(player);
 
         GoalType goalType = data.goalType;
         if (levelState == null) {
