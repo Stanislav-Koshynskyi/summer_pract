@@ -1,6 +1,7 @@
 package org.core.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.core.collision.Blocker;
 import org.core.definition.EnemyProfile;
 import org.core.enums.AIState;
@@ -24,13 +25,15 @@ public class Enemy extends Entity implements Damageable, Blocker {
 
     private AIState currentState;
     private float facingAngle;
-
+    @Setter
     private float reactionTimer;
+    @Setter
     private float aimMemoryTimer;
+    @Setter
     private float shotCommitTimer;
-
+    @Setter
     private float knockbackVelocityX, knockbackVelocityY;
-
+    @Setter
     private float lastKnownPlayerX, lastKnownPlayerY;
     private List<Vec2> currentPath;
 
@@ -89,4 +92,39 @@ public class Enemy extends Entity implements Damageable, Blocker {
     public float getSoundAttenuationFactor() {
         return 1;
     }
+    public float getCurrentFovAngle() {
+        return currentState == AIState.PATROL ? profile.getPatrolFovAngle() : profile.getAlertFovAngle();
+    }
+    public void updateReactionTimer(float delta){
+        reactionTimer -= delta;
+    }
+    public void updateAimMemoryTimer(float delta){
+        aimMemoryTimer -= delta;
+    }
+    public void updateShotCommitTimer(float delta){
+        shotCommitTimer -= delta;
+    }
+    public boolean isReactionTimer(){
+        return reactionTimer <= 0;
+    }
+    public boolean isAimMemoryTimer(){
+        return aimMemoryTimer <= 0;
+    }
+    public boolean isShotCommitTimer(){
+        return shotCommitTimer <= 0;
+    }
+    public void resetReactionTimer(){
+        reactionTimer = profile.getReactionTime();
+    }
+    public void resetAimMemoryTimer(){
+        aimMemoryTimer = profile.getAimMemoryDuration();
+    }
+    public void resetShotCommitTimer(){
+        shotCommitTimer = profile.getShotCommitDuration();
+    }
+    public void setLastKnownPlayerPosition(float x, float y){
+        lastKnownPlayerX = x;
+        lastKnownPlayerY = y;
+    }
+
 }
