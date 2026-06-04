@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.core.collision.Blocker;
 import org.core.collision.CollisionSystem;
 import org.core.data.*;
+import org.core.definition.EnemyProfile;
 import org.core.entity.*;
 import org.core.enums.*;
 import org.core.event.*;
@@ -69,9 +70,23 @@ public class GameController {
         }
         // поки заглушка, потім обробити з спавнпойнтів
         List<Enemy> enemies = new ArrayList<>();
+        for (EnemySpawnData d : data.enemySpawns){
+            enemies.add(
+                    new Enemy(
+                            d.x, d.y, 16f, 16f,
+                            (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
+                            null, // заглушка, потім дістанемо зброю за id
+                            d.enemyId
+                    ));
+        }
 
         // сейм
         List<WeaponPickup> pickups = new ArrayList<>();
+        for (WeaponPickupData w: data.weaponPickups){
+            pickups.add(new WeaponPickup(
+                w.x, w.y, "test", null, false, "test"
+            ));
+        }
 
         GoalType goalType = data.goalType;
         if (levelState == null) {

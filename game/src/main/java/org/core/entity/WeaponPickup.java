@@ -9,10 +9,11 @@ public class WeaponPickup extends Entity {
     private final String weaponId;
     private final Weapon weapon;
     private final boolean isEmpty;
+    private final static float DEFAULT_SIZE = 20f;
 
-    public WeaponPickup(float x, float y, float width, float height,
+    public WeaponPickup(float x, float y,
                        String weaponId, Weapon weapon, boolean isEmpty, String pickupId) {
-        super(x, y, width, height);
+        super(x, y, DEFAULT_SIZE, DEFAULT_SIZE);
         this.weaponId = weaponId;
         this.weapon = weapon;
         this.isEmpty = isEmpty;
