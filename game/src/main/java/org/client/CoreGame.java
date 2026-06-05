@@ -130,6 +130,8 @@ public class CoreGame extends ApplicationAdapter {
     private void draw() {
         ScreenUtils.clear(Color.BLUE);
 
+        camera.position.x = Math.round(camera.position.x);
+        camera.position.y = Math.round(camera.position.y);
         camera.update();
         renderer.setView(camera);
         renderer.render();
