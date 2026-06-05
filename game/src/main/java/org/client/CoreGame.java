@@ -133,6 +133,9 @@ public class CoreGame extends ApplicationAdapter {
         if (gameStateView != null) {
             Vec2 playerPos = gameStateView.getPlayerPosition();
 
+            // Камера
+            camera.position.set(playerPos.x, playerPos.y, 0);
+
             // Гравець
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
