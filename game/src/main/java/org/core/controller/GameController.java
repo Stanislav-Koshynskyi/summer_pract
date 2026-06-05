@@ -3,6 +3,7 @@ package org.core.controller;
 import java.util.*;
 
 import lombok.Getter;
+import org.content.weapon_behavior.SimpleRayCastBehavior;
 import org.core.ai.EnemyAI;
 import org.core.ai.PathFinder;
 import org.core.ai.VisionSystem;
@@ -93,25 +94,19 @@ public class GameController {
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
-        WeaponBehavior weaponBehavior = new WeaponBehavior() {
-            @Override
-            public List<RayCastResult> fire(WeaponFireContext context) {
-                return List.of();
-            }
-        };
         Player player = new Player(
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
                 new Weapon(new WeaponDefinition(
                         "1",
-                        WeaponType.MELEE,
-                        20,
-                        20f,
-                        20f,
-                        12,
+                        WeaponType.HITSCAN,
+                        100,
+                        2000f,
+                        1f,
+                        100,
                         false,
                         false,
-                        weaponBehavior
+                        new SimpleRayCastBehavior()
                 ))
         );
         player.setMovementMode(pendingMovementMode);
