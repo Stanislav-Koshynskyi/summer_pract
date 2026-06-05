@@ -99,7 +99,7 @@ public class LevelTmxLoader {
                     String enemy = String.valueOf(enemyId);
 
                     EnemySpawnData enemyData = new EnemySpawnData(
-                            worldX, worldY, enemyType, weapon, patrolPath, facingAngleDegrees, enemy
+                            worldX, worldY + 200f, enemyType, weapon, patrolPath, facingAngleDegrees, enemy
                     );
                     enemySpawns.add(enemyData);
                 }

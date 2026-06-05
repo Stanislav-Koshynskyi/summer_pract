@@ -306,4 +306,11 @@ public class GameController {
         pendingShoot = false;
         pendingInteract = false;
     }
+
+    public List<Enemy> getEnemies() {
+        if (levelState != null && levelState.getEnemies() != null) {
+            return levelState.getEnemies();
+        }
+        return Collections.emptyList();
+    }
 }
