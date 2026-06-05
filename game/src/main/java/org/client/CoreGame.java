@@ -48,7 +48,7 @@ public class CoreGame extends ApplicationAdapter {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        map = new TmxMapLoader().load("maps/tests/test.tmx");
+        map = new TmxMapLoader().load("maps/tests/waypointTest.tmx");
         float unitScale = 1f;
         renderer = new OrthogonalTiledMapRenderer(map, unitScale);
 

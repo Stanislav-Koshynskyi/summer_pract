@@ -163,6 +163,18 @@ public class LevelTmxLoader {
 
                     exits.add(exitData);
                 }
+
+                if (objectType.equals("Waypoint")) {
+                    int pathId = objectProps.get("pathId", Integer.class);
+                    int order = objectProps.get("order", Integer.class);
+
+                    String path = String.valueOf(pathId);
+
+                    WaypointData waypointData = new WaypointData(
+                            path, order, worldX, worldY
+                    );
+                    waypoints.add(waypointData);
+                }
             }
         }
         return new LevelData(
