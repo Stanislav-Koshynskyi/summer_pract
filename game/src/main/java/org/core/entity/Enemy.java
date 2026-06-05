@@ -109,6 +109,8 @@ public class Enemy extends Entity implements Damageable, Blocker {
     public float getSoundAttenuationFactor() {
         return 1;
     }
+    @Setter
+    private boolean shotCommitStarted = false;
 
     public float getCurrentFovAngle() {
         switch (currentState){
@@ -190,5 +192,11 @@ public class Enemy extends Entity implements Damageable, Blocker {
     }
     public void goToNextPatrolPoint(){
         currentPatrolIndex++;
+    }
+    public boolean isShotCommitReady() {
+        return shotCommitTimer <= 0;
+    }
+    public boolean isShotCommitStarted(){
+        return shotCommitStarted;
     }
 }

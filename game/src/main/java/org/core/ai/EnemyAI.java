@@ -1,11 +1,18 @@
 package org.core.ai;
 
-import org.core.collision.PathBlocker;
+import org.core.behavior.AimBehavior;
 import org.core.entity.Enemy;
 import org.core.entity.Entity;
 import org.core.entity.Player;
 import org.core.enums.AIState;
+import org.core.enums.AimBehaviorType;
+import org.core.enums.WeaponType;
+import org.core.event.GameEvent;
 import org.core.math.Vec2;
+import org.core.raycast.RayCastSystem;
+import org.core.weapon.Weapon;
+import org.core.weapon.WeaponFireContext;
+import org.core.weapon.WeaponSystem;
 
 import java.util.*;
 
@@ -26,16 +33,24 @@ public class EnemyAI {
     private final List<Enemy> enemies;
     private final Player player;
     private final PathFinder pathfinder;
+    private final WeaponSystem weaponSystem;
+    private final RayCastSystem rayCastSystem;
+    private final Map<AimBehaviorType, AimBehavior> aimBehaviors;
 
-    public EnemyAI(VisionSystem visionSystem, List<Enemy> enemies, Player player, PathFinder pathfinder) {
+    public EnemyAI(VisionSystem visionSystem, List<Enemy> enemies, Player player, PathFinder pathfinder,
+                   WeaponSystem weaponSystem, RayCastSystem rayCastSystem, Map<AimBehaviorType, AimBehavior> aimBehaviors) {
         this.visionSystem = visionSystem;
         this.enemies = enemies;
         this.player = player;
         this.pathfinder = pathfinder;
+        this.weaponSystem = weaponSystem;
+        this.rayCastSystem = rayCastSystem;
+        this.aimBehaviors = aimBehaviors;
     }
 
-    public void update(float delta) {
+    public List<GameEvent> update(float delta) {
         Set<Entity> ignoredEntities = new HashSet<>(enemies);
+        List<GameEvent> events = new ArrayList<>();
         for (Enemy enemy : enemies) {
             if (!enemy.isAlive()) continue;
 
@@ -43,8 +58,9 @@ public class EnemyAI {
 
             boolean seesPlayer = visionSystem.canEnemySeePlayer(enemy, player, ignoredEntities);
 
-            processState(enemy, seesPlayer, delta);
+            processState(enemy, seesPlayer, delta, events);
         }
+        return events;
     }
 
     private void updateTimers(Enemy enemy, float delta) {
@@ -56,23 +72,23 @@ public class EnemyAI {
         }
     }
 
-    private void processState(Enemy enemy, boolean seesPlayer, float delta) {
+    private void processState(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         switch (enemy.getCurrentState()) {
-            case PATROL -> updatePatrol(enemy, seesPlayer, delta);
-            case ATTACK -> updateAttack(enemy, seesPlayer, delta);
-            case SEARCH -> updateSearch(enemy, seesPlayer, delta);
-            case INVESTIGATE -> updateInvestigate(enemy, seesPlayer, delta);
+            case PATROL -> updatePatrol(enemy, seesPlayer, delta, events);
+            case ATTACK -> updateAttack(enemy, seesPlayer, delta, events);
+            case SEARCH -> updateSearch(enemy, seesPlayer, delta, events);
+            case INVESTIGATE -> updateInvestigate(enemy, seesPlayer, delta, events);
         }
     }
 
-    private void updateInvestigate(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updateInvestigate(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             enterAttack(enemy);
             return;
         }
 
         if (!enemy.getCurrentPath().isEmpty()) {
-            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true);
+            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, true);
             if (enemy.getCurrentPath().isEmpty()) {
                 enemy.resetAimMemoryTimer();
             }
@@ -86,19 +102,19 @@ public class EnemyAI {
         performSearchRotation(enemy, delta);
     }
 
-    private void updatePatrol(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updatePatrol(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             enterAttack(enemy);
             return;
         }
-        if (enemy.getCurrentPath().isEmpty()){
+        if (enemy.getCurrentPath().isEmpty()) {
             goToNextPatrolPoint(enemy);
         }
 
-        moveAlongPath(enemy, enemy.getProfile().getPatrolSpeed(), delta, false);
+        moveAlongPath(enemy, enemy.getProfile().getPatrolSpeed(), delta, false, true);
     }
 
-    private void updateAttack(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (!seesPlayer) {
             // Гравець зник
             enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
@@ -108,25 +124,66 @@ public class EnemyAI {
             if (!path.isEmpty()) enemy.setCurrentPath(path);
             return;
         }
-
-        if (enemy.isReactionTimer()) {
-
-            // TODO: стрільба
-        }
+        AimBehavior behavior = aimBehaviors.get(enemy.getProfile().getAimBehaviorType());
+        if (behavior != null) {
+            behavior.updateAim(enemy, player, delta);
+            }
         updatePathToPlayer(enemy, delta);
-        moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true);
-    }
+        moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, false);
 
-    private void updateSearch(Enemy enemy, boolean seesPlayer, float delta) {
+        float distToPlayer = new Vec2(enemy.getX(), enemy.getY())
+                .distanceTo(player.getX(), player.getY());
+
+        float maxAttackDist = Math.min(
+                enemy.getProfile().getPreferredAttackRange(),
+                enemy.getCurrentWeapon().getDefinition().getRange()
+        );
+        // стріляємо тільки якщо є шанс попасти, тобто якщо гравець не задалеко
+        if (distToPlayer > maxAttackDist) {
+            enemy.setShotCommitStarted(false);
+            return;
+        }
+
+
+
+        Weapon weapon = enemy.getCurrentWeapon();
+        if (weapon == null || !weapon.canFire()) return;
+        if (!enemy.isReactionTimer()) return;
+
+        if (!enemy.isShotCommitStarted()) {
+            // зафіксували ціль
+            enemy.resetShotCommitTimer();
+            enemy.setShotCommitStarted(true);
+            return;
+        }
+        if (!enemy.isShotCommitTimer()) return;
+        float baseAngle = enemy.getFacingAngle();
+        if (behavior != null){
+            baseAngle += behavior.calculateError(enemy, player,
+                    new Vec2(enemy.getX(), enemy.getY()).distanceTo(player.getX(), player.getY()));
+        }
+        Vec2 from = new Vec2(enemy.getX(), enemy.getY());
+        Vec2 target = Vec2.fromAngleDeg(baseAngle);
+        WeaponFireContext weaponFireContext = new WeaponFireContext(
+                rayCastSystem, enemy, from,
+                target, enemy.getCurrentWeapon().getDefinition().getRange(),
+                Set.of(enemy), enemy.getCurrentWeapon().getDefinition().getDamage()
+        );
+        events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
+        enemy.resetReactionTimer();
+        enemy.setShotCommitStarted(false);
+        }
+
+    private void updateSearch(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             applyMemoryReaction(enemy);
             enterAttack(enemy);
             return;
         }
 
-        if (!enemy.getCurrentPath().isEmpty()){
-            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true);
-            if (enemy.getCurrentPath().isEmpty()){
+        if (!enemy.getCurrentPath().isEmpty()) {
+            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, true);
+            if (enemy.getCurrentPath().isEmpty()) {
                 enemy.resetAimMemoryTimer();
             }
             return;
@@ -146,10 +203,11 @@ public class EnemyAI {
         enemy.changeState(AIState.INVESTIGATE);
         enemy.resetAimMemoryTimer();
 
-        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY,List.of(player));
+        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY, List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
 
     }
+
     private void updatePathToPlayer(Enemy enemy, float delta) {
         Float last = lastPathUpdate.get(enemy);
         if (last != null && last > 0f) {
@@ -179,7 +237,8 @@ public class EnemyAI {
         lastPathUpdate.put(enemy, ATTACK_REPEAT_INTERVAL);
     }
 
-    private void moveAlongPath(Enemy enemy, float speed, float delta, boolean allowStrafe) {
+    private void moveAlongPath(Enemy enemy, float speed, float delta, boolean allowStrafe,
+                               boolean canChangeAngle) {
         List<Vec2> path = enemy.getCurrentPath();
         if (path == null || path.isEmpty()) {
             enemy.setIntendMove(0, 0);
@@ -202,9 +261,10 @@ public class EnemyAI {
             dy = target.y - enemy.getY();
             dist = (float) Math.sqrt(dx * dx + dy * dy);
         }
-
         float targetAngle = (float) Math.toDegrees(Math.atan2(dy, dx));
-        enemy.rotateTowards(targetAngle, delta);
+        if (canChangeAngle)
+            enemy.rotateTowards(targetAngle, delta);
+
         // якщо не дозволений стрейф і недостатньо повернулись то стоїмо на місці
         if (!allowStrafe && Math.abs(Vec2.angleDiff(enemy.getFacingAngle(), targetAngle)) > DEGREE_TOLERANCE) {
             enemy.setIntendMove(0, 0);
@@ -215,6 +275,7 @@ public class EnemyAI {
         float moveY = (dy / dist) * speed * delta;
         enemy.setIntendMove(moveX, moveY);
     }
+
     private void enterAttack(Enemy enemy) {
         enemy.changeState(AIState.ATTACK);
         enemy.resetReactionTimer();
@@ -228,6 +289,7 @@ public class EnemyAI {
             enemy.setReactionTimer(enemy.getProfile().getReactionTime() * 0.5f);
         }
     }
+
     private void performSearchRotation(Enemy enemy, float delta) {
         float currentAngle = enemy.getFacingAngle();
         float targetAngle = enemy.getSearchAngle();
@@ -239,14 +301,15 @@ public class EnemyAI {
 
         enemy.rotateTowards(targetAngle, delta);
     }
-    private void buildPathToPatrolTarget(Enemy enemy){
+
+    private void buildPathToPatrolTarget(Enemy enemy) {
         Vec2 target = enemy.getCurrentPatrolTarget();
-        if (target == null){
+        if (target == null) {
             enemy.setCurrentPath(List.of());
             return;
         }
         List<Vec2> path = pathfinder.findPath(enemy, target.x, target.y, List.of(player));
-        if (!path.isEmpty()){
+        if (!path.isEmpty()) {
             enemy.setCurrentPath(path);
             return;
         }
@@ -258,6 +321,7 @@ public class EnemyAI {
         enemy.goToNextPatrolPoint();
         buildPathToPatrolTarget(enemy);
     }
+
     private void returnToPatrol(Enemy enemy) {
         enemy.changeState(AIState.PATROL);
         buildPathToPatrolTarget(enemy);

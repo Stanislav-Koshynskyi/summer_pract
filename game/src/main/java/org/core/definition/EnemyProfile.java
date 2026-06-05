@@ -2,7 +2,10 @@ package org.core.definition;
 
 
 import lombok.Getter;
+import org.core.behavior.AimBehavior;
 import org.core.enums.AimBehaviorType;
+
+import java.util.Map;
 
 @Getter
 public class EnemyProfile {

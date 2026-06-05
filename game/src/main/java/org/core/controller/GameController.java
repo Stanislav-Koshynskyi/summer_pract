@@ -3,10 +3,12 @@ package org.core.controller;
 import java.util.*;
 
 import lombok.Getter;
+import org.content.aim_behavior.StandardAim;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
 import org.core.ai.EnemyAI;
 import org.core.ai.PathFinder;
 import org.core.ai.VisionSystem;
+import org.core.behavior.AimBehavior;
 import org.core.behavior.WeaponBehavior;
 import org.core.collision.Blocker;
 import org.core.collision.CollisionSystem;
@@ -79,7 +81,17 @@ public class GameController {
                     new Enemy(
                             d.x, d.y,
                             (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
-                            null, // заглушка, потім дістанемо зброю за id
+                            new Weapon(new WeaponDefinition(
+                                    "1",
+                                    WeaponType.HITSCAN,
+                                    100,
+                                    2000f,
+                                    1f,
+                                    100,
+                                    false,
+                                    false,
+                                    new SimpleRayCastBehavior()
+                            )),
                             d.enemyId,
                             List.of()
                     ));
@@ -126,7 +138,10 @@ public class GameController {
 
         visionSystem = new VisionSystem(rayCastSystem, data.worldGeometry);
         pathfinder = new PathFinder(data.worldGeometry, collisionSystem, blockers);
-        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder);
+        Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
+        aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
+        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem
+        , aimBehaviorMap);
         clearPendingCommands();
 
 
