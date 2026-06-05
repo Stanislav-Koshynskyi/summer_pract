@@ -116,6 +116,10 @@ public class CoreGame extends ApplicationAdapter {
             debugMode = !debugMode;
         }
 
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            gameController.shoot();
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * dt;
         if (Gdx.input.isKeyPressed(Input.Keys.S)) dy -= speed * dt;
         if (Gdx.input.isKeyPressed(Input.Keys.D)) dx += speed * dt;
