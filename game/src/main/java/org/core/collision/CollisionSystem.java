@@ -45,7 +45,7 @@ public class CollisionSystem {
 
     private void moveX(Entity entity, float dx) {
         float newX = entity.getX() + dx;
-        Rect aabb = Rect.fromCenter(newX, entity.getY(), entity.getWidth(), entity.getHeight());
+        Rect aabb = Rect.fromCenter(newX, entity.getY(), entity.getCollisionWidth(), entity.getCollisionHeight());
         float maxPen = 0f;
 
         float ts = geometry.getTileSize();
@@ -61,10 +61,10 @@ public class CollisionSystem {
                 if (aabb.getRight() > left && aabb.getLeft() < right &&
                         aabb.getTop() > ty*ts && aabb.getBottom() < (ty+1)*ts) {
 
-                    if (dx > 0 && left > entity.getRight() - EPSILON) {
+                    if (dx > 0 && left > entity.getCollisionRight() - EPSILON) {
                         float pen = aabb.getRight() - left;
                         if (pen > maxPen) maxPen = pen;
-                    } else if (dx < 0 && right < entity.getLeft() + EPSILON) {
+                    } else if (dx < 0 && right < entity.getCollisionLeft() + EPSILON) {
                         float pen = right - aabb.getLeft();
                         if (pen > maxPen) maxPen = pen;
                     }
@@ -76,10 +76,10 @@ public class CollisionSystem {
             if (!b.blocksMovement()) continue;
             Rect br = b.getBounds();
             if (aabb.overlaps(br)) {
-                if (dx > 0 && br.getLeft() > entity.getRight() - EPSILON) {
+                if (dx > 0 && br.getLeft() > entity.getCollisionRight() - EPSILON) {
                     float pen = aabb.getRight() - br.getLeft();
                     if (pen > maxPen) maxPen = pen;
-                } else if (dx < 0 && br.getRight() < entity.getLeft() + EPSILON) {
+                } else if (dx < 0 && br.getRight() < entity.getCollisionLeft() + EPSILON) {
                     float pen = br.getRight() - aabb.getLeft();
                     if (pen > maxPen) maxPen = pen;
                 }
@@ -96,7 +96,7 @@ public class CollisionSystem {
 
     private void moveY(Entity entity, float dy) {
         float newY = entity.getY() + dy;
-        Rect aabb = Rect.fromCenter(entity.getX(), newY, entity.getWidth(), entity.getHeight());
+        Rect aabb = Rect.fromCenter(entity.getX(), newY, entity.getCollisionWidth(), entity.getCollisionHeight());
         float maxPen = 0f;
 
         float ts = geometry.getTileSize();
@@ -114,10 +114,10 @@ public class CollisionSystem {
                 if (aabb.getRight() > tx * ts && aabb.getLeft() < (tx + 1) * ts &&
                         aabb.getTop() > tileBottom && aabb.getBottom() < tileTop) {
 
-                    if (dy > 0 && tileBottom > entity.getTop() - EPSILON) {
+                    if (dy > 0 && tileBottom > entity.getCollisionTop() - EPSILON) {
                         float pen = aabb.getTop() - tileBottom;
                         if (pen > maxPen) maxPen = pen;
-                    } else if (dy < 0 && tileTop < entity.getBottom() + EPSILON) {
+                    } else if (dy < 0 && tileTop < entity.getCollisionBottom() + EPSILON) {
                         float pen = tileTop - aabb.getBottom();
                         if (pen > maxPen) maxPen = pen;
                     }
@@ -130,10 +130,10 @@ public class CollisionSystem {
             if (!b.blocksMovement()) continue;
             Rect br = b.getBounds();
             if (aabb.overlaps(br)) {
-                if (dy > 0 && br.getBottom() > entity.getTop() - EPSILON) {
+                if (dy > 0 && br.getBottom() > entity.getCollisionTop() - EPSILON) {
                     float pen = aabb.getTop() - br.getBottom();
                     if (pen > maxPen) maxPen = pen;
-                } else if (dy < 0 && br.getTop() < entity.getBottom() + EPSILON) {
+                } else if (dy < 0 && br.getTop() < entity.getCollisionBottom() + EPSILON) {
                     float pen = br.getTop() - aabb.getBottom();
                     if (pen > maxPen) maxPen = pen;
                 }

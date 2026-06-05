@@ -42,4 +42,23 @@ public class Entity {
     public float getBottom(){
         return y - height / 2f;
     }
+    public float getCollisionWidth(){
+        return width * 0.99f;
+    }
+    public float getCollisionHeight(){
+        return height * 0.99f;
+    }
+    public float getCollisionLeft(){
+        return x - getCollisionWidth() / 2f;
+    }
+    public float getCollisionRight(){
+        return x + getCollisionWidth() / 2f;
+    }
+    public float getCollisionTop(){
+        return y + getCollisionHeight() / 2f;
+    }
+    public float getCollisionBottom(){
+        return y - getCollisionHeight() / 2f;
+    }
+
 }

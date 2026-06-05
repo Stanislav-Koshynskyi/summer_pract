@@ -61,7 +61,7 @@ public class Player extends Entity implements Damageable, Blocker {
 
     @Override
     public boolean blocksMovement() {
-        return false;
+        return true;
     }
 
     @Override

@@ -12,9 +12,9 @@ import java.util.*;
 public class EnemyAI {
 
     // Як часто перебудовувати шлях у ATTACK (секунди)
-    private static final float ATTACK_REPEAT_INTERVAL = 0.5f;
+    private static final float ATTACK_REPEAT_INTERVAL = 0.1f;
     // Мінімальна зміна позиції гравця для перебудови шляху (тайлів)
-    private static final float REPAT_DISTANCE_THRESHOLD = 3f;
+    private static final float REPAT_DISTANCE_THRESHOLD = 2f;
 
     private static final float PIXEL_TOLERANCE = 5;
     private static final float DEGREE_TOLERANCE = 10;
@@ -72,7 +72,7 @@ public class EnemyAI {
         }
 
         if (!enemy.getCurrentPath().isEmpty()) {
-            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, false);
+            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true);
             if (enemy.getCurrentPath().isEmpty()) {
                 enemy.resetAimMemoryTimer();
             }
@@ -104,7 +104,7 @@ public class EnemyAI {
             enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
             enemy.resetAimMemoryTimer();
             enemy.changeState(AIState.SEARCH);
-            List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY());
+            List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
             if (!path.isEmpty()) enemy.setCurrentPath(path);
             return;
         }
@@ -125,7 +125,7 @@ public class EnemyAI {
         }
 
         if (!enemy.getCurrentPath().isEmpty()){
-            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, false);
+            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true);
             if (enemy.getCurrentPath().isEmpty()){
                 enemy.resetAimMemoryTimer();
             }
@@ -146,7 +146,7 @@ public class EnemyAI {
         enemy.changeState(AIState.INVESTIGATE);
         enemy.resetAimMemoryTimer();
 
-        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY);
+        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY,List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
 
     }
@@ -172,7 +172,7 @@ public class EnemyAI {
         }
 
         if (needNewPath) {
-            List<Vec2> newPath = pathfinder.findPath(enemy, player.getX(), player.getY());
+            List<Vec2> newPath = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
             if (!newPath.isEmpty()) enemy.setCurrentPath(newPath);
         }
 
@@ -192,7 +192,7 @@ public class EnemyAI {
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (dist < PIXEL_TOLERANCE) {
-            path.remove(0);
+            path.removeFirst();
             if (path.isEmpty()) {
                 enemy.setIntendMove(0, 0);
                 return;
@@ -245,7 +245,7 @@ public class EnemyAI {
             enemy.setCurrentPath(List.of());
             return;
         }
-        List<Vec2> path = pathfinder.findPath(enemy, target.x, target.y);
+        List<Vec2> path = pathfinder.findPath(enemy, target.x, target.y, List.of(player));
         if (!path.isEmpty()){
             enemy.setCurrentPath(path);
             return;

@@ -51,8 +51,8 @@ public class Enemy extends Entity implements Damageable, Blocker {
     @Setter
     private int currentPatrolIndex = 0;
 
-    public Enemy(float x, float y, float width, float height, EnemyProfile profile, Weapon weapon, String enemyId, List<Vec2> patrolPath) {
-        super(x, y, width, height);
+    public Enemy(float x, float y, EnemyProfile profile, Weapon weapon, String enemyId, List<Vec2> patrolPath) {
+        super(x, y, profile.getWidth(), profile.getHeight());
         this.profile = profile;
         this.hp = profile.getHp();
         this.currentWeapon = weapon;

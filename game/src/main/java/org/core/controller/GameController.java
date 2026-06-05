@@ -76,7 +76,7 @@ public class GameController {
         for (EnemySpawnData d : data.enemySpawns){
             enemies.add(
                     new Enemy(
-                            d.x, d.y, 16f, 16f,
+                            d.x, d.y,
                             (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
                             null, // заглушка, потім дістанемо зброю за id
                             d.enemyId,
@@ -159,7 +159,6 @@ public class GameController {
         //TODO
         // Крок 3. FootstepEmitter – згенерувати footstep SoundEvents
         // Крок 4. HearingSystem – обробити SoundEventQueue
-        // Крок 5. VisionSystem – оновити видимість
 
         enemyAI.update(delta);
 
