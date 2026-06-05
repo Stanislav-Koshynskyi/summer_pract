@@ -78,6 +78,12 @@ public class GameController {
         // поки заглушка, потім обробити з спавнпойнтів
         List<Enemy> enemies = new ArrayList<>();
         for (EnemySpawnData d : data.enemySpawns){
+            // сортуємо, щоб patrolPathId ворога = pathId вейпойнтів
+            List<Vec2> patrolPath = data.waypoints.stream()
+                    .filter(w -> w.pathId.equals(d.patrolPathId))
+                    .sorted(Comparator.comparingInt(w -> w.order))
+                    .map(w -> new Vec2(w.x, w.y))
+                    .toList();
             enemies.add(
                     new Enemy(
                             d.x, d.y,
@@ -94,7 +100,7 @@ public class GameController {
                                     new SimpleRayCastBehavior()
                             )),
                             d.enemyId,
-                            List.of()
+                            patrolPath
                     ));
         }
         blockers.addAll(enemies);
