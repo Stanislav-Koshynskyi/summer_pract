@@ -74,7 +74,7 @@ public class LevelTmxLoader {
                 float height = objectProps.containsKey("height") ? objectProps.get("height", Float.class) : 0f;
 
                 float worldX = tiledX;
-                float worldY = mapHeightInPixels - tiledY - height;
+                float worldY = tiledY;
 
                 String objectType = objectProps.get("type", String.class);
                 if (objectType == null) {
@@ -99,7 +99,7 @@ public class LevelTmxLoader {
                     String enemy = String.valueOf(enemyId);
 
                     EnemySpawnData enemyData = new EnemySpawnData(
-                            worldX, worldY + 200f, enemyType, weapon, patrolPath, facingAngleDegrees, enemy
+                            worldX, worldY, enemyType, weapon, patrolPath, facingAngleDegrees, enemy
                     );
                     enemySpawns.add(enemyData);
                 }
