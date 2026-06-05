@@ -40,6 +40,7 @@ public class CoreGame extends ApplicationAdapter {
     private ShapeRenderer shapeRenderer;
     private LevelState levelState;
     private GameController gameController;
+    private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
 
     @Override
@@ -53,7 +54,6 @@ public class CoreGame extends ApplicationAdapter {
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1600, 900);
-        camera.update();
 
         //cameraController = new CameraInputController(camera);
         //Gdx.input.setInputProcessor(cameraController);
@@ -111,6 +111,10 @@ public class CoreGame extends ApplicationAdapter {
         float dx = 0f;
         float dy = 0f;
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+            debugMode = !debugMode;
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * dt;
         if (Gdx.input.isKeyPressed(Input.Keys.S)) dy -= speed * dt;
         if (Gdx.input.isKeyPressed(Input.Keys.D)) dx += speed * dt;
@@ -157,11 +161,6 @@ public class CoreGame extends ApplicationAdapter {
             float targetX = playerPos.x + dirX * laserLength;
             float targetY = playerPos.y + dirY * laserLength;
 
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.RED);
-            shapeRenderer.line(playerPos.x, playerPos.y, targetX, targetY);
-            shapeRenderer.end();
-
             // Вороги (різні стани)
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -179,40 +178,47 @@ public class CoreGame extends ApplicationAdapter {
                 }
             }
             shapeRenderer.end();
-        }
 
-        // Візуалізація зору ворогів
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.WHITE);
+            if (debugMode) {
+                // Візуалізація зору ворогів
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                shapeRenderer.setColor(Color.WHITE);
+                if (gameController != null) {
+                    for (org.core.entity.Enemy enemy : gameController.getEnemies()) {
+                        if (!enemy.isAlive()) continue;
 
-        if (gameController != null) {
-            for (org.core.entity.Enemy enemy : gameController.getEnemies()) {
-                if (!enemy.isAlive()) continue;
+                        float baseAngle = enemy.getFacingAngle();
+                        float fov = enemy.getCurrentFovAngle();
+                        float viewRange = enemy.getProfile().getVisionRange();
 
-                float baseAngle = enemy.getFacingAngle();
-                float fov = enemy.getCurrentFovAngle();
-                float viewRange = enemy.getProfile().getVisionRange();
+                        float leftAngleRad = (float) Math.toRadians(baseAngle - fov / 2f);
+                        float leftX = enemy.getX() + (float) Math.cos(leftAngleRad) * viewRange;
+                        float leftY = enemy.getY() + (float) Math.sin(leftAngleRad) * viewRange;
 
-                float leftAngleRad = (float) Math.toRadians(baseAngle - fov / 2f);
-                float leftX = enemy.getX() + (float) Math.cos(leftAngleRad) * viewRange;
-                float leftY = enemy.getY() + (float) Math.sin(leftAngleRad) * viewRange;
+                        float rightAngleRad = (float) Math.toRadians(baseAngle + fov / 2f);
+                        float rightX = enemy.getX() + (float) Math.cos(rightAngleRad) * viewRange;
+                        float rightY = enemy.getY() + (float) Math.sin(rightAngleRad) * viewRange;
 
-                float rightAngleRad = (float) Math.toRadians(baseAngle + fov / 2f);
-                float rightX = enemy.getX() + (float) Math.cos(rightAngleRad) * viewRange;
-                float rightY = enemy.getY() + (float) Math.sin(rightAngleRad) * viewRange;
+                        shapeRenderer.line(enemy.getX(), enemy.getY(), leftX, leftY);
+                        shapeRenderer.line(enemy.getX(), enemy.getY(), rightX, rightY);
+                        shapeRenderer.arc(
+                                enemy.getX(),
+                                enemy.getY(),
+                                viewRange,
+                                baseAngle - fov / 2f,
+                                fov
+                        );
+                    }
+                }
+                shapeRenderer.end();
 
-                shapeRenderer.line(enemy.getX(), enemy.getY(), leftX, leftY);
-                shapeRenderer.line(enemy.getX(), enemy.getY(), rightX, rightY);
-                shapeRenderer.arc(
-                        enemy.getX(),
-                        enemy.getY(),
-                        viewRange,
-                        baseAngle - fov / 2f,
-                        fov
-                );
+                // Лазер гравця
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                shapeRenderer.setColor(Color.RED);
+                shapeRenderer.line(playerPos.x, playerPos.y, targetX, targetY);
+                shapeRenderer.end();
             }
         }
-        shapeRenderer.end();
     }
 
     @Override
