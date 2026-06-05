@@ -72,8 +72,8 @@ public class CoreGame extends ApplicationAdapter {
                 AimBehaviorType.values()[0],
                 90f,
                 130f,
-                15f,
-                15f,
+                16f,
+                16f,
                 23f,
                 123f
         );
