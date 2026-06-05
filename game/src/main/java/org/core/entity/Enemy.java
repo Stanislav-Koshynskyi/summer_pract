@@ -111,7 +111,18 @@ public class Enemy extends Entity implements Damageable, Blocker {
     }
 
     public float getCurrentFovAngle() {
-        return currentState == AIState.PATROL ? profile.getPatrolFovAngle() : profile.getAlertFovAngle();
+        switch (currentState){
+            case ATTACK -> {
+                return profile.getAttackFovAngle();
+            }
+            case PATROL -> {
+                return profile.getPatrolFovAngle();
+            }
+            case null, default ->
+            {
+                return profile.getAlertFovAngle();
+            }
+        }
     }
 
     public void updateReactionTimer(float delta) {

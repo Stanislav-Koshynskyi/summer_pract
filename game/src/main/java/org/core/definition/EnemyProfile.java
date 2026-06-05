@@ -17,6 +17,7 @@ public class EnemyProfile {
     private final float preferredAttackRange;
     private final AimBehaviorType aimBehaviorType;
     private final float patrolFovAngle;
+    private final float attackFovAngle;
     private final float alertFovAngle;
     private final float width;
     private final float height;
@@ -28,7 +29,7 @@ public class EnemyProfile {
                         float chaseSpeed, float visionRange, float reactionTime,
                         float shotCommitDuration, float aimMemoryDuration,
                         float preferredAttackRange, AimBehaviorType aimBehaviorType, float patrolFovAngle,
-                        float alertFovAngle, float width, float height, float closeRevealRadius,
+                        float alertFovAngle, float attackFovAngle, float width, float height, float closeRevealRadius,
                         float turnRate) {
         this.enemyTypeId = enemyTypeId;
         this.hp = hp;
@@ -46,5 +47,6 @@ public class EnemyProfile {
         this.height = height;
         this.closeRevealRadius = closeRevealRadius;
         this.turnRate = turnRate;
+        this.attackFovAngle = attackFovAngle;
     }
 }
