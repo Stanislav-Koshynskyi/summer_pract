@@ -2,6 +2,7 @@ package org.core.controller;
 
 import java.util.*;
 
+import com.badlogic.gdx.Game;
 import lombok.Getter;
 import org.content.aim_behavior.StandardAim;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
@@ -170,7 +171,11 @@ public class GameController {
         // Крок 3. FootstepEmitter – згенерувати footstep SoundEvents
         // Крок 4. HearingSystem – обробити SoundEventQueue
 
-        enemyAI.update(delta);
+        List<GameEvent> aIEvents = enemyAI.update(delta);
+        for (GameEvent e : aIEvents){
+            levelState.addGameEvent(e);
+        }
+
 
 
         for (Enemy enemy: levelState.getEnemies()){
