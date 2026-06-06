@@ -6,7 +6,6 @@ import org.core.entity.Entity;
 import org.core.entity.Player;
 import org.core.enums.AIState;
 import org.core.enums.AimBehaviorType;
-import org.core.enums.WeaponType;
 import org.core.event.GameEvent;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastSystem;
@@ -53,6 +52,12 @@ public class EnemyAI {
         List<GameEvent> events = new ArrayList<>();
         for (Enemy enemy : enemies) {
             if (!enemy.isAlive()) continue;
+            float vx = enemy.getVelocityX();
+            float vy = enemy.getVelocityY();
+            // якщо є кнокбек то ворог не може адекватно реагувати
+            if (Math.abs(vx) > 0.1f || Math.abs(vy) > 0.1f){
+                continue;
+            }
 
             updateTimers(enemy, delta);
 
@@ -117,11 +122,7 @@ public class EnemyAI {
     private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (!seesPlayer) {
             // Гравець зник
-            enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
-            enemy.resetAimMemoryTimer();
-            enemy.changeState(AIState.SEARCH);
-            List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
-            if (!path.isEmpty()) enemy.setCurrentPath(path);
+            enterSearch(enemy);
             return;
         }
         AimBehavior behavior = aimBehaviors.get(enemy.getProfile().getAimBehaviorType());
@@ -167,7 +168,8 @@ public class EnemyAI {
         WeaponFireContext weaponFireContext = new WeaponFireContext(
                 rayCastSystem, enemy, from,
                 target, enemy.getCurrentWeapon().getDefinition().getRange(),
-                Set.of(enemy), enemy.getCurrentWeapon().getDefinition().getDamage()
+                Set.of(enemy), enemy.getCurrentWeapon().getDefinition().getDamage(),
+                weapon.getDefinition().getKnockbackForce()
         );
         events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
         enemy.resetReactionTimer();
@@ -281,7 +283,13 @@ public class EnemyAI {
         enemy.resetReactionTimer();
         lastPathUpdate.remove(enemy); // негайно перебудувати шлях
     }
-
+    private void enterSearch(Enemy enemy){
+        enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
+        enemy.resetAimMemoryTimer();
+        enemy.changeState(AIState.SEARCH);
+        List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
+        if (!path.isEmpty()) enemy.setCurrentPath(path);
+    }
     private void applyMemoryReaction(Enemy enemy) {
         if (!enemy.isAimMemoryTimer()) {
             enemy.setReactionTimer(0f); // пам'ятає — миттєво
@@ -325,5 +333,9 @@ public class EnemyAI {
     private void returnToPatrol(Enemy enemy) {
         enemy.changeState(AIState.PATROL);
         buildPathToPatrolTarget(enemy);
+    }
+    public void onEnemyHit(Enemy enemy, Entity hitter){
+        if (enemy.getCurrentState() == AIState.ATTACK) return;
+        enterSearch(enemy);
     }
 }

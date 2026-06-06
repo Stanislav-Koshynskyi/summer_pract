@@ -44,6 +44,8 @@ public class CollisionSystem {
     // Мікро-відступ для запобігання "залипанню" на швах
     private static final float EPSILON = 0.001f;
 
+    public static final float DEFAULT_FRICTION = 5;
+
     public CollisionSystem(WorldGeometry geometry, List<Blocker> blockers) {
         this.geometry = geometry;
         this.blockers = blockers;
@@ -75,7 +77,7 @@ public class CollisionSystem {
 
     private void moveX(Entity entity, float dx) {
         float newX = entity.getX() + dx;
-        Rect aabb = Rect.fromCenter(newX, entity.getY(), entity.getWidth(), entity.getHeight());
+        Rect aabb = Rect.fromCenter(newX, entity.getY(), entity.getCollisionWidth(), entity.getCollisionHeight());
         float maxPen = 0f;
 
         float ts = geometry.getTileSize();
@@ -91,10 +93,10 @@ public class CollisionSystem {
                 if (aabb.getRight() > left && aabb.getLeft() < right &&
                         aabb.getTop() > ty*ts && aabb.getBottom() < (ty+1)*ts) {
 
-                    if (dx > 0 && left > entity.getRight() - EPSILON) {
+                    if (dx > 0 && left > entity.getCollisionRight() - EPSILON) {
                         float pen = aabb.getRight() - left;
                         if (pen > maxPen) maxPen = pen;
-                    } else if (dx < 0 && right < entity.getLeft() + EPSILON) {
+                    } else if (dx < 0 && right < entity.getCollisionLeft() + EPSILON) {
                         float pen = right - aabb.getLeft();
                         if (pen > maxPen) maxPen = pen;
                     }
@@ -106,10 +108,10 @@ public class CollisionSystem {
             if (!b.blocksMovement()) continue;
             Rect br = b.getBounds();
             if (aabb.overlaps(br)) {
-                if (dx > 0 && br.getLeft() > entity.getRight() - EPSILON) {
+                if (dx > 0 && br.getLeft() > entity.getCollisionRight() - EPSILON) {
                     float pen = aabb.getRight() - br.getLeft();
                     if (pen > maxPen) maxPen = pen;
-                } else if (dx < 0 && br.getRight() < entity.getLeft() + EPSILON) {
+                } else if (dx < 0 && br.getRight() < entity.getCollisionLeft() + EPSILON) {
                     float pen = br.getRight() - aabb.getLeft();
                     if (pen > maxPen) maxPen = pen;
                 }
@@ -126,7 +128,7 @@ public class CollisionSystem {
 
     private void moveY(Entity entity, float dy) {
         float newY = entity.getY() + dy;
-        Rect aabb = Rect.fromCenter(entity.getX(), newY, entity.getWidth(), entity.getHeight());
+        Rect aabb = Rect.fromCenter(entity.getX(), newY, entity.getCollisionWidth(), entity.getCollisionHeight());
         float maxPen = 0f;
 
         float ts = geometry.getTileSize();
@@ -144,10 +146,10 @@ public class CollisionSystem {
                 if (aabb.getRight() > tx * ts && aabb.getLeft() < (tx + 1) * ts &&
                         aabb.getTop() > tileBottom && aabb.getBottom() < tileTop) {
 
-                    if (dy > 0 && tileBottom > entity.getTop() - EPSILON) {
+                    if (dy > 0 && tileBottom > entity.getCollisionTop() - EPSILON) {
                         float pen = aabb.getTop() - tileBottom;
                         if (pen > maxPen) maxPen = pen;
-                    } else if (dy < 0 && tileTop < entity.getBottom() + EPSILON) {
+                    } else if (dy < 0 && tileTop < entity.getCollisionBottom() + EPSILON) {
                         float pen = tileTop - aabb.getBottom();
                         if (pen > maxPen) maxPen = pen;
                     }
@@ -160,10 +162,10 @@ public class CollisionSystem {
             if (!b.blocksMovement()) continue;
             Rect br = b.getBounds();
             if (aabb.overlaps(br)) {
-                if (dy > 0 && br.getBottom() > entity.getTop() - EPSILON) {
+                if (dy > 0 && br.getBottom() > entity.getCollisionTop() - EPSILON) {
                     float pen = aabb.getTop() - br.getBottom();
                     if (pen > maxPen) maxPen = pen;
-                } else if (dy < 0 && br.getTop() < entity.getBottom() + EPSILON) {
+                } else if (dy < 0 && br.getTop() < entity.getCollisionBottom() + EPSILON) {
                     float pen = br.getTop() - aabb.getBottom();
                     if (pen > maxPen) maxPen = pen;
                 }
@@ -222,10 +224,14 @@ public interface PathBlocker extends Blocker {
 
 import java.util.*;
 
+import com.badlogic.gdx.Game;
 import lombok.Getter;
+import org.content.aim_behavior.StandardAim;
+import org.content.weapon_behavior.SimpleRayCastBehavior;
 import org.core.ai.EnemyAI;
 import org.core.ai.PathFinder;
 import org.core.ai.VisionSystem;
+import org.core.behavior.AimBehavior;
 import org.core.behavior.WeaponBehavior;
 import org.core.collision.Blocker;
 import org.core.collision.CollisionSystem;
@@ -294,13 +300,30 @@ public class GameController {
         // поки заглушка, потім обробити з спавнпойнтів
         List<Enemy> enemies = new ArrayList<>();
         for (EnemySpawnData d : data.enemySpawns){
+            // сортуємо, щоб patrolPathId ворога = pathId вейпойнтів
+            List<Vec2> patrolPath = data.waypoints.stream()
+                    .filter(w -> w.pathId.equals(d.patrolPathId))
+                    .sorted(Comparator.comparingInt(w -> w.order))
+                    .map(w -> new Vec2(w.x, w.y))
+                    .toList();
             enemies.add(
                     new Enemy(
-                            d.x, d.y, 16f, 16f,
+                            d.x, d.y,
                             (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
-                            null, // заглушка, потім дістанемо зброю за id
+                            new Weapon(new WeaponDefinition(
+                                    "1",
+                                    WeaponType.HITSCAN,
+                                    100,
+                                    2000f,
+                                    1f,
+                                    100,
+                                    false,
+                                    false,
+                                    new SimpleRayCastBehavior(),
+                                    10
+                            )),
                             d.enemyId,
-                            List.of()
+                            patrolPath
                     ));
         }
         blockers.addAll(enemies);
@@ -313,25 +336,20 @@ public class GameController {
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
-        WeaponBehavior weaponBehavior = new WeaponBehavior() {
-            @Override
-            public List<RayCastResult> fire(WeaponFireContext context) {
-                return List.of();
-            }
-        };
         Player player = new Player(
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
                 new Weapon(new WeaponDefinition(
                         "1",
-                        WeaponType.MELEE,
-                        20,
-                        20f,
-                        20f,
-                        12,
+                        WeaponType.HITSCAN,
+                        1,
+                        2000f,
+                        1f,
+                        100,
                         false,
                         false,
-                        weaponBehavior
+                        new SimpleRayCastBehavior(),
+                        100
                 ))
         );
         player.setMovementMode(pendingMovementMode);
@@ -351,7 +369,10 @@ public class GameController {
 
         visionSystem = new VisionSystem(rayCastSystem, data.worldGeometry);
         pathfinder = new PathFinder(data.worldGeometry, collisionSystem, blockers);
-        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder);
+        Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
+        aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
+        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem
+        , aimBehaviorMap);
         clearPendingCommands();
 
 
@@ -380,11 +401,28 @@ public class GameController {
         // Крок 3. FootstepEmitter – згенерувати footstep SoundEvents
         // Крок 4. HearingSystem – обробити SoundEventQueue
 
-        enemyAI.update(delta);
+        for (Enemy enemy : levelState.getEnemies()) {
+            enemy.resetDamageFlag();
+        }
+
+        List<GameEvent> aIEvents = enemyAI.update(delta);
+        for (GameEvent e : aIEvents){
+            levelState.addGameEvent(e);
+        }
 
 
-        for (Enemy enemy: levelState.getEnemies()){
-            collisionSystem.move(enemy, enemy.getIntendedDx(), enemy.getIntendedDy());
+
+        for (Enemy enemy: levelState.getEnemies()) {
+            if (Math.abs(enemy.getVelocityX()) >= 0.01f || Math.abs(enemy.getVelocityY()) >= 0.01f) {
+                collisionSystem.applyKnockback(enemy, delta, CollisionSystem.DEFAULT_FRICTION);
+                if (Math.abs(enemy.getVelocityX()) < 0.5f && Math.abs(enemy.getVelocityY()) < 0.5f){
+                    enemy.setVelocity(0, 0);
+
+                }
+
+            } else {
+                collisionSystem.move(enemy, enemy.getIntendedDx(), enemy.getIntendedDy());
+            }
         }
 
         if (pendingDx != 0f || pendingDy != 0f) {
@@ -415,7 +453,8 @@ public class GameController {
                         rayCastSystem, player, from, target,
                         weapon.getDefinition().getRange(),
                         Set.of(player),
-                        weapon.getDefinition().getDamage()
+                        weapon.getDefinition().getDamage(),
+                        weapon.getDefinition().getKnockbackForce()
                 );
                 List<GameEvent> events = weaponSystem.useWeapon(context, weapon);
                 for (GameEvent e : events){
@@ -426,6 +465,12 @@ public class GameController {
         }
         // Крок 10. Перевірити deaths → перемістити в corpses
         levelState.flushDeadEnemies();
+
+        for (Enemy enemy : levelState.getEnemies()) {
+            if (enemy.isDamaged()) {
+                enemyAI.onEnemyHit(enemy, player);
+            }
+        }
 
         // Перевірка смерті гравця
         if (!player.isAlive()) {
@@ -697,7 +742,10 @@ package org.core.definition;
 
 
 import lombok.Getter;
+import org.core.behavior.AimBehavior;
 import org.core.enums.AimBehaviorType;
+
+import java.util.Map;
 
 @Getter
 public class EnemyProfile {
@@ -712,6 +760,7 @@ public class EnemyProfile {
     private final float preferredAttackRange;
     private final AimBehaviorType aimBehaviorType;
     private final float patrolFovAngle;
+    private final float attackFovAngle;
     private final float alertFovAngle;
     private final float width;
     private final float height;
@@ -723,7 +772,7 @@ public class EnemyProfile {
                         float chaseSpeed, float visionRange, float reactionTime,
                         float shotCommitDuration, float aimMemoryDuration,
                         float preferredAttackRange, AimBehaviorType aimBehaviorType, float patrolFovAngle,
-                        float alertFovAngle, float width, float height, float closeRevealRadius,
+                        float alertFovAngle, float attackFovAngle, float width, float height, float closeRevealRadius,
                         float turnRate) {
         this.enemyTypeId = enemyTypeId;
         this.hp = hp;
@@ -741,6 +790,7 @@ public class EnemyProfile {
         this.height = height;
         this.closeRevealRadius = closeRevealRadius;
         this.turnRate = turnRate;
+        this.attackFovAngle = attackFovAngle;
     }
 }
 package org.core.entity;
@@ -872,6 +922,10 @@ public class Enemy extends Entity implements Damageable, Blocker {
 
     private final String enemyId;
 
+    @Getter
+    @Setter
+    private boolean wasDamagedThisFrame = false;
+
     private AIState currentState;
     private float facingAngle;
     @Setter
@@ -899,8 +953,8 @@ public class Enemy extends Entity implements Damageable, Blocker {
     @Setter
     private int currentPatrolIndex = 0;
 
-    public Enemy(float x, float y, float width, float height, EnemyProfile profile, Weapon weapon, String enemyId, List<Vec2> patrolPath) {
-        super(x, y, width, height);
+    public Enemy(float x, float y, EnemyProfile profile, Weapon weapon, String enemyId, List<Vec2> patrolPath) {
+        super(x, y, profile.getWidth(), profile.getHeight());
         this.profile = profile;
         this.hp = profile.getHp();
         this.currentWeapon = weapon;
@@ -918,6 +972,13 @@ public class Enemy extends Entity implements Damageable, Blocker {
         if (hp == 0) {
             alive = false;
         }
+        wasDamagedThisFrame = true;
+    }
+    public void resetDamageFlag(){
+        wasDamagedThisFrame = false;
+    }
+    public boolean isDamaged(){
+        return wasDamagedThisFrame;
     }
 
     public void changeState(AIState state) {
@@ -957,9 +1018,22 @@ public class Enemy extends Entity implements Damageable, Blocker {
     public float getSoundAttenuationFactor() {
         return 1;
     }
+    @Setter
+    private boolean shotCommitStarted = false;
 
     public float getCurrentFovAngle() {
-        return currentState == AIState.PATROL ? profile.getPatrolFovAngle() : profile.getAlertFovAngle();
+        switch (currentState){
+            case ATTACK -> {
+                return profile.getAttackFovAngle();
+            }
+            case PATROL -> {
+                return profile.getPatrolFovAngle();
+            }
+            case null, default ->
+            {
+                return profile.getAlertFovAngle();
+            }
+        }
     }
 
     public void updateReactionTimer(float delta) {
@@ -1028,6 +1102,12 @@ public class Enemy extends Entity implements Damageable, Blocker {
     public void goToNextPatrolPoint(){
         currentPatrolIndex++;
     }
+    public boolean isShotCommitReady() {
+        return shotCommitTimer <= 0;
+    }
+    public boolean isShotCommitStarted(){
+        return shotCommitStarted;
+    }
 }package org.core.entity;
 
 import lombok.Getter;
@@ -1072,6 +1152,25 @@ public class Entity {
     public float getBottom(){
         return y - height / 2f;
     }
+    public float getCollisionWidth(){
+        return width * 0.99f;
+    }
+    public float getCollisionHeight(){
+        return height * 0.99f;
+    }
+    public float getCollisionLeft(){
+        return x - getCollisionWidth() / 2f;
+    }
+    public float getCollisionRight(){
+        return x + getCollisionWidth() / 2f;
+    }
+    public float getCollisionTop(){
+        return y + getCollisionHeight() / 2f;
+    }
+    public float getCollisionBottom(){
+        return y - getCollisionHeight() / 2f;
+    }
+
 }package org.core.entity;
 
 import lombok.Getter;
@@ -2451,6 +2550,7 @@ public class WeaponFireContext {
     private final float maxDistance;
     private final Set<Entity> ignoredEntities;
     private final int damage;
+    private final float knockbackForce;
 
     public WeaponFireContext(RayCastSystem raycastSystem,
                              Entity shooter,
@@ -2458,7 +2558,8 @@ public class WeaponFireContext {
                              Vec2 direction,
                              float maxDistance,
                              Set<Entity> ignoredEntities,
-                             int damage) {
+                             int damage,
+                             float knockbackForce) {
         this.raycastSystem = raycastSystem;
         this.shooter = shooter;
         this.origin = origin;
@@ -2466,6 +2567,7 @@ public class WeaponFireContext {
         this.maxDistance = maxDistance;
         this.ignoredEntities = ignoredEntities;
         this.damage = damage;
+        this.knockbackForce = knockbackForce;
     }
 
 
@@ -2482,6 +2584,7 @@ public class WeaponFireContext {
 }package org.core.weapon;
 
 import org.core.behavior.WeaponBehavior;
+import org.core.entity.Entity;
 import org.core.enums.WeaponType;
 import org.core.event.GameEvent;
 import org.core.event.MeleeAttackEvent;
@@ -2502,6 +2605,13 @@ public class WeaponSystem {
 
         for (RayCastResult hit : hits) {
             hit.tryApplyDamage(context.getDamage());
+            if (context.getKnockbackForce() > 0 && hit.getTarget() instanceof Entity target){
+                Vec2 knockbackDirection = context.getDirection().copy().normalize();
+                target.setVelocity(
+                        knockbackDirection.x * context.getKnockbackForce(),
+                        knockbackDirection.y * context.getKnockbackForce()
+                );
+            }
         }
 
         WeaponType type = def.getWeaponType();
@@ -2549,10 +2659,12 @@ public class WeaponDefinition {
     private final boolean isSuppressed;
     private final boolean isAutomatic;
     private final WeaponBehavior behavior;
+    @Getter
+    private final float knockbackForce;
 
     public WeaponDefinition(String id, WeaponType weaponType, int damage, float range,
                             float cooldown, int maxAmmo, boolean isSuppressed,
-                            boolean isAutomatic, WeaponBehavior behavior) {
+                            boolean isAutomatic, WeaponBehavior behavior, float knockbackForce) {
         this.id = id;
         this.weaponType = weaponType;
         this.damage = damage;
@@ -2562,6 +2674,7 @@ public class WeaponDefinition {
         this.isSuppressed = isSuppressed;
         this.isAutomatic = isAutomatic;
         this.behavior = behavior;
+        this.knockbackForce = knockbackForce;
     }
 
 }package org.core.raycast;
@@ -2803,12 +2916,19 @@ public class VisionSystem {
 }
 package org.core.ai;
 
-import org.core.collision.PathBlocker;
+import org.core.behavior.AimBehavior;
 import org.core.entity.Enemy;
 import org.core.entity.Entity;
 import org.core.entity.Player;
 import org.core.enums.AIState;
+import org.core.enums.AimBehaviorType;
+import org.core.enums.WeaponType;
+import org.core.event.GameEvent;
 import org.core.math.Vec2;
+import org.core.raycast.RayCastSystem;
+import org.core.weapon.Weapon;
+import org.core.weapon.WeaponFireContext;
+import org.core.weapon.WeaponSystem;
 
 import java.util.*;
 
@@ -2818,6 +2938,8 @@ public class EnemyAI {
     private static final float ATTACK_REPEAT_INTERVAL = 0.1f;
     // Мінімальна зміна позиції гравця для перебудови шляху (тайлів)
     private static final float REPAT_DISTANCE_THRESHOLD = 2f;
+    // наскільки швидко буде втрачатись кнокбек
+    private static final float KNOCKBACK_FRICTION = 8f;
 
     private static final float PIXEL_TOLERANCE = 5;
     private static final float DEGREE_TOLERANCE = 10;
@@ -2829,25 +2951,40 @@ public class EnemyAI {
     private final List<Enemy> enemies;
     private final Player player;
     private final PathFinder pathfinder;
+    private final WeaponSystem weaponSystem;
+    private final RayCastSystem rayCastSystem;
+    private final Map<AimBehaviorType, AimBehavior> aimBehaviors;
 
-    public EnemyAI(VisionSystem visionSystem, List<Enemy> enemies, Player player, PathFinder pathfinder) {
+    public EnemyAI(VisionSystem visionSystem, List<Enemy> enemies, Player player, PathFinder pathfinder,
+                   WeaponSystem weaponSystem, RayCastSystem rayCastSystem, Map<AimBehaviorType, AimBehavior> aimBehaviors) {
         this.visionSystem = visionSystem;
         this.enemies = enemies;
         this.player = player;
         this.pathfinder = pathfinder;
+        this.weaponSystem = weaponSystem;
+        this.rayCastSystem = rayCastSystem;
+        this.aimBehaviors = aimBehaviors;
     }
 
-    public void update(float delta) {
+    public List<GameEvent> update(float delta) {
         Set<Entity> ignoredEntities = new HashSet<>(enemies);
+        List<GameEvent> events = new ArrayList<>();
         for (Enemy enemy : enemies) {
             if (!enemy.isAlive()) continue;
+            float vx = enemy.getVelocityX();
+            float vy = enemy.getVelocityY();
+            // якщо є кнокбек то ворог не може адекватно реагувати
+            if (Math.abs(vx) > 0.1f || Math.abs(vy) > 0.1f){
+                continue;
+            }
 
             updateTimers(enemy, delta);
 
             boolean seesPlayer = visionSystem.canEnemySeePlayer(enemy, player, ignoredEntities);
 
-            processState(enemy, seesPlayer, delta);
+            processState(enemy, seesPlayer, delta, events);
         }
+        return events;
     }
 
     private void updateTimers(Enemy enemy, float delta) {
@@ -2859,23 +2996,23 @@ public class EnemyAI {
         }
     }
 
-    private void processState(Enemy enemy, boolean seesPlayer, float delta) {
+    private void processState(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         switch (enemy.getCurrentState()) {
-            case PATROL -> updatePatrol(enemy, seesPlayer, delta);
-            case ATTACK -> updateAttack(enemy, seesPlayer, delta);
-            case SEARCH -> updateSearch(enemy, seesPlayer, delta);
-            case INVESTIGATE -> updateInvestigate(enemy, seesPlayer, delta);
+            case PATROL -> updatePatrol(enemy, seesPlayer, delta, events);
+            case ATTACK -> updateAttack(enemy, seesPlayer, delta, events);
+            case SEARCH -> updateSearch(enemy, seesPlayer, delta, events);
+            case INVESTIGATE -> updateInvestigate(enemy, seesPlayer, delta, events);
         }
     }
 
-    private void updateInvestigate(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updateInvestigate(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             enterAttack(enemy);
             return;
         }
 
         if (!enemy.getCurrentPath().isEmpty()) {
-            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, false);
+            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, true);
             if (enemy.getCurrentPath().isEmpty()) {
                 enemy.resetAimMemoryTimer();
             }
@@ -2889,47 +3026,85 @@ public class EnemyAI {
         performSearchRotation(enemy, delta);
     }
 
-    private void updatePatrol(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updatePatrol(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             enterAttack(enemy);
             return;
         }
-        if (enemy.getCurrentPath().isEmpty()){
+        if (enemy.getCurrentPath().isEmpty()) {
             goToNextPatrolPoint(enemy);
         }
 
-        moveAlongPath(enemy, enemy.getProfile().getPatrolSpeed(), delta, false);
+        moveAlongPath(enemy, enemy.getProfile().getPatrolSpeed(), delta, false, true);
     }
 
-    private void updateAttack(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (!seesPlayer) {
             // Гравець зник
-            enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
-            enemy.resetAimMemoryTimer();
-            enemy.changeState(AIState.SEARCH);
-            List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
-            if (!path.isEmpty()) enemy.setCurrentPath(path);
+            enterSearch(enemy);
+            return;
+        }
+        AimBehavior behavior = aimBehaviors.get(enemy.getProfile().getAimBehaviorType());
+        if (behavior != null) {
+            behavior.updateAim(enemy, player, delta);
+            }
+        updatePathToPlayer(enemy, delta);
+        moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, false);
+
+        float distToPlayer = new Vec2(enemy.getX(), enemy.getY())
+                .distanceTo(player.getX(), player.getY());
+
+        float maxAttackDist = Math.min(
+                enemy.getProfile().getPreferredAttackRange(),
+                enemy.getCurrentWeapon().getDefinition().getRange()
+        );
+        // стріляємо тільки якщо є шанс попасти, тобто якщо гравець не задалеко
+        if (distToPlayer > maxAttackDist) {
+            enemy.setShotCommitStarted(false);
             return;
         }
 
-        if (enemy.isReactionTimer()) {
 
-            // TODO: стрільба
+
+        Weapon weapon = enemy.getCurrentWeapon();
+        if (weapon == null || !weapon.canFire()) return;
+        if (!enemy.isReactionTimer()) return;
+
+        if (!enemy.isShotCommitStarted()) {
+            // зафіксували ціль
+            enemy.resetShotCommitTimer();
+            enemy.setShotCommitStarted(true);
+            return;
         }
-        updatePathToPlayer(enemy, delta);
-        moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true);
-    }
+        if (!enemy.isShotCommitTimer()) return;
+        float baseAngle = enemy.getFacingAngle();
+        if (behavior != null){
+            baseAngle += behavior.calculateError(enemy, player,
+                    new Vec2(enemy.getX(), enemy.getY()).distanceTo(player.getX(), player.getY()));
+        }
+        Vec2 from = new Vec2(enemy.getX(), enemy.getY());
+        Vec2 target = Vec2.fromAngleDeg(baseAngle);
+        WeaponFireContext weaponFireContext = new WeaponFireContext(
+                rayCastSystem, enemy, from,
+                target, enemy.getCurrentWeapon().getDefinition().getRange(),
+                Set.of(enemy), enemy.getCurrentWeapon().getDefinition().getDamage(),
+                weapon.getDefinition().getKnockbackForce()
+        );
+        events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
+        enemy.resetReactionTimer();
+        enemy.setShotCommitStarted(false);
+        }
 
-    private void updateSearch(Enemy enemy, boolean seesPlayer, float delta) {
+    private void updateSearch(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             applyMemoryReaction(enemy);
             enterAttack(enemy);
             return;
         }
 
-        if (!enemy.getCurrentPath().isEmpty()){
-            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, false);
-            if (enemy.getCurrentPath().isEmpty()){
+        if (!enemy.getCurrentPath().isEmpty()) {
+            moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, true);
+            if (enemy.getCurrentPath().isEmpty()) {
                 enemy.resetAimMemoryTimer();
             }
             return;
@@ -2949,10 +3124,11 @@ public class EnemyAI {
         enemy.changeState(AIState.INVESTIGATE);
         enemy.resetAimMemoryTimer();
 
-        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY,List.of(player));
+        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY, List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
 
     }
+
     private void updatePathToPlayer(Enemy enemy, float delta) {
         Float last = lastPathUpdate.get(enemy);
         if (last != null && last > 0f) {
@@ -2982,7 +3158,8 @@ public class EnemyAI {
         lastPathUpdate.put(enemy, ATTACK_REPEAT_INTERVAL);
     }
 
-    private void moveAlongPath(Enemy enemy, float speed, float delta, boolean allowStrafe) {
+    private void moveAlongPath(Enemy enemy, float speed, float delta, boolean allowStrafe,
+                               boolean canChangeAngle) {
         List<Vec2> path = enemy.getCurrentPath();
         if (path == null || path.isEmpty()) {
             enemy.setIntendMove(0, 0);
@@ -2995,7 +3172,7 @@ public class EnemyAI {
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (dist < PIXEL_TOLERANCE) {
-            path.remove(0);
+            path.removeFirst();
             if (path.isEmpty()) {
                 enemy.setIntendMove(0, 0);
                 return;
@@ -3005,9 +3182,10 @@ public class EnemyAI {
             dy = target.y - enemy.getY();
             dist = (float) Math.sqrt(dx * dx + dy * dy);
         }
-
         float targetAngle = (float) Math.toDegrees(Math.atan2(dy, dx));
-        enemy.rotateTowards(targetAngle, delta);
+        if (canChangeAngle)
+            enemy.rotateTowards(targetAngle, delta);
+
         // якщо не дозволений стрейф і недостатньо повернулись то стоїмо на місці
         if (!allowStrafe && Math.abs(Vec2.angleDiff(enemy.getFacingAngle(), targetAngle)) > DEGREE_TOLERANCE) {
             enemy.setIntendMove(0, 0);
@@ -3018,12 +3196,19 @@ public class EnemyAI {
         float moveY = (dy / dist) * speed * delta;
         enemy.setIntendMove(moveX, moveY);
     }
+
     private void enterAttack(Enemy enemy) {
         enemy.changeState(AIState.ATTACK);
         enemy.resetReactionTimer();
         lastPathUpdate.remove(enemy); // негайно перебудувати шлях
     }
-
+    private void enterSearch(Enemy enemy){
+        enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
+        enemy.resetAimMemoryTimer();
+        enemy.changeState(AIState.SEARCH);
+        List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
+        if (!path.isEmpty()) enemy.setCurrentPath(path);
+    }
     private void applyMemoryReaction(Enemy enemy) {
         if (!enemy.isAimMemoryTimer()) {
             enemy.setReactionTimer(0f); // пам'ятає — миттєво
@@ -3031,6 +3216,7 @@ public class EnemyAI {
             enemy.setReactionTimer(enemy.getProfile().getReactionTime() * 0.5f);
         }
     }
+
     private void performSearchRotation(Enemy enemy, float delta) {
         float currentAngle = enemy.getFacingAngle();
         float targetAngle = enemy.getSearchAngle();
@@ -3042,14 +3228,15 @@ public class EnemyAI {
 
         enemy.rotateTowards(targetAngle, delta);
     }
-    private void buildPathToPatrolTarget(Enemy enemy){
+
+    private void buildPathToPatrolTarget(Enemy enemy) {
         Vec2 target = enemy.getCurrentPatrolTarget();
-        if (target == null){
+        if (target == null) {
             enemy.setCurrentPath(List.of());
             return;
         }
         List<Vec2> path = pathfinder.findPath(enemy, target.x, target.y, List.of(player));
-        if (!path.isEmpty()){
+        if (!path.isEmpty()) {
             enemy.setCurrentPath(path);
             return;
         }
@@ -3061,9 +3248,14 @@ public class EnemyAI {
         enemy.goToNextPatrolPoint();
         buildPathToPatrolTarget(enemy);
     }
+
     private void returnToPatrol(Enemy enemy) {
         enemy.changeState(AIState.PATROL);
         buildPathToPatrolTarget(enemy);
+    }
+    public void onEnemyHit(Enemy enemy, Entity hitter){
+        if (enemy.getCurrentState() == AIState.ATTACK) return;
+        enterSearch(enemy);
     }
 }package org.core.ai;
 
@@ -3083,8 +3275,8 @@ public class PathFinder {
     private static final float DIAGONAL_COST = 1.414f;
 
     private static final int[][] DIRS = {
-            { 1,  0}, {-1,  0}, { 0,  1}, { 0, -1},
-            { 1,  1}, { 1, -1}, {-1,  1}, {-1, -1}
+            {1, 0}, {-1, 0}, {0, 1}, {0, -1},
+            {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
     };
 
     private final WorldGeometry geometry;
@@ -3104,14 +3296,14 @@ public class PathFinder {
 
         int startTX = (int) Math.floor(enemy.getX() / ts);
         int startTY = (int) Math.floor(enemy.getY() / ts);
-        int goalTX  = (int) Math.floor(targetWorldX / ts);
-        int goalTY  = (int) Math.floor(targetWorldY / ts);
+        int goalTX = (int) Math.floor(targetWorldX / ts);
+        int goalTY = (int) Math.floor(targetWorldY / ts);
 
         if (startTX == goalTX && startTY == goalTY) return Collections.emptyList();
 
         PriorityQueue<Node> open = new PriorityQueue<>(Comparator.comparingDouble(n -> n.f));
-        Map<Long, Node> openMap  = new HashMap<>();
-        Map<Long, Node> closed   = new HashMap<>();
+        Map<Long, Node> openMap = new HashMap<>();
+        Map<Long, Node> closed = new HashMap<>();
 
         Node start = new Node(startTX, startTY, 0f, heuristic(startTX, startTY, goalTX, goalTY), null);
         open.add(start);
@@ -3137,44 +3329,45 @@ public class PathFinder {
                 float tileCX = nx * ts + ts * 0.5f;
                 float tileCY = ny * ts + ts * 0.5f;
 
-
+                boolean isGoal = (nx == goalTX && ny == goalTY);
                 TileType tileType = geometry.getTile(nx, ny);
                 float tileCost = tileType.getPathCost();
                 // якщо не прохідний то не рахуємо
                 if (tileCost >= Float.MAX_VALUE) continue;
+                if (!isGoal) {
 
-                boolean blockedByBlocker = false;
-                for (Blocker blocker : blockers) {
-                    if (!blocker.getBounds().contains(tileCX, tileCY)) continue;
-                    if (ignoredBlockers.contains(blocker)) continue;
-                    if (blocker instanceof PathBlocker pathBlocker) {
-                        if (!pathBlocker.isTraversable()) {
+                    boolean blockedByBlocker = false;
+                    for (Blocker blocker : blockers) {
+                        if (!blocker.getBounds().contains(tileCX, tileCY)) continue;
+                        if (ignoredBlockers.contains(blocker)) continue;
+                        if (blocker instanceof PathBlocker pathBlocker) {
+                            if (!pathBlocker.isTraversable()) {
+                                blockedByBlocker = true;
+                                break;
+                            }
+                            // тут треба буде прикинути як краще, брати max або сумувати вартості
+                            // поки так бо простіше
+                            tileCost = Math.max(tileCost, pathBlocker.getPathCost());
+                        } else if (blocker.blocksMovement()) {
                             blockedByBlocker = true;
                             break;
                         }
-                        // тут треба буде прикинути як краще, брати max або сумувати вартості
-                        // поки так бо простіше
-                        tileCost = Math.max(tileCost, pathBlocker.getPathCost());
-                    } else if (blocker.blocksMovement()) {
-                        blockedByBlocker = true;
-                        break;
+                    }
+                    if (blockedByBlocker) continue;
+
+                    // Стандартна колізія (тайли, що не блокують рух, але можуть бути завузькими)
+                    if (!isTileWalkable(tileCX, tileCY, ew, eh, ignoredBlockers)) continue;
+
+                    // перевірка кутів, якщо хочемо йти по діагоналі, але проходу немає
+                    if (dir[0] != 0 && dir[1] != 0){
+                        float cx1 = (current.tx + dir[0]) * ts + ts * 0.5f;
+                        float cy1 = current.ty * ts + ts * 0.5f;
+                        float cx2 = current.tx * ts + ts * 0.5f;
+                        float cy2 = (current.ty + dir[1]) * ts + ts * 0.5f;
+                        if (!isTileWalkable(cx1, cy1, ew, eh, ignoredBlockers) ||
+                                !isTileWalkable(cx2, cy2, ew, eh, ignoredBlockers)) continue;
                     }
                 }
-                if (blockedByBlocker) continue;
-
-                // Стандартна колізія (тайли, що не блокують рух, але можуть бути завузькими)
-                if (!isTileWalkable(tileCX, tileCY, ew, eh, ignoredBlockers)) continue;
-
-                // перевірка кутів, якщо хочемо йти по діагоналі, але проходу немає
-                if (dir[0] != 0 && dir[1] != 0) {
-                    float cx1 = (current.tx + dir[0]) * ts + ts * 0.5f;
-                    float cy1 = current.ty * ts + ts * 0.5f;
-                    float cx2 = current.tx * ts + ts * 0.5f;
-                    float cy2 = (current.ty + dir[1]) * ts + ts * 0.5f;
-                    if (!isTileWalkable(cx1, cy1, ew, eh, ignoredBlockers) ||
-                            !isTileWalkable(cx2, cy2, ew, eh, ignoredBlockers)) continue;
-                }
-
                 float moveCost = (dir[0] != 0 && dir[1] != 0) ? DIAGONAL_COST : STRAIGHT_COST;
                 float newG = current.g + moveCost * tileCost;
                 float newH = heuristic(nx, ny, goalTX, goalTY);
@@ -3186,6 +3379,7 @@ public class PathFinder {
                 Node neighbor = new Node(nx, ny, newG, newF, current);
                 open.add(neighbor);
                 openMap.put(nKey, neighbor);
+
             }
         }
 
@@ -3218,10 +3412,10 @@ public class PathFinder {
     }
 
     private static class Node {
-        final int   tx, ty;
+        final int tx, ty;
         final float g;
         final float f;
-        final Node  parent;
+        final Node parent;
 
         Node(int tx, int ty, float g, float f, Node parent) {
             this.tx = tx;
@@ -3231,13 +3425,17 @@ public class PathFinder {
             this.parent = parent;
         }
     }
-    public float getTitleSize(){
+
+    public float getTitleSize() {
         return geometry.getTileSize();
     }
+
     private boolean isTileWalkable(float centerX, float centerY, float width, float height, List<Blocker> ignoredBlockers) {
+        float ts = geometry.getTileSize();
+        ;
+
         float halfW = width / 2f;
         float halfH = height / 2f;
-        float ts = geometry.getTileSize();
 
         int minTX = (int) Math.floor((centerX - halfW) / ts);
         int maxTX = (int) Math.floor((centerX + halfW) / ts);
@@ -3248,6 +3446,7 @@ public class PathFinder {
             for (int tx = minTX; tx <= maxTX; tx++) {
                 TileType tile = geometry.getTile(tx, ty);
                 if (!tile.canPass()) return false;
+
                 float tileCX = tx * ts + ts / 2f;
                 float tileCY = ty * ts + ts / 2f;
                 for (Blocker blocker : blockers) {

@@ -14,10 +14,12 @@ public class WeaponDefinition {
     private final boolean isSuppressed;
     private final boolean isAutomatic;
     private final WeaponBehavior behavior;
+    @Getter
+    private final float knockbackForce;
 
     public WeaponDefinition(String id, WeaponType weaponType, int damage, float range,
                             float cooldown, int maxAmmo, boolean isSuppressed,
-                            boolean isAutomatic, WeaponBehavior behavior) {
+                            boolean isAutomatic, WeaponBehavior behavior, float knockbackForce) {
         this.id = id;
         this.weaponType = weaponType;
         this.damage = damage;
@@ -27,6 +29,7 @@ public class WeaponDefinition {
         this.isSuppressed = isSuppressed;
         this.isAutomatic = isAutomatic;
         this.behavior = behavior;
+        this.knockbackForce = knockbackForce;
     }
 
 }

@@ -17,6 +17,7 @@ public class WeaponFireContext {
     private final float maxDistance;
     private final Set<Entity> ignoredEntities;
     private final int damage;
+    private final float knockbackForce;
 
     public WeaponFireContext(RayCastSystem raycastSystem,
                              Entity shooter,
@@ -24,7 +25,8 @@ public class WeaponFireContext {
                              Vec2 direction,
                              float maxDistance,
                              Set<Entity> ignoredEntities,
-                             int damage) {
+                             int damage,
+                             float knockbackForce) {
         this.raycastSystem = raycastSystem;
         this.shooter = shooter;
         this.origin = origin;
@@ -32,6 +34,7 @@ public class WeaponFireContext {
         this.maxDistance = maxDistance;
         this.ignoredEntities = ignoredEntities;
         this.damage = damage;
+        this.knockbackForce = knockbackForce;
     }
 
 

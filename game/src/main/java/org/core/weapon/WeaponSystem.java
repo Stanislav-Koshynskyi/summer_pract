@@ -1,6 +1,7 @@
 package org.core.weapon;
 
 import org.core.behavior.WeaponBehavior;
+import org.core.entity.Entity;
 import org.core.enums.WeaponType;
 import org.core.event.GameEvent;
 import org.core.event.MeleeAttackEvent;
@@ -21,6 +22,13 @@ public class WeaponSystem {
 
         for (RayCastResult hit : hits) {
             hit.tryApplyDamage(context.getDamage());
+            if (context.getKnockbackForce() > 0 && hit.getTarget() instanceof Entity target){
+                Vec2 knockbackDirection = context.getDirection().copy().normalize();
+                target.setVelocity(
+                        knockbackDirection.x * context.getKnockbackForce(),
+                        knockbackDirection.y * context.getKnockbackForce()
+                );
+            }
         }
 
         WeaponType type = def.getWeaponType();

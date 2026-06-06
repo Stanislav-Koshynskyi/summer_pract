@@ -14,6 +14,8 @@ public class CollisionSystem {
     // Мікро-відступ для запобігання "залипанню" на швах
     private static final float EPSILON = 0.001f;
 
+    public static final float DEFAULT_FRICTION = 5;
+
     public CollisionSystem(WorldGeometry geometry, List<Blocker> blockers) {
         this.geometry = geometry;
         this.blockers = blockers;

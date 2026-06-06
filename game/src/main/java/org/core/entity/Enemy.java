@@ -24,6 +24,10 @@ public class Enemy extends Entity implements Damageable, Blocker {
 
     private final String enemyId;
 
+    @Getter
+    @Setter
+    private boolean wasDamagedThisFrame = false;
+
     private AIState currentState;
     private float facingAngle;
     @Setter
@@ -70,6 +74,13 @@ public class Enemy extends Entity implements Damageable, Blocker {
         if (hp == 0) {
             alive = false;
         }
+        wasDamagedThisFrame = true;
+    }
+    public void resetDamageFlag(){
+        wasDamagedThisFrame = false;
+    }
+    public boolean isDamaged(){
+        return wasDamagedThisFrame;
     }
 
     public void changeState(AIState state) {

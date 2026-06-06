@@ -97,7 +97,8 @@ public class GameController {
                                     100,
                                     false,
                                     false,
-                                    new SimpleRayCastBehavior()
+                                    new SimpleRayCastBehavior(),
+                                    10
                             )),
                             d.enemyId,
                             patrolPath
@@ -119,13 +120,14 @@ public class GameController {
                 new Weapon(new WeaponDefinition(
                         "1",
                         WeaponType.HITSCAN,
-                        100,
+                        1,
                         2000f,
                         1f,
                         100,
                         false,
                         false,
-                        new SimpleRayCastBehavior()
+                        new SimpleRayCastBehavior(),
+                        100
                 ))
         );
         player.setMovementMode(pendingMovementMode);
@@ -177,6 +179,10 @@ public class GameController {
         // Крок 3. FootstepEmitter – згенерувати footstep SoundEvents
         // Крок 4. HearingSystem – обробити SoundEventQueue
 
+        for (Enemy enemy : levelState.getEnemies()) {
+            enemy.resetDamageFlag();
+        }
+
         List<GameEvent> aIEvents = enemyAI.update(delta);
         for (GameEvent e : aIEvents){
             levelState.addGameEvent(e);
@@ -184,8 +190,17 @@ public class GameController {
 
 
 
-        for (Enemy enemy: levelState.getEnemies()){
-            collisionSystem.move(enemy, enemy.getIntendedDx(), enemy.getIntendedDy());
+        for (Enemy enemy: levelState.getEnemies()) {
+            if (Math.abs(enemy.getVelocityX()) >= 0.01f || Math.abs(enemy.getVelocityY()) >= 0.01f) {
+                collisionSystem.applyKnockback(enemy, delta, CollisionSystem.DEFAULT_FRICTION);
+                if (Math.abs(enemy.getVelocityX()) < 0.5f && Math.abs(enemy.getVelocityY()) < 0.5f){
+                    enemy.setVelocity(0, 0);
+
+                }
+
+            } else {
+                collisionSystem.move(enemy, enemy.getIntendedDx(), enemy.getIntendedDy());
+            }
         }
 
         if (pendingDx != 0f || pendingDy != 0f) {
@@ -216,7 +231,8 @@ public class GameController {
                         rayCastSystem, player, from, target,
                         weapon.getDefinition().getRange(),
                         Set.of(player),
-                        weapon.getDefinition().getDamage()
+                        weapon.getDefinition().getDamage(),
+                        weapon.getDefinition().getKnockbackForce()
                 );
                 List<GameEvent> events = weaponSystem.useWeapon(context, weapon);
                 for (GameEvent e : events){
@@ -227,6 +243,12 @@ public class GameController {
         }
         // Крок 10. Перевірити deaths → перемістити в corpses
         levelState.flushDeadEnemies();
+
+        for (Enemy enemy : levelState.getEnemies()) {
+            if (enemy.isDamaged()) {
+                enemyAI.onEnemyHit(enemy, player);
+            }
+        }
 
         // Перевірка смерті гравця
         if (!player.isAlive()) {
