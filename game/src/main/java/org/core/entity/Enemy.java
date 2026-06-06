@@ -210,4 +210,22 @@ public class Enemy extends Entity implements Damageable, Blocker {
     public boolean isShotCommitStarted(){
         return shotCommitStarted;
     }
+    public float getCollisionWidth(){
+        return getWidth() * 0.99f;
+    }
+    public float getCollisionHeight(){
+        return getHeight() * 0.99f;
+    }
+    public float getCollisionLeft(){
+        return getX() - getCollisionWidth() / 2f;
+    }
+    public float getCollisionRight(){
+        return getX() + getCollisionWidth() / 2f;
+    }
+    public float getCollisionTop(){
+        return getY() + getCollisionHeight() / 2f;
+    }
+    public float getCollisionBottom(){
+        return getY() - getCollisionHeight() / 2f;
+    }
 }

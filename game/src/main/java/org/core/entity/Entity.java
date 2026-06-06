@@ -43,10 +43,10 @@ public class Entity {
         return y - height / 2f;
     }
     public float getCollisionWidth(){
-        return width * 0.99f;
+        return width;
     }
     public float getCollisionHeight(){
-        return height * 0.99f;
+        return height;
     }
     public float getCollisionLeft(){
         return x - getCollisionWidth() / 2f;
