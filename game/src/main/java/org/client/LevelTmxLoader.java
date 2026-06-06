@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import org.core.data.*;
+import org.core.enums.DoorState;
 import org.core.enums.TileType;
 import org.core.geometry.WorldGeometry;
 
@@ -103,44 +104,6 @@ public class LevelTmxLoader {
                     );
                     enemySpawns.add(enemyData);
                 }
-
-                if (objectType.equals("Door")) {
-                    String doorId = objectProps.get("doorId", String.class);
-                    String orientation = objectProps.get("orientation", String.class);
-                    float widthDoor = objectProps.containsKey("width") ? objectProps.get("width", Float.class) : (float) tileSize;
-                    float heightDoor = objectProps.containsKey("height") ? objectProps.get("height", Float.class) : (float) tileSize;
-                    float openingDuration = objectProps.containsKey("openingDuration") ? objectProps.get("openingDuration", Float.class) : 1.0f;
-                    int startTileX = (int) (worldX / tileSize);
-                    int startTileY = (int) (worldY / tileSize);
-
-                    int tilesX = Math.max(1, (int) Math.ceil(width / tileSize));
-                    int tilesY = Math.max(1, (int) Math.ceil(height / tileSize));
-
-                    int[][] blockedTiles = new int[tilesX * tilesY][2];
-                    int index = 0;
-
-                    for (int tx = 0; tx < tilesX; tx++) {
-                        for (int ty = 0; ty < tilesY; ty++) {
-                            blockedTiles[index][0] = startTileX + tx;
-                            blockedTiles[index][1] = startTileY + ty;
-                            index++;
-                        }
-                    }
-
-                    org.core.enums.DoorState initialState = org.core.enums.DoorState.CLOSED;
-                    if (objectProps.containsKey("initialState")) {
-                        try {
-                            initialState = org.core.enums.DoorState.valueOf(objectProps.get("initialState", String.class).toUpperCase());
-                        } catch (IllegalArgumentException e) {
-                            initialState = org.core.enums.DoorState.CLOSED;
-                        }
-                    }
-                    DoorData doorData = new DoorData(
-                            doorId, worldX, worldY, widthDoor, heightDoor, initialState, blockedTiles, openingDuration
-                    );
-                    doors.add(doorData);
-                }
-
                 if (objectType.equals("WeaponPickup")) {
                     int weaponId = objectProps.get("weaponId", Integer.class);
                     String weapon = String.valueOf(weaponId);
@@ -175,6 +138,58 @@ public class LevelTmxLoader {
                     );
                     waypoints.add(waypointData);
                 }
+            }
+        }
+
+        // Двері
+        MapLayer doorsLayer = map.getLayers().get("doors");
+        for (MapObject door : doorsLayer.getObjects()) {
+
+            MapProperties doorProps = door.getProperties();
+            String objectType = doorProps.get("type", String.class);
+            if (objectType == null) {
+                continue;
+            }
+
+            float worldX = doorProps.get("x", Float.class);
+            float worldY = doorProps.get("y", Float.class);
+            if (objectType.equals("Door")) {
+                int doorId = doorProps.get("doorId", Integer.class);
+                String orientation = doorProps.get("orientation", String.class);
+                float widthDoor = doorProps.get("width", Float.class);
+                float heightDoor = doorProps.get("height", Float.class);
+                float openingDuration = doorProps.containsKey("openingDuration") ? doorProps.get("openingDuration", Float.class) : 1.0f;
+                int startTileX = (int) (worldX / tileSize);
+                int startTileY = (int) (worldY / tileSize);
+
+                int tilesX = Math.max(1, (int) Math.ceil(widthDoor  / tileSize));
+                int tilesY = Math.max(1, (int) Math.ceil(heightDoor / tileSize));
+
+                int[][] blockedTiles = new int[tilesX * tilesY][2];
+                int index = 0;
+
+                for (int tx = 0; tx < tilesX; tx++) {
+                    for (int ty = 0; ty < tilesY; ty++) {
+                        blockedTiles[index][0] = startTileX + tx;
+                        blockedTiles[index][1] = startTileY + ty;
+                        index++;
+                    }
+                }
+
+                DoorState initialState = DoorState.CLOSED;
+                if (doorProps.containsKey("initialState")) {
+                    try {
+                        initialState = org.core.enums.DoorState.valueOf(doorProps.get("initialState", String.class).toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        initialState = org.core.enums.DoorState.CLOSED;
+                    }
+                }
+
+                String doorNumber = String.valueOf(doorId);
+                DoorData doorData = new DoorData(
+                        doorNumber, worldX, worldY, widthDoor, heightDoor, initialState, blockedTiles, openingDuration
+                );
+                doors.add(doorData);
             }
         }
         return new LevelData(

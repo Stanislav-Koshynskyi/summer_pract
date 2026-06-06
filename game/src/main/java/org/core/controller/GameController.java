@@ -355,4 +355,8 @@ public class GameController {
         }
         return Collections.emptyList();
     }
+
+    public List<Door> getDoors() {
+        return levelState.getDoors();
+    }
 }

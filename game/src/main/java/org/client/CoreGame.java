@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -19,6 +20,7 @@ import org.core.data.*;
 import org.core.definition.EnemyProfile;
 import org.core.entity.*;
 import org.core.enums.AimBehaviorType;
+import org.core.enums.DoorState;
 import org.core.event.*;
 import org.core.math.Vec2;
 import org.core.state.*;
@@ -35,6 +37,8 @@ public class CoreGame extends ApplicationAdapter {
     private OrthographicCamera camera;
     private CameraInputController cameraController;
     private SpriteBatch spriteBatch;
+    private Texture doorOpenedTexture;
+    private Texture doorClosedTexture;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -50,7 +54,7 @@ public class CoreGame extends ApplicationAdapter {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        map = new TmxMapLoader().load("maps/tests/waypointTest.tmx");
+        map = new TmxMapLoader().load("maps/tests/test.tmx");
         float unitScale = 1f;
         renderer = new OrthogonalTiledMapRenderer(map, unitScale);
 
@@ -92,6 +96,9 @@ public class CoreGame extends ApplicationAdapter {
         this.gameStateView = gameController.getStateView();
 
         shapeRenderer = new ShapeRenderer();
+        spriteBatch = new SpriteBatch();
+        doorOpenedTexture = new Texture(Gdx.files.internal("textures/door_opened.png"));
+        doorClosedTexture = new Texture(Gdx.files.internal("textures/door_closed.png"));
     }
 
     @Override
@@ -267,6 +274,19 @@ public class CoreGame extends ApplicationAdapter {
             shapeRenderer.line(effect.fromX, effect.fromY, effect.toX, effect.toY);
         }
         shapeRenderer.end();
+
+        // Тимчасові текстури дверей
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
+        for (Door door : gameController.getDoors()) {
+            if (door.getState() == DoorState.OPEN) {
+                spriteBatch.draw(doorOpenedTexture, door.getX(), door.getY(), door.getWidth(), door.getHeight());
+            }
+            if (door.getState() == DoorState.CLOSED) {
+                spriteBatch.draw(doorClosedTexture, door.getX(), door.getY(), door.getWidth(), door.getHeight());
+            }
+        }
+        spriteBatch.end();
     }
 
     @Override
@@ -274,6 +294,9 @@ public class CoreGame extends ApplicationAdapter {
         map.dispose();
         renderer.dispose();
         shapeRenderer.dispose();
+        spriteBatch.dispose();
+        doorClosedTexture.dispose();
+        doorOpenedTexture.dispose();
         attackEffects.clear();
     }
 
