@@ -14,18 +14,18 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
-import org.core.ai.EnemyAI;
 import org.core.controller.GameController;
 import org.core.data.*;
 import org.core.definition.EnemyProfile;
 import org.core.entity.*;
 import org.core.enums.AimBehaviorType;
+import org.core.event.*;
 import org.core.math.Vec2;
-import org.core.raycast.RayCastSystem;
 import org.core.state.*;
 import org.core.weapon.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class CoreGame extends ApplicationAdapter {
@@ -42,6 +42,7 @@ public class CoreGame extends ApplicationAdapter {
     private GameController gameController;
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
+    private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
 
     @Override
     public void create() {
@@ -130,6 +131,33 @@ public class CoreGame extends ApplicationAdapter {
         camera.unproject(mouseInWorld);
         gameController.aimPlayer(mouseInWorld.x, mouseInWorld.y);
         gameController.update(Gdx.graphics.getDeltaTime());
+
+        Iterator<VisualAttackEffect> it = attackEffects.iterator();
+        while (it.hasNext()) {
+            VisualAttackEffect effect = it.next();
+            effect.lifetime -= dt;
+            if (effect.lifetime <= 0) {
+                it.remove();
+            }
+        }
+
+        List<GameEvent> events = gameController.drainEvents();
+        for (GameEvent event : events) {
+            if (event instanceof ShotFiredEvent) {
+                ShotFiredEvent shot = (ShotFiredEvent) event;
+
+                for (Vec2 targetPos : shot.getTargets()) {
+                    attackEffects.add(new VisualAttackEffect(
+                            shot.fromX,
+                            shot.fromY,
+                            targetPos.x,
+                            targetPos.y,
+                            0.3f,
+                            Color.YELLOW
+                    ));
+                }
+            }
+        }
     }
 
     private void draw() {
@@ -226,6 +254,14 @@ public class CoreGame extends ApplicationAdapter {
                 shapeRenderer.end();
             }
         }
+
+        // Постріли
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (VisualAttackEffect effect : attackEffects) {
+            shapeRenderer.setColor(effect.color);
+            shapeRenderer.line(effect.fromX, effect.fromY, effect.toX, effect.toY);
+        }
+        shapeRenderer.end();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.core.event;
 
+import lombok.Getter;
 import org.core.math.Vec2;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 public class ShotFiredEvent extends GameEvent {
     public float fromX, fromY;
     public String weaponId;
+    @Getter
     List<Vec2> targets;
     public boolean isSuppressed;
 
