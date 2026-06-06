@@ -38,8 +38,9 @@ public class CoreGame extends ApplicationAdapter {
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
-    private LevelState levelState;
     private GameController gameController;
+    private EnemyProfile testEnemyProfile;
+    private WeaponSystem weaponSystem;
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
@@ -60,7 +61,7 @@ public class CoreGame extends ApplicationAdapter {
         //Gdx.input.setInputProcessor(cameraController);
 
         // тестовий профіль, щоб програма не падала
-        EnemyProfile testEnemyProfile = new EnemyProfile(
+        testEnemyProfile = new EnemyProfile(
                 "1",
                 100,
                 120f,
@@ -80,11 +81,10 @@ public class CoreGame extends ApplicationAdapter {
                 123f
         );
 
-        WeaponSystem weaponSystem = new WeaponSystem();
+        weaponSystem = new WeaponSystem();
 
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
-        levelState = new LevelState();
 
         gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
         gameController.loadLevel(levelData);
@@ -119,6 +119,11 @@ public class CoreGame extends ApplicationAdapter {
 
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             gameController.shoot();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            restart();
+            return;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * dt;
@@ -269,6 +274,15 @@ public class CoreGame extends ApplicationAdapter {
         map.dispose();
         renderer.dispose();
         shapeRenderer.dispose();
+        attackEffects.clear();
+    }
+
+    private void restart() {
+        LevelTmxLoader levelLoader = new LevelTmxLoader();
+        LevelData levelData = levelLoader.parseMapObjects(map);
+        gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
+        gameController.loadLevel(levelData);
+        this.gameStateView = gameController.getStateView();
     }
 
 }
