@@ -53,7 +53,6 @@ public class GameController {
     private final Object weaponRegistry;
     private final Object enemyProfileRegistry;
     private final Map<AimBehaviorType, ?> aimBehaviors;
-
     public GameController(Object weaponRegistry,
                           Object enemyProfileRegistry,
                           Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem) {
@@ -150,7 +149,7 @@ public class GameController {
         Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
         aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
         enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem
-        , aimBehaviorMap);
+        , aimBehaviorMap, doors, levelState.getWorldGeometry());
         clearPendingCommands();
 
 

@@ -1,12 +1,15 @@
 package org.core.ai;
 
 import org.core.behavior.AimBehavior;
+import org.core.controller.GameController;
+import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.Entity;
 import org.core.entity.Player;
 import org.core.enums.AIState;
 import org.core.enums.AimBehaviorType;
 import org.core.event.GameEvent;
+import org.core.geometry.WorldGeometry;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastSystem;
 import org.core.weapon.Weapon;
@@ -24,6 +27,7 @@ public class EnemyAI {
 
     private static final float PIXEL_TOLERANCE = 5;
     private static final float DEGREE_TOLERANCE = 10;
+    private static final float INTERACTION_RADIUS = 32;
 
     // коли останній раз міняли шлях, треба щоб не рахувати шлях дуже часто
     private final Map<Enemy, Float> lastPathUpdate = new HashMap<>();
@@ -35,9 +39,12 @@ public class EnemyAI {
     private final WeaponSystem weaponSystem;
     private final RayCastSystem rayCastSystem;
     private final Map<AimBehaviorType, AimBehavior> aimBehaviors;
+    private final List<Door> doors;
+    private final WorldGeometry worldGeometry;
 
     public EnemyAI(VisionSystem visionSystem, List<Enemy> enemies, Player player, PathFinder pathfinder,
-                   WeaponSystem weaponSystem, RayCastSystem rayCastSystem, Map<AimBehaviorType, AimBehavior> aimBehaviors) {
+                   WeaponSystem weaponSystem, RayCastSystem rayCastSystem, Map<AimBehaviorType,
+                    AimBehavior> aimBehaviors, List<Door> doors, WorldGeometry worldGeometry) {
         this.visionSystem = visionSystem;
         this.enemies = enemies;
         this.player = player;
@@ -45,6 +52,8 @@ public class EnemyAI {
         this.weaponSystem = weaponSystem;
         this.rayCastSystem = rayCastSystem;
         this.aimBehaviors = aimBehaviors;
+        this.doors = doors;
+        this.worldGeometry = worldGeometry;
     }
 
     public List<GameEvent> update(float delta) {
@@ -78,6 +87,7 @@ public class EnemyAI {
     }
 
     private void processState(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
+        tryOpenDoorInPath(enemy);
         switch (enemy.getCurrentState()) {
             case PATROL -> updatePatrol(enemy, seesPlayer, delta, events);
             case ATTACK -> updateAttack(enemy, seesPlayer, delta, events);
@@ -344,5 +354,28 @@ public class EnemyAI {
     public void onEnemyHit(Enemy enemy, Entity hitter){
         if (enemy.getCurrentState() == AIState.ATTACK) return;
         enterSearch(enemy);
+    }
+    private void tryOpenDoorInPath(Enemy enemy){
+        List<Vec2> path = enemy.getCurrentPath();
+        if (path == null || path.isEmpty()) return;
+
+        Vec2 nextPoint = path.get(0);
+        float ts = worldGeometry.getTileSize();
+        int tileX = (int) Math.floor(nextPoint.x / ts);
+        int tileY = (int) Math.floor(nextPoint.y / ts);
+        float tileCX = tileX * ts + ts / 2f;
+        float tileCY = tileY * ts + ts / 2f;
+        Door door = findDoorAt(tileCX, tileCY);
+        if (door == null) return;
+        float distToDoor = new Vec2(enemy.getX(), enemy.getY()).distanceTo(door.getX(), door.getY());
+        if (distToDoor <= INTERACTION_RADIUS){
+            door.requestOpen();
+        }
+    }
+    private Door findDoorAt(float worldX, float worldY) {
+        for (Door door : doors) {
+            if (door.getBounds().contains(worldX, worldY)) return door;
+        }
+        return null;
     }
 }
