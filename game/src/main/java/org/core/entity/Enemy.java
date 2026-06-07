@@ -167,7 +167,10 @@ public class Enemy extends Entity implements Damageable, Blocker {
     }
 
     public void resetAimMemoryTimer() {
-        aimMemoryTimer = profile.getAimMemoryDuration();
+         aimMemoryTimer = switch (currentState){
+            case SEARCH, INVESTIGATE -> profile.getSearchMemoryDuration();
+            default -> profile.getAimMemoryDuration();
+        };
     }
 
     public void resetShotCommitTimer() {

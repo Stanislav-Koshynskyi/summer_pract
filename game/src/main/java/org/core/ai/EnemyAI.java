@@ -120,11 +120,18 @@ public class EnemyAI {
     }
 
     private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
+        enemy.setIntendMove(0,0);
         if (!seesPlayer) {
-            // Гравець зник
-            enterSearch(enemy);
+            enemy.setReactionTimer(0f);
+            float targetAngle = (float) Math.toDegrees(Math.atan2(enemy.getLastKnownPlayerX() - enemy.getX(), enemy.getLastKnownPlayerY() - enemy.getY()));
+            enemy.rotateTowards(targetAngle, delta);
+            if (enemy.isAimMemoryTimer()) {
+                enterSearch(enemy);
+            }
             return;
         }
+        enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
+        enemy.resetAimMemoryTimer();
         AimBehavior behavior = aimBehaviors.get(enemy.getProfile().getAimBehaviorType());
         if (behavior != null) {
             behavior.updateAim(enemy, player, delta);
@@ -203,7 +210,7 @@ public class EnemyAI {
         if (enemy.getCurrentState() == AIState.ATTACK) return;
         enemy.setLastKnownPlayerPosition(worldX, worldY);
         enemy.changeState(AIState.INVESTIGATE);
-        enemy.resetAimMemoryTimer();
+        enemy.setAimMemoryTimer(0);
 
         List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY, List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);

@@ -72,7 +72,8 @@ public class CoreGame extends ApplicationAdapter {
                 220f,
                 300f,
                 0.5f,
-                0.4f,
+                0.1f,
+                0.5f,
                 3.0f,
                 200f,
                 AimBehaviorType.values()[0],
@@ -82,7 +83,7 @@ public class CoreGame extends ApplicationAdapter {
                 16f,
                 16f,
                 23f,
-                123f
+                600
         );
 
         weaponSystem = new WeaponSystem();
