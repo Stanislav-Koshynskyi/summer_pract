@@ -220,7 +220,8 @@ public class EnemyAI {
         if (enemy.getCurrentState() == AIState.ATTACK) return;
         enemy.setLastKnownPlayerPosition(worldX, worldY);
         enemy.changeState(AIState.INVESTIGATE);
-        enemy.setAimMemoryTimer(0);
+        enemy.setReactionTimer(0);
+        enemy.resetAimMemoryTimer();
 
         List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY, List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
