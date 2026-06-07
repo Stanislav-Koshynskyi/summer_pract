@@ -123,7 +123,7 @@ public class EnemyAI {
         enemy.setIntendMove(0,0);
         if (!seesPlayer) {
             enemy.setReactionTimer(0f);
-            float targetAngle = (float) Math.toDegrees(Math.atan2(enemy.getLastKnownPlayerX() - enemy.getX(), enemy.getLastKnownPlayerY() - enemy.getY()));
+            float targetAngle = (float) Math.toDegrees(Math.atan2(enemy.getLastKnownPlayerY() - enemy.getY(), enemy.getLastKnownPlayerX() - enemy.getX()));
             enemy.rotateTowards(targetAngle, delta);
             if (enemy.isAimMemoryTimer()) {
                 enterSearch(enemy);
