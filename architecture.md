@@ -327,7 +327,7 @@ List<GameEvent> drainEvents()
 - Вороги відчиняють тільки двері у стані `CLOSED`. `LOCKED` вороги не можуть відчинити.
 - A* будує маршрут через `DOOR_CLOSED` з high cost → ворог підходить і викликає `requestDoorOpen`.
 - `requestDoorOpen`: якщо двері вже `OPENING` або `OPEN` — виклик ігнорується.
-- Канонічний enum станів дверей: `OPEN`, `CLOSED`, `OPENING`, `LOCKED`. У MVP використовується `OPEN/CLOSED/OPENING`; `LOCKED` залишається для stretch.
+- Канонічний enum станів дверей: `OPEN`, `CLOSED`, `OPENING`, `CLOSING`, `LOCKED`. У MVP використовується `OPEN/CLOSED/OPENING/CLOSING`; `LOCKED` залишається для stretch.
 
 ### 6.13 LevelOutcome
 
