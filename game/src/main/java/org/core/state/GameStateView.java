@@ -230,6 +230,9 @@ public class GameStateView {
             return p.isEmpty();
         }
     }
+    public boolean isCurrentWeaponAutomatic() {
+        return state.getPlayer().getCurrentWeapon().getDefinition().isAutomatic();
+    }
 
     public static class StatsView {
         private final LevelStats s;
