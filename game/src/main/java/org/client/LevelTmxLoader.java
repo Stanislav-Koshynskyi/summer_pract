@@ -153,6 +153,7 @@ public class LevelTmxLoader {
 
             float worldX = doorProps.get("x", Float.class);
             float worldY = doorProps.get("y", Float.class);
+
             if (objectType.equals("Door")) {
                 int doorId = doorProps.get("doorId", Integer.class);
                 String orientation = doorProps.get("orientation", String.class);
@@ -161,6 +162,9 @@ public class LevelTmxLoader {
                 float openingDuration = doorProps.containsKey("openingDuration") ? doorProps.get("openingDuration", Float.class) : 1.0f;
                 int startTileX = (int) (worldX / tileSize);
                 int startTileY = (int) (worldY / tileSize);
+
+                float centerX = worldX + widthDoor / 2f;
+                float centerY = worldY + heightDoor / 2f;
 
                 int tilesX = Math.max(1, (int) Math.ceil(widthDoor  / tileSize));
                 int tilesY = Math.max(1, (int) Math.ceil(heightDoor / tileSize));
@@ -187,7 +191,7 @@ public class LevelTmxLoader {
 
                 String doorNumber = String.valueOf(doorId);
                 DoorData doorData = new DoorData(
-                        doorNumber, worldX, worldY, widthDoor, heightDoor, initialState, blockedTiles, openingDuration
+                        doorNumber, centerX, centerY, widthDoor, heightDoor, initialState, blockedTiles, openingDuration
                 );
                 doors.add(doorData);
             }

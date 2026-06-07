@@ -280,11 +280,13 @@ public class CoreGame extends ApplicationAdapter {
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         for (Door door : gameController.getDoors()) {
+            float drawX = door.getX() - door.getWidth() / 2f;
+            float drawY = door.getY() - door.getHeight() / 2f;
             if (door.getState() == DoorState.OPEN) {
-                spriteBatch.draw(doorOpenedTexture, door.getX(), door.getY(), door.getWidth(), door.getHeight());
+                spriteBatch.draw(doorOpenedTexture, drawX, drawY, door.getWidth(), door.getHeight());
             }
             if (door.getState() == DoorState.CLOSED) {
-                spriteBatch.draw(doorClosedTexture, door.getX(), door.getY(), door.getWidth(), door.getHeight());
+                spriteBatch.draw(doorClosedTexture, drawX, drawY, door.getWidth(), door.getHeight());
             }
         }
         spriteBatch.end();
