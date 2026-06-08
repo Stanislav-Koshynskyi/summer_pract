@@ -8,6 +8,7 @@ import org.core.entity.Player;
 import org.core.entity.WeaponPickup;
 import org.core.enums.GamePhase;
 import org.core.enums.GoalType;
+import org.core.event.EnemyDiedEvent;
 import org.core.event.GameEvent;
 import org.core.event.SoundEventQueue;
 import org.core.geometry.WorldGeometry;
@@ -78,15 +79,18 @@ public class LevelState {
         return phase == GamePhase.PLAYING;
     }
 
-    public void flushDeadEnemies() {
+    public List<GameEvent> flushDeadEnemies() {
         Iterator<Enemy> it = enemies.iterator();
+        List<GameEvent> deadEvents = new ArrayList<>();
         while (it.hasNext()) {
             Enemy e = it.next();
             if (!e.isAlive()) {
+                deadEvents.add(new EnemyDiedEvent(e.getX(), e.getY(), e.getEnemyId()));
                 corpses.add(e);
                 it.remove();
             }
         }
+        return deadEvents;
     }
 
     public List<GameEvent> getGameEvents() {
@@ -94,6 +98,9 @@ public class LevelState {
     }
     public void addGameEvent(GameEvent event) {
         gameEvents.add(event);
+    }
+    public void addAllGameEvent(List<GameEvent> events){
+        gameEvents.addAll(events);
     }
     public void clearGameEvents() {
         gameEvents.clear();

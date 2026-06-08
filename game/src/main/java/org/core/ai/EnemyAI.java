@@ -1,13 +1,14 @@
 package org.core.ai;
 
+import com.badlogic.gdx.Game;
 import org.core.behavior.AimBehavior;
-import org.core.controller.GameController;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.Entity;
 import org.core.entity.Player;
 import org.core.enums.AIState;
 import org.core.enums.AimBehaviorType;
+import org.core.event.EnemyAlertedEvent;
 import org.core.event.GameEvent;
 import org.core.geometry.WorldGeometry;
 import org.core.math.Vec2;
@@ -71,7 +72,7 @@ public class EnemyAI {
             updateTimers(enemy, delta);
 
             boolean seesPlayer = visionSystem.canEnemySeePlayer(enemy, player, ignoredEntities);
-
+            tryOpenDoorInPath(enemy);
             processState(enemy, seesPlayer, delta, events);
         }
         return events;
@@ -87,7 +88,6 @@ public class EnemyAI {
     }
 
     private void processState(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
-        tryOpenDoorInPath(enemy);
         switch (enemy.getCurrentState()) {
             case PATROL -> updatePatrol(enemy, seesPlayer, delta, events);
             case ATTACK -> updateAttack(enemy, seesPlayer, delta, events);
@@ -98,7 +98,7 @@ public class EnemyAI {
 
     private void updateInvestigate(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
-            enterAttack(enemy);
+            enterAttack(enemy, events);
             return;
         }
 
@@ -111,7 +111,7 @@ public class EnemyAI {
         }
 
         if (enemy.isAimMemoryTimer()) {
-            returnToPatrol(enemy);
+            returnToPatrol(enemy, events);
             return;
         }
         performSearchRotation(enemy, delta);
@@ -119,7 +119,7 @@ public class EnemyAI {
 
     private void updatePatrol(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
-            enterAttack(enemy);
+            enterAttack(enemy, events);
             return;
         }
         if (enemy.getCurrentPath().isEmpty()) {
@@ -136,7 +136,7 @@ public class EnemyAI {
             float targetAngle = (float) Math.toDegrees(Math.atan2(enemy.getLastKnownPlayerY() - enemy.getY(), enemy.getLastKnownPlayerX() - enemy.getX()));
             enemy.rotateTowards(targetAngle, delta);
             if (enemy.isAimMemoryTimer()) {
-                enterSearch(enemy);
+                enterSearch(enemy, events);
             }
             return;
         }
@@ -196,7 +196,7 @@ public class EnemyAI {
     private void updateSearch(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
             applyMemoryReaction(enemy);
-            enterAttack(enemy);
+            enterAttack(enemy, events);
             return;
         }
 
@@ -209,15 +209,15 @@ public class EnemyAI {
         }
 
         if (enemy.isAimMemoryTimer()) {
-            returnToPatrol(enemy);
+            returnToPatrol(enemy, events);
             return;
         }
         performSearchRotation(enemy, delta);
 
     }
 
-    public void onSoundHeard(Enemy enemy, float worldX, float worldY) {
-        if (enemy.getCurrentState() == AIState.ATTACK) return;
+    public List<GameEvent> onSoundHeard(Enemy enemy, float worldX, float worldY) {
+        if (enemy.getCurrentState() == AIState.ATTACK) return new ArrayList<>();
         enemy.setLastKnownPlayerPosition(worldX, worldY);
         enemy.changeState(AIState.INVESTIGATE);
         enemy.setReactionTimer(0);
@@ -226,6 +226,7 @@ public class EnemyAI {
         List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY, List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
 
+        return List.of(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.INVESTIGATE));
     }
 
     private void updatePathToPlayer(Enemy enemy, float delta) {
@@ -296,12 +297,14 @@ public class EnemyAI {
         enemy.setIntendMove(moveX, moveY);
     }
 
-    private void enterAttack(Enemy enemy) {
+    private void enterAttack(Enemy enemy, List<GameEvent> events) {
+        events.add(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.ATTACK));
         enemy.changeState(AIState.ATTACK);
         enemy.resetReactionTimer();
         lastPathUpdate.remove(enemy); // негайно перебудувати шлях
     }
-    private void enterSearch(Enemy enemy){
+    private void enterSearch(Enemy enemy, List<GameEvent> events){
+        events.add(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.SEARCH));
         enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
         enemy.resetAimMemoryTimer();
         enemy.changeState(AIState.SEARCH);
@@ -348,13 +351,17 @@ public class EnemyAI {
         buildPathToPatrolTarget(enemy);
     }
 
-    private void returnToPatrol(Enemy enemy) {
+    private void returnToPatrol(Enemy enemy, List<GameEvent> events) {
         enemy.changeState(AIState.PATROL);
         buildPathToPatrolTarget(enemy);
+        events.add(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.PATROL));
     }
-    public void onEnemyHit(Enemy enemy, Entity hitter){
-        if (enemy.getCurrentState() == AIState.ATTACK) return;
-        enterSearch(enemy);
+    public List<GameEvent> onEnemyHit(Enemy enemy, Entity hitter){
+        if (enemy.getCurrentState() == AIState.ATTACK) return new ArrayList<>();
+        ArrayList<GameEvent> list = new ArrayList<>();
+        enterSearch(enemy, list);
+        return list;
+
     }
     private void tryOpenDoorInPath(Enemy enemy){
         List<Vec2> path = enemy.getCurrentPath();

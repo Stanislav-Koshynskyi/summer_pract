@@ -183,9 +183,7 @@ public class GameController {
         }
 
         List<GameEvent> aIEvents = enemyAI.update(delta);
-        for (GameEvent e : aIEvents){
-            levelState.addGameEvent(e);
-        }
+        levelState.addAllGameEvent(aIEvents);
 
 
 
@@ -233,19 +231,17 @@ public class GameController {
                         weapon.getDefinition().getDamage(),
                         weapon.getDefinition().getKnockbackForce()
                 );
-                List<GameEvent> events = weaponSystem.useWeapon(context, weapon);
-                for (GameEvent e : events){
-                    levelState.addGameEvent(e);
-                }
+                List<GameEvent> weaponEvents = weaponSystem.useWeapon(context, weapon);
+                levelState.addAllGameEvent(weaponEvents);
             }
             pendingShoot = false;
         }
         // Крок 10. Перевірити deaths → перемістити в corpses
-        levelState.flushDeadEnemies();
-
+        List<GameEvent> deadEvent = levelState.flushDeadEnemies();
+        levelState.addAllGameEvent(deadEvent);
         for (Enemy enemy : levelState.getEnemies()) {
             if (enemy.isDamaged()) {
-                enemyAI.onEnemyHit(enemy, player);
+                levelState.addAllGameEvent(enemyAI.onEnemyHit(enemy, player));
             }
         }
 
