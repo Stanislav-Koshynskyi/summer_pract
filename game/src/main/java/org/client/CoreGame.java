@@ -54,7 +54,7 @@ public class CoreGame extends ApplicationAdapter {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        map = new TmxMapLoader().load("maps/tests/test.tmx");
+        map = new TmxMapLoader().load("maps/level_01.tmx");
         float unitScale = 1f;
         renderer = new OrthogonalTiledMapRenderer(map, unitScale);
 
@@ -116,7 +116,7 @@ public class CoreGame extends ApplicationAdapter {
     private void logic() {
         if (gameController == null) return;
 
-        float speed = 200f;
+        float speed = gameStateView.getPlayerSpeed();
         float dt = Gdx.graphics.getDeltaTime();
         float dx = 0f;
         float dy = 0f;

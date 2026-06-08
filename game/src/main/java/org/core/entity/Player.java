@@ -8,7 +8,7 @@ import org.core.math.Rect;
 import org.core.weapon.Weapon;
 
 public class Player extends Entity implements Damageable, Blocker {
-
+    public static final float BASE_MOVE_SPEED = 16;
     @Getter
     private Weapon currentWeapon;
     @Setter
@@ -82,6 +82,9 @@ public class Player extends Entity implements Damageable, Blocker {
     @Override
     public float getSoundAttenuationFactor() {
         return 1;
+    }
+    public float getSpeed(){
+        return BASE_MOVE_SPEED * movementMode.getSpeedMultiply();
     }
 }
 
