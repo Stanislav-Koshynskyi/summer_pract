@@ -120,14 +120,14 @@ public class GameController {
                 new Weapon(new WeaponDefinition(
                         "1",
                         WeaponType.HITSCAN,
-                        1,
-                        2000f,
+                        50,
+                        250,
                         1f,
                         100,
                         false,
                         false,
                         new SimpleRayCastBehavior(),
-                        100
+                        30
                 ))
         );
         player.setMovementMode(pendingMovementMode);
