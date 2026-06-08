@@ -8,7 +8,7 @@ import org.core.math.Rect;
 import org.core.weapon.Weapon;
 
 public class Player extends Entity implements Damageable, Blocker {
-    public static final float BASE_MOVE_SPEED = 16;
+    public static final float BASE_MOVE_SPEED = 100f;
     @Getter
     private Weapon currentWeapon;
     @Setter

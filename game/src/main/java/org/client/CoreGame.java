@@ -19,8 +19,7 @@ import org.core.controller.GameController;
 import org.core.data.*;
 import org.core.definition.EnemyProfile;
 import org.core.entity.*;
-import org.core.enums.AimBehaviorType;
-import org.core.enums.DoorState;
+import org.core.enums.*;
 import org.core.event.*;
 import org.core.math.Vec2;
 import org.core.state.*;
@@ -132,6 +131,14 @@ public class CoreGame extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             restart();
             return;
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            gameController.setMovementMode(MovementMode.RUN);
+        } else if (Gdx.input.isKeyPressed(Input.Keys.C)) {
+            gameController.setMovementMode(MovementMode.SNEAK);
+        } else {
+            gameController.setMovementMode(MovementMode.WALK);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * dt;
