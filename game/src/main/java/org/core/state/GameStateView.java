@@ -233,6 +233,9 @@ public class GameStateView {
     public boolean isCurrentWeaponAutomatic() {
         return state.getPlayer().getCurrentWeapon().getDefinition().isAutomatic();
     }
+    public float getPlayerSpeed(){
+        return state.getPlayer().getSpeed();
+    }
 
     public static class StatsView {
         private final LevelStats s;
