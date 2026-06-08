@@ -6,7 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -39,6 +41,7 @@ public class CoreGame extends ApplicationAdapter {
     private SpriteBatch spriteBatch;
     private Texture doorOpenedTexture;
     private Texture doorClosedTexture;
+    private Texture playerSprite;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -48,6 +51,12 @@ public class CoreGame extends ApplicationAdapter {
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
+
+    // Анімація
+    private Animation<TextureRegion> walkAnimation;
+    private Texture[] animationFrames;
+    private float stateTime;
+    private boolean isPlayerMoving = false;
 
     @Override
     public void create() {
@@ -60,6 +69,7 @@ public class CoreGame extends ApplicationAdapter {
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1600, 900);
+        camera.zoom = 0.5f;
 
         //cameraController = new CameraInputController(camera);
         //Gdx.input.setInputProcessor(cameraController);
@@ -100,6 +110,24 @@ public class CoreGame extends ApplicationAdapter {
         spriteBatch = new SpriteBatch();
         doorOpenedTexture = new Texture(Gdx.files.internal("textures/door_opened.png"));
         doorClosedTexture = new Texture(Gdx.files.internal("textures/door_closed.png"));
+        playerSprite = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
+        //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        // Анімація
+        int frames = 6;
+        animationFrames = new Texture[frames];
+        TextureRegion[] walkFrames = new TextureRegion[frames];
+
+        for (int i = 0; i < frames; i++) {
+            Texture texture = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_" + (i + 1) + ".png"));
+
+            animationFrames[i] = texture;
+            walkFrames[i] = new TextureRegion(texture);
+        }
+
+        walkAnimation = new Animation<>(0.1f, walkFrames);
+        walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        stateTime = 8f;
     }
 
     @Override
@@ -154,6 +182,8 @@ public class CoreGame extends ApplicationAdapter {
         dx += movement.x * speed * dt;
         dy += movement.y * speed * dt;
 
+        isPlayerMoving = (dx != 0 || dy != 0);
+
         gameController.movePlayer(dx, dy);
         mouseInWorld.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(mouseInWorld);
@@ -191,24 +221,54 @@ public class CoreGame extends ApplicationAdapter {
     private void draw() {
         ScreenUtils.clear(Color.BLUE);
 
-        camera.position.x = Math.round(camera.position.x);
-        camera.position.y = Math.round(camera.position.y);
+        if (gameStateView != null) {
+            float lerp = 10f * Gdx.graphics.getDeltaTime();
+
+            Vec2 playerPos = gameStateView.getPlayerPosition();
+            camera.position.set(playerPos.x, playerPos.y, 0);
+
+            camera.position.x += (playerPos.x - camera.position.x) * lerp;
+            camera.position.y += (playerPos.y - camera.position.y) * lerp;
+        }
+
         camera.update();
         renderer.setView(camera);
         renderer.render();
 
         if (gameStateView != null) {
             Vec2 playerPos = gameStateView.getPlayerPosition();
-
+            shapeRenderer.setProjectionMatrix(camera.combined);
             // Камера
             camera.position.set(playerPos.x, playerPos.y, 0);
 
+            if (isPlayerMoving) {
+                stateTime += Gdx.graphics.getDeltaTime();
+            } else {
+                stateTime = 0f;
+            }
+
+            TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+
             // Гравець
-            shapeRenderer.setProjectionMatrix(camera.combined);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(Color.BLACK);
-            shapeRenderer.circle(playerPos.x, playerPos.y, 16f);
-            shapeRenderer.end();
+            float width = 45f;
+            float height = 36f;
+            float originX = 9f;
+            float originY = height / 2f;
+            float drawX = playerPos.x - originX;
+            float drawY = playerPos.y - originY;
+            float angle = gameStateView.getPlayerFacingAngle();
+
+            spriteBatch.begin();
+
+            spriteBatch.draw(
+                    currentFrame,
+                    drawX, drawY,
+                    originX, originY,
+                    width, height,
+                    1f, 1f,
+                    angle
+            );
+            spriteBatch.end();
 
             // Прицілювання мишкою та лазер
             float dirX = mouseInWorld.x - playerPos.x;
@@ -316,6 +376,12 @@ public class CoreGame extends ApplicationAdapter {
         doorClosedTexture.dispose();
         doorOpenedTexture.dispose();
         attackEffects.clear();
+        playerSprite.dispose();
+        if (animationFrames != null) {
+            for (Texture texture : animationFrames) {
+                if (texture != null) texture.dispose();
+            }
+        }
     }
 
     private void restart() {
