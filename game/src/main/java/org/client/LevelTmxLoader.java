@@ -90,8 +90,7 @@ public class LevelTmxLoader {
                     int enemyTypeId = objectProps.get("enemyType", Integer.class);
                     int weaponId = objectProps.get("weaponId", Integer.class);
                     int patrolPathId = objectProps.get("patrolPath", Integer.class);
-                    String facingAngle =  objectProps.get("facingAngle", String.class);
-                    float facingAngleDegrees = convertToAngle(facingAngle);
+                    float facingAngle = objectProps.get("facingAngle", Float.class);
                     int enemyId = 1; //Тимчасово
 
                     String enemyType = String.valueOf(enemyTypeId);
@@ -100,7 +99,7 @@ public class LevelTmxLoader {
                     String enemy = String.valueOf(enemyId);
 
                     EnemySpawnData enemyData = new EnemySpawnData(
-                            worldX, worldY, enemyType, weapon, patrolPath, facingAngleDegrees, enemy
+                            worldX, worldY, enemyType, weapon, patrolPath, facingAngle, enemy
                     );
                     enemySpawns.add(enemyData);
                 }
@@ -207,12 +206,5 @@ public class LevelTmxLoader {
                 goalType,
                 targetEnemyId
         );
-    }
-
-    private float convertToAngle(String stringAngle) {
-        if ("down".equals(stringAngle)) return 90f;
-        if ("left".equals(stringAngle)) return 180f;
-        if ("up".equals(stringAngle)) return 270f;
-        return 0f; // right
     }
 }
