@@ -1,9 +1,9 @@
 package org.core.ai;
 
-import org.core.definition.EnemyProfile;
 import org.core.entity.Enemy;
 import org.core.entity.Entity;
 import org.core.entity.Player;
+import org.core.enums.AIState;
 import org.core.enums.MovementMode;
 import org.core.enums.RayCastType;
 import org.core.enums.TileType;
