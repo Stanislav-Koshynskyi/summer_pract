@@ -92,8 +92,8 @@ public class CoreGame extends ApplicationAdapter {
                 360f,
                 16f,
                 16f,
-                23f,
-                600
+                50,
+                300
         );
 
         weaponSystem = new WeaponSystem();
