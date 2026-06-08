@@ -223,9 +223,7 @@ public class CoreGame extends ApplicationAdapter {
 
         if (gameStateView != null) {
             float lerp = 10f * Gdx.graphics.getDeltaTime();
-
             Vec2 playerPos = gameStateView.getPlayerPosition();
-            camera.position.set(playerPos.x, playerPos.y, 0);
 
             camera.position.x += (playerPos.x - camera.position.x) * lerp;
             camera.position.y += (playerPos.y - camera.position.y) * lerp;
