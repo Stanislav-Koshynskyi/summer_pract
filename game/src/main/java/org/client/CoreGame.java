@@ -229,6 +229,11 @@ public class CoreGame extends ApplicationAdapter {
             camera.position.y += (playerPos.y - camera.position.y) * lerp;
         }
 
+        float exactCameraX = camera.position.x;
+        float exactCameraY = camera.position.y;
+        camera.position.x = Math.round(exactCameraX);
+        camera.position.y = Math.round(exactCameraY);
+
         camera.update();
         renderer.setView(camera);
         renderer.render();
@@ -236,8 +241,6 @@ public class CoreGame extends ApplicationAdapter {
         if (gameStateView != null) {
             Vec2 playerPos = gameStateView.getPlayerPosition();
             shapeRenderer.setProjectionMatrix(camera.combined);
-            // Камера
-            camera.position.set(playerPos.x, playerPos.y, 0);
 
             if (isPlayerMoving) {
                 stateTime += Gdx.graphics.getDeltaTime();
