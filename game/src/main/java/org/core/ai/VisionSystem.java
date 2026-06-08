@@ -44,7 +44,7 @@ public class VisionSystem {
     }
     public boolean canEnemySeePlayer(Enemy from, Player to, Set<Entity> ignoredEntity){
         // якщо гравець крадеться і в укритті і близько то автоматично false
-        if (to.getMovementMode() == MovementMode.SNEAK){
+        if (to.getMovementMode() == MovementMode.SNEAK && from.getCurrentState() != AIState.ATTACK){
             float dist = new Vec2(from.getX(), from.getY()).distanceTo(new Vec2(to.getX(), to.getY()));
             if (dist > from.getProfile().getCloseRevealRadius()){
                 TileType tile = worldGeometry.getTileAt(to.getX(), to.getY());
