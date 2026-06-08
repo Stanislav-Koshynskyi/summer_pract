@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
@@ -115,6 +116,7 @@ public class CoreGame extends ApplicationAdapter {
     private void logic() {
         if (gameController == null) return;
 
+        Vector2 movement = new Vector2();
         float speed = gameStateView.getPlayerSpeed();
         float dt = Gdx.graphics.getDeltaTime();
         float dx = 0f;
@@ -141,10 +143,16 @@ public class CoreGame extends ApplicationAdapter {
             gameController.setMovementMode(MovementMode.WALK);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) dy += speed * dt;
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) dy -= speed * dt;
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) dx += speed * dt;
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) dx -= speed * dt;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) movement.y += 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) movement.y -= 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) movement.x += 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) movement.x -= 1;
+
+        if (movement.len2() > 0) {
+            movement.nor();
+        }
+        dx += movement.x * speed * dt;
+        dy += movement.y * speed * dt;
 
         gameController.movePlayer(dx, dy);
         mouseInWorld.set(Gdx.input.getX(), Gdx.input.getY(), 0);
