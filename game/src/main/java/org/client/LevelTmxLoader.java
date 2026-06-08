@@ -32,6 +32,8 @@ public class LevelTmxLoader {
 
         // Стіни
         TiledMapTileLayer wallsLayer = (TiledMapTileLayer) map.getLayers().get("walls");
+        // Невисокі перешкоди
+        TiledMapTileLayer lowObstaclesLayer = (TiledMapTileLayer) map.getLayers().get("low_obstacles");
 
         for (int y = 0; y < mapHeightInTiles; y++) {
             for (int x = 0; x < mapWidthInTiles; x++) {
@@ -39,6 +41,10 @@ public class LevelTmxLoader {
 
                 if (wallsLayer != null && wallsLayer.getCell(x, y) != null && wallsLayer.getCell(x, y).getTile() != null) {
                     type = TileType.WALL;
+                }
+
+                if (lowObstaclesLayer != null && lowObstaclesLayer.getCell(x, y) != null && lowObstaclesLayer.getCell(x, y).getTile() != null) {
+                    type = TileType.LOW_OBSTACLE;
                 }
 
                 tiles[y][x] = type;
