@@ -138,7 +138,7 @@ public class GameController {
             levelState = new LevelState();
         }
         levelState.reset(data.worldGeometry, player, enemies, doors, pickups,
-                goalType, data.targetEnemyId);
+                data.exits, goalType, data.targetEnemyId);
 
         collisionSystem = new CollisionSystem(data.worldGeometry, blockers);
 

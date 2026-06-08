@@ -2,6 +2,7 @@ package org.core.state;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.core.data.ExitData;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.Player;
@@ -12,6 +13,7 @@ import org.core.event.EnemyDiedEvent;
 import org.core.event.GameEvent;
 import org.core.event.SoundEventQueue;
 import org.core.geometry.WorldGeometry;
+import org.core.math.Rect;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,18 +49,27 @@ public class LevelState {
     private GoalType goalType;
     @Getter
     private String targetEnemyId;
+    @Getter
+    private final List<Rect> exitBounds = new ArrayList<>();
 
 
     public void reset(WorldGeometry geometry, Player player,
                       List<Enemy> enemies,
                       List<Door> doors,
                       List<WeaponPickup> pickups,
+                      List<ExitData> exitData,
                       GoalType goalType,
                       String targetEnemyId) {
         this.worldGeometry = geometry;
         this.player = player;
         this.goalType = goalType;
         this.targetEnemyId = targetEnemyId;
+
+        this.exitBounds.clear();
+        for (ExitData exit : exitData) {
+            exitBounds.add(Rect.fromCenter(exit.x, exit.y, exit.width, exit.height));
+        }
+
 
         this.enemies.clear();
         this.enemies.addAll(enemies);
@@ -106,7 +117,13 @@ public class LevelState {
         gameEvents.clear();
     }
     public boolean isPlayerAtExit() {
-        if (player == null || worldGeometry == null) return false;
+        if (player == null) return false;
+        Rect playerBounds = Rect.fromCenter(player.getX(), player.getY(), player.getWidth(), player.getHeight());
+        for (Rect exitBound : exitBounds) {
+            if (playerBounds.overlaps(exitBound)) {
+                return true;
+            }
+        }
         return false;
     }
     public boolean isEnemyAlive(String enemyId) {
