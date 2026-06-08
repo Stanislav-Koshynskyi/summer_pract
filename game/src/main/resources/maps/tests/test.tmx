@@ -88,7 +88,7 @@
   <object id="5" name="EnemyFacingRight" type="EnemySpawn" x="144" y="192">
    <properties>
     <property name="enemyType" type="int" value="1"/>
-    <property name="facingAngle" value="right"/>
+    <property name="facingAngle" type="float" value="0"/>
     <property name="patrolPath" type="int" value="0"/>
     <property name="weaponId" type="int" value="1"/>
    </properties>
@@ -97,7 +97,7 @@
   <object id="6" name="EnemyFacingLeft" type="EnemySpawn" x="144" y="336">
    <properties>
     <property name="enemyType" type="int" value="1"/>
-    <property name="facingAngle" value="left"/>
+    <property name="facingAngle" type="float" value="180"/>
     <property name="patrolPath" type="int" value="0"/>
     <property name="weaponId" type="int" value="1"/>
    </properties>
@@ -106,7 +106,7 @@
   <object id="7" name="EnemyFacingDown" type="EnemySpawn" x="144" y="464">
    <properties>
     <property name="enemyType" type="int" value="1"/>
-    <property name="facingAngle" value="down"/>
+    <property name="facingAngle" type="float" value="270"/>
     <property name="patrolPath" type="int" value="0"/>
     <property name="weaponId" type="int" value="1"/>
    </properties>
