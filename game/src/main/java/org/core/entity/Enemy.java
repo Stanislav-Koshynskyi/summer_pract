@@ -68,6 +68,20 @@ public class Enemy extends Entity implements Damageable, Blocker {
         this.patrolPath = patrolPath;
         this.currentPath = new ArrayList<>(patrolPath);
     }
+    public Enemy(float x, float y, EnemyProfile profile, Weapon weapon, String enemyId, List<Vec2> patrolPath, float startAngle) {
+        super(x, y, profile.getWidth(), profile.getHeight());
+        this.profile = profile;
+        this.hp = profile.getHp();
+        this.currentWeapon = weapon;
+        this.enemyId = enemyId;
+        this.alive = true;
+        this.bodyInvestigated = false;
+        this.currentState = AIState.PATROL;
+        this.facingAngle = 0f;
+        this.patrolPath = patrolPath;
+        this.currentPath = new ArrayList<>(patrolPath);
+        this.facingAngle = startAngle;
+    }
 
     public void applyDamage(int damage) {
         hp = Math.max(0, hp - damage);

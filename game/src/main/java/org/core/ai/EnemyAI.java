@@ -1,6 +1,5 @@
 package org.core.ai;
 
-import com.badlogic.gdx.Game;
 import org.core.behavior.AimBehavior;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
@@ -8,10 +7,12 @@ import org.core.entity.Entity;
 import org.core.entity.Player;
 import org.core.enums.AIState;
 import org.core.enums.AimBehaviorType;
+import org.core.enums.RayCastType;
 import org.core.event.EnemyAlertedEvent;
 import org.core.event.GameEvent;
 import org.core.geometry.WorldGeometry;
 import org.core.math.Vec2;
+import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
 import org.core.weapon.Weapon;
 import org.core.weapon.WeaponFireContext;
@@ -28,7 +29,7 @@ public class EnemyAI {
 
     private static final float PIXEL_TOLERANCE = 5;
     private static final float DEGREE_TOLERANCE = 10;
-    private static final float INTERACTION_RADIUS = 32;
+    private static final float INTERACTION_RADIUS = 16;
 
     // коли останній раз міняли шлях, треба щоб не рахувати шлях дуже часто
     private final Map<Enemy, Float> lastPathUpdate = new HashMap<>();
@@ -65,7 +66,7 @@ public class EnemyAI {
             float vx = enemy.getVelocityX();
             float vy = enemy.getVelocityY();
             // якщо є кнокбек то ворог не може адекватно реагувати
-            if (Math.abs(vx) > 0.1f || Math.abs(vy) > 0.1f){
+            if (Math.abs(vx) > 0.1f || Math.abs(vy) > 0.1f) {
                 continue;
             }
 
@@ -130,7 +131,7 @@ public class EnemyAI {
     }
 
     private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
-        enemy.setIntendMove(0,0);
+        enemy.setIntendMove(0, 0);
         if (!seesPlayer) {
             enemy.setReactionTimer(0f);
             float targetAngle = (float) Math.toDegrees(Math.atan2(enemy.getLastKnownPlayerY() - enemy.getY(), enemy.getLastKnownPlayerX() - enemy.getX()));
@@ -145,7 +146,7 @@ public class EnemyAI {
         AimBehavior behavior = aimBehaviors.get(enemy.getProfile().getAimBehaviorType());
         if (behavior != null) {
             behavior.updateAim(enemy, player, delta);
-            }
+        }
         updatePathToPlayer(enemy, delta);
         moveAlongPath(enemy, enemy.getProfile().getChaseSpeed(), delta, true, false);
 
@@ -163,7 +164,6 @@ public class EnemyAI {
         }
 
 
-
         Weapon weapon = enemy.getCurrentWeapon();
         if (weapon == null || !weapon.canFire()) return;
         if (!enemy.isReactionTimer()) return;
@@ -176,7 +176,7 @@ public class EnemyAI {
         }
         if (!enemy.isShotCommitTimer()) return;
         float baseAngle = enemy.getFacingAngle();
-        if (behavior != null){
+        if (behavior != null) {
             baseAngle += behavior.calculateError(enemy, player,
                     new Vec2(enemy.getX(), enemy.getY()).distanceTo(player.getX(), player.getY()));
         }
@@ -191,7 +191,7 @@ public class EnemyAI {
         events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
         enemy.resetReactionTimer();
         enemy.setShotCommitStarted(false);
-        }
+    }
 
     private void updateSearch(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
         if (seesPlayer) {
@@ -303,7 +303,8 @@ public class EnemyAI {
         enemy.resetReactionTimer();
         lastPathUpdate.remove(enemy); // негайно перебудувати шлях
     }
-    private void enterSearch(Enemy enemy, List<GameEvent> events){
+
+    private void enterSearch(Enemy enemy, List<GameEvent> events) {
         events.add(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.SEARCH));
         enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
         enemy.resetAimMemoryTimer();
@@ -311,6 +312,7 @@ public class EnemyAI {
         List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
     }
+
     private void applyMemoryReaction(Enemy enemy) {
         if (!enemy.isAimMemoryTimer()) {
             enemy.setReactionTimer(0f); // пам'ятає — миттєво
@@ -356,34 +358,33 @@ public class EnemyAI {
         buildPathToPatrolTarget(enemy);
         events.add(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.PATROL));
     }
-    public List<GameEvent> onEnemyHit(Enemy enemy, Entity hitter){
+
+    public List<GameEvent> onEnemyHit(Enemy enemy, Entity hitter) {
         if (enemy.getCurrentState() == AIState.ATTACK) return new ArrayList<>();
         ArrayList<GameEvent> list = new ArrayList<>();
         enterSearch(enemy, list);
         return list;
 
     }
-    private void tryOpenDoorInPath(Enemy enemy){
+
+    private void tryOpenDoorInPath(Enemy enemy) {
         List<Vec2> path = enemy.getCurrentPath();
         if (path == null || path.isEmpty()) return;
 
-        Vec2 nextPoint = path.get(0);
-        float ts = worldGeometry.getTileSize();
-        int tileX = (int) Math.floor(nextPoint.x / ts);
-        int tileY = (int) Math.floor(nextPoint.y / ts);
-        float tileCX = tileX * ts + ts / 2f;
-        float tileCY = tileY * ts + ts / 2f;
-        Door door = findDoorAt(tileCX, tileCY);
-        if (door == null) return;
-        float distToDoor = new Vec2(enemy.getX(), enemy.getY()).distanceTo(door.getX(), door.getY());
-        if (distToDoor <= INTERACTION_RADIUS){
-            door.requestOpen();
+        Vec2 nextPoint = path.getFirst();
+        Vec2 from = new Vec2(enemy.getX(), enemy.getY());
+        Vec2 dir = nextPoint.copy().sub(from);
+        float distToNext = dir.length();
+        dir.normalize();
+        Set<Entity> ignored = new HashSet<>(enemies);
+        ignored.add(enemy);
+        RayCastResult hit = rayCastSystem.cast(from, dir, distToNext, enemy, ignored, RayCastType.VISION);
+
+        if (hit.getTarget() instanceof Door door) {
+            float distToDoor = from.distanceTo(hit.getPoint());
+            if (distToDoor <= INTERACTION_RADIUS) {
+                door.requestOpen();
+            }
         }
-    }
-    private Door findDoorAt(float worldX, float worldY) {
-        for (Door door : doors) {
-            if (door.getBounds().contains(worldX, worldY)) return door;
-        }
-        return null;
     }
 }

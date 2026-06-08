@@ -100,7 +100,8 @@ public class GameController {
                                     10
                             )),
                             d.enemyId,
-                            patrolPath
+                            patrolPath,
+                            d.facingAngle
                     ));
         }
         blockers.addAll(enemies);

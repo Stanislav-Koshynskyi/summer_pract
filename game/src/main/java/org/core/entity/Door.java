@@ -108,11 +108,11 @@ public class Door extends Entity implements PathBlocker {
             case LOCKED -> {
                 return Float.POSITIVE_INFINITY;
             }
-            case CLOSED, OPENING -> {
-                return 5f;
+            case CLOSED-> {
+                return 3f;
             }
             case CLOSING -> {
-                return 8f;
+                return 4f;
             }
             case null, default -> {
                 return 1f;
