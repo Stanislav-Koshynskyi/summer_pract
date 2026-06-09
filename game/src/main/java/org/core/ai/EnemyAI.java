@@ -187,7 +187,8 @@ public class EnemyAI {
                 rayCastSystem, enemy, from,
                 target, enemy.getCurrentWeapon().getDefinition().getRange(),
                 Set.of(enemy), enemy.getCurrentWeapon().getDefinition().getDamage(),
-                weapon.getDefinition().getKnockbackForce()
+                weapon.getDefinition().getKnockbackForce(),
+                weapon.getDefinition().getSpread()
         );
         events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
         enemy.resetReactionTimer();

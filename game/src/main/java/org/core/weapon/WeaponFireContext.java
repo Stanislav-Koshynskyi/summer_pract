@@ -18,6 +18,7 @@ public class WeaponFireContext {
     private final Set<Entity> ignoredEntities;
     private final int damage;
     private final float knockbackForce;
+    private final float spreadAngle;
 
     public WeaponFireContext(RayCastSystem raycastSystem,
                              Entity shooter,
@@ -26,7 +27,8 @@ public class WeaponFireContext {
                              float maxDistance,
                              Set<Entity> ignoredEntities,
                              int damage,
-                             float knockbackForce) {
+                             float knockbackForce,
+                             float spreadAngle) {
         this.raycastSystem = raycastSystem;
         this.shooter = shooter;
         this.origin = origin;
@@ -35,6 +37,18 @@ public class WeaponFireContext {
         this.ignoredEntities = ignoredEntities;
         this.damage = damage;
         this.knockbackForce = knockbackForce;
+        this.spreadAngle = spreadAngle;
+    }
+
+    /**
+     * копіює контекст з змінений напрямом
+     */
+    public WeaponFireContext(WeaponFireContext weaponFireContext, Vec2 direction){
+        this(weaponFireContext.getRaycastSystem(), weaponFireContext.getShooter(),
+                weaponFireContext.getOrigin(), direction, weaponFireContext.getMaxDistance(),
+                weaponFireContext.getIgnoredEntities(), weaponFireContext.getDamage(), weaponFireContext.getKnockbackForce(),
+                weaponFireContext.getSpreadAngle()
+        );
     }
 
 
@@ -47,5 +61,12 @@ public class WeaponFireContext {
     // інший рейкаст
     public RayCastResult performRaycast(Vec2 customDirection, RayCastType type) {
         return raycastSystem.cast(origin, customDirection, maxDistance, shooter, ignoredEntities, type);
+    }
+    // повертає нормалізований вектор
+    public Vec2 applySpread(Vec2 direction, float spreadAngle){
+        if (spreadAngle <= 0f) return direction;
+        float angle = direction.angleDeg();
+        float randomOffset = (float) Math.random() * spreadAngle - spreadAngle / 2f;
+        return Vec2.fromAngleDeg(angle + randomOffset);
     }
 }

@@ -16,10 +16,12 @@ public class WeaponDefinition {
     private final WeaponBehavior behavior;
     @Getter
     private final float knockbackForce;
+    private final float spread;
 
     public WeaponDefinition(String id, WeaponType weaponType, int damage, float range,
                             float cooldown, int maxAmmo, boolean isSuppressed,
-                            boolean isAutomatic, WeaponBehavior behavior, float knockbackForce) {
+                            boolean isAutomatic, WeaponBehavior behavior, float knockbackForce,
+                            float spread) {
         this.id = id;
         this.weaponType = weaponType;
         this.damage = damage;
@@ -30,6 +32,7 @@ public class WeaponDefinition {
         this.isAutomatic = isAutomatic;
         this.behavior = behavior;
         this.knockbackForce = knockbackForce;
+        this.spread = spread;
     }
 
 }

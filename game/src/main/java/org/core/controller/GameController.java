@@ -102,7 +102,8 @@ public class GameController {
                                     false,
                                     true,
                                     new SimpleRayCastBehavior(),
-                                    10
+                                    10,
+                                    0
                             ), true),
                             d.enemyId,
                             patrolPath,
@@ -127,12 +128,13 @@ public class GameController {
                         WeaponType.HITSCAN,
                         50,
                         250,
-                        0.5f,
+                        0.1f,
                         100,
                         false,
                         true,
                         new SimpleRayCastBehavior(),
-                        30
+                        30,
+                        10
                 ))
         );
         player.setMovementMode(pendingMovementMode);
@@ -233,7 +235,8 @@ public class GameController {
                         weapon.getDefinition().getRange(),
                         Set.of(player),
                         weapon.getDefinition().getDamage(),
-                        weapon.getDefinition().getKnockbackForce()
+                        weapon.getDefinition().getKnockbackForce(),
+                        weapon.getDefinition().getSpread()
                 );
                 List<GameEvent> weaponEvents = weaponSystem.useWeapon(context, weapon);
                 levelState.addAllGameEvent(weaponEvents);
