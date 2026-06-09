@@ -30,6 +30,7 @@ public class EnemyAI {
     private static final float PIXEL_TOLERANCE = 5;
     private static final float DEGREE_TOLERANCE = 10;
     private static final float INTERACTION_RADIUS = 16;
+    static final float LOW_OBSTACLE_RADIUS = 40;
 
     // коли останній раз міняли шлях, треба щоб не рахувати шлях дуже часто
     private final Map<Enemy, Float> lastPathUpdate = new HashMap<>();
