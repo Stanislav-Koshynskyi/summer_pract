@@ -122,7 +122,7 @@ public class Enemy extends Entity implements Damageable, Blocker {
 
     @Override
     public boolean blocksProjectile() {
-        return true;
+        return isAlive();
     }
 
     @Override
