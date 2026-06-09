@@ -1,8 +1,5 @@
 package org.core.controller;
 
-import java.util.*;
-
-import com.badlogic.gdx.Game;
 import lombok.Getter;
 import org.content.aim_behavior.StandardAim;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
@@ -10,18 +7,23 @@ import org.core.ai.EnemyAI;
 import org.core.ai.PathFinder;
 import org.core.ai.VisionSystem;
 import org.core.behavior.AimBehavior;
-import org.core.behavior.WeaponBehavior;
 import org.core.collision.Blocker;
 import org.core.collision.CollisionSystem;
-import org.core.data.*;
+import org.core.data.DoorData;
+import org.core.data.EnemySpawnData;
+import org.core.data.LevelData;
+import org.core.data.WeaponPickupData;
 import org.core.definition.EnemyProfile;
-import org.core.entity.*;
+import org.core.entity.Door;
+import org.core.entity.Enemy;
+import org.core.entity.Player;
+import org.core.entity.WeaponPickup;
 import org.core.enums.*;
-import org.core.event.*;
-
-import org.core.geometry.WorldGeometry;
+import org.core.event.EnemyDiedEvent;
+import org.core.event.GameEvent;
+import org.core.event.LevelCompletedEvent;
+import org.core.event.PlayerDiedEvent;
 import org.core.math.Vec2;
-import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
@@ -29,6 +31,8 @@ import org.core.weapon.Weapon;
 import org.core.weapon.WeaponDefinition;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
+
+import java.util.*;
 
 public class GameController {
 
@@ -53,6 +57,7 @@ public class GameController {
     private final Object weaponRegistry;
     private final Object enemyProfileRegistry;
     private final Map<AimBehaviorType, ?> aimBehaviors;
+
     public GameController(Object weaponRegistry,
                           Object enemyProfileRegistry,
                           Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem) {
@@ -76,7 +81,7 @@ public class GameController {
         }
         // поки заглушка, потім обробити з спавнпойнтів
         List<Enemy> enemies = new ArrayList<>();
-        for (EnemySpawnData d : data.enemySpawns){
+        for (EnemySpawnData d : data.enemySpawns) {
             // сортуємо, щоб patrolPathId ворога = pathId вейпойнтів
             List<Vec2> patrolPath = data.waypoints.stream()
                     .filter(w -> w.pathId.equals(d.patrolPathId))
@@ -98,7 +103,7 @@ public class GameController {
                                     true,
                                     new SimpleRayCastBehavior(),
                                     10
-                            )),
+                            ), true),
                             d.enemyId,
                             patrolPath,
                             d.facingAngle
@@ -108,9 +113,9 @@ public class GameController {
 
         // сейм
         List<WeaponPickup> pickups = new ArrayList<>();
-        for (WeaponPickupData w: data.weaponPickups){
+        for (WeaponPickupData w : data.weaponPickups) {
             pickups.add(new WeaponPickup(
-                w.x, w.y, "test", null, false, "test"
+                    w.x, w.y, "test", null, false, "test"
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
@@ -150,9 +155,8 @@ public class GameController {
         Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
         aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
         enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem
-        , aimBehaviorMap, doors, levelState.getWorldGeometry());
+                , aimBehaviorMap, doors, levelState.getWorldGeometry());
         clearPendingCommands();
-
 
 
     }
@@ -162,7 +166,7 @@ public class GameController {
         // тоді гра уповільниться просто
         // потенційно придумати альтернативу, наприклад накопичувальну систему що викличе
         // update декілька разів підряд якщо delta занадто велике (але такий підхід теж має проблеми)
-        delta = Math.min (delta, 0.05f);
+        delta = Math.min(delta, 0.05f);
         if (!levelState.isPlaying()) {
             return;
         }
@@ -187,11 +191,10 @@ public class GameController {
         levelState.addAllGameEvent(aIEvents);
 
 
-
-        for (Enemy enemy: levelState.getEnemies()) {
+        for (Enemy enemy : levelState.getEnemies()) {
             if (Math.abs(enemy.getVelocityX()) >= 0.01f || Math.abs(enemy.getVelocityY()) >= 0.01f) {
                 collisionSystem.applyKnockback(enemy, delta, CollisionSystem.DEFAULT_FRICTION);
-                if (Math.abs(enemy.getVelocityX()) < 0.5f && Math.abs(enemy.getVelocityY()) < 0.5f){
+                if (Math.abs(enemy.getVelocityX()) < 0.5f && Math.abs(enemy.getVelocityY()) < 0.5f) {
                     enemy.setVelocity(0, 0);
 
                 }
@@ -222,7 +225,7 @@ public class GameController {
         player.getCurrentWeapon().updateCooldown(delta);
         if (pendingShoot) {
             Weapon weapon = player.getCurrentWeapon();
-            if (weapon.canFire()){
+            if (weapon.canFire()) {
                 Vec2 from = new Vec2(player.getX(), player.getY());
                 Vec2 target = Vec2.fromAngleDeg(player.getFacingAngle());
                 WeaponFireContext context = new WeaponFireContext(
@@ -238,7 +241,18 @@ public class GameController {
             pendingShoot = false;
         }
         // Крок 10. Перевірити deaths → перемістити в corpses
-        List<GameEvent> deadEvent = levelState.flushDeadEnemies();
+        List<Enemy> deadEnemies = levelState.flushDeadEnemies();
+        List<GameEvent> deadEvent = new ArrayList<>();
+        for (Enemy enemy : deadEnemies) {
+            deadEvent.add(new EnemyDiedEvent(enemy.getX(), enemy.getY(), enemy.getEnemyId()));
+            if (enemy.getCurrentWeapon() != null) {
+                WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
+                Weapon weapon = new Weapon(definition);
+                WeaponPickup pickup = new WeaponPickup(enemy.getX(), enemy.getY(),
+                        definition.getId(), weapon, false, UUID.randomUUID().toString());
+                levelState.getPickups().add(pickup);
+            }
+        }
         levelState.addAllGameEvent(deadEvent);
         for (Enemy enemy : levelState.getEnemies()) {
             if (enemy.isDamaged()) {
@@ -256,7 +270,6 @@ public class GameController {
         // TODO: MVP-2 – розширити статистику (alerted enemies, silent kills тощо)
         checkLevelGoals();
         levelState.getStats().addElapsedTime(delta);
-
 
 
         // Очищення команд гравця після обробки

@@ -90,18 +90,18 @@ public class LevelState {
         return phase == GamePhase.PLAYING;
     }
 
-    public List<GameEvent> flushDeadEnemies() {
+    public List<Enemy> flushDeadEnemies() {
         Iterator<Enemy> it = enemies.iterator();
-        List<GameEvent> deadEvents = new ArrayList<>();
+        List<Enemy> deadEnemy = new ArrayList<>();
         while (it.hasNext()) {
             Enemy e = it.next();
             if (!e.isAlive()) {
-                deadEvents.add(new EnemyDiedEvent(e.getX(), e.getY(), e.getEnemyId()));
+                deadEnemy.add(e);
                 corpses.add(e);
                 it.remove();
             }
         }
-        return deadEvents;
+        return deadEnemy;
     }
 
     public List<GameEvent> getGameEvents() {
