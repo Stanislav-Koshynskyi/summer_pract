@@ -42,6 +42,8 @@ public class CoreGame extends ApplicationAdapter {
     private Texture doorOpenedTexture;
     private Texture doorClosedTexture;
     private Texture playerSprite;
+    private Texture alertTexture;
+    private Texture searchTexture;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -51,6 +53,7 @@ public class CoreGame extends ApplicationAdapter {
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
+    private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
     private boolean isShooting = false;
 
     // Анімація
@@ -112,6 +115,8 @@ public class CoreGame extends ApplicationAdapter {
         doorOpenedTexture = new Texture(Gdx.files.internal("textures/door_opened.png"));
         doorClosedTexture = new Texture(Gdx.files.internal("textures/door_closed.png"));
         playerSprite = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
+        alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
+        searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Анімація
@@ -206,6 +211,15 @@ public class CoreGame extends ApplicationAdapter {
             }
         }
 
+        Iterator<VisualAlertEffect> alertIt = alertEffects.iterator();
+        while (alertIt.hasNext()) {
+            VisualAlertEffect effect = alertIt.next();
+            effect.lifetime -= dt;
+            if (effect.lifetime <= 0 || !effect.enemy.isAlive()) {
+                alertIt.remove();
+            }
+        }
+
         List<GameEvent> events = gameController.drainEvents();
         for (GameEvent event : events) {
             if (event instanceof ShotFiredEvent) {
@@ -220,6 +234,24 @@ public class CoreGame extends ApplicationAdapter {
                             0.3f,
                             Color.YELLOW
                     ));
+                }
+            }
+
+            if (event instanceof EnemyAlertedEvent) {
+                EnemyAlertedEvent alertedEvent = (EnemyAlertedEvent) event;
+                Enemy enemy =gameController.getEnemies().stream().
+                        filter(e -> e.getEnemyId() == alertedEvent.getEnemyId()).findFirst().orElse(null);
+
+                boolean alreadyHasMark = false;
+                for (VisualAlertEffect effect : alertEffects) {
+                    if (effect.enemy == enemy) {
+                        alreadyHasMark = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyHasMark && enemy.isAlive()) {
+                    alertEffects.add(new VisualAlertEffect(enemy, 1.5f));
                 }
             }
         }
@@ -373,6 +405,32 @@ public class CoreGame extends ApplicationAdapter {
             }
         }
         spriteBatch.end();
+
+        // Знак оклику/питання над ворогами
+        spriteBatch.begin();
+        for (Enemy enemy : gameController.getEnemies()) {
+            if (!enemy.isAlive()) continue;
+
+            Texture statusTexture;
+            switch (enemy.getCurrentState()) {
+                case ATTACK ->
+                        statusTexture = alertTexture;
+                case SEARCH ->
+                        statusTexture = searchTexture;
+                default -> statusTexture = null;
+            }
+
+            if (statusTexture != null) {
+                float markSize = 24f;
+
+                float drawX = enemy.getX() - (markSize / 2f);
+                float drawY = enemy.getY() + 20f;
+
+                spriteBatch.draw(statusTexture, drawX, drawY, markSize, markSize);
+            }
+        }
+
+        spriteBatch.end();
     }
 
     @Override
@@ -385,6 +443,8 @@ public class CoreGame extends ApplicationAdapter {
         doorOpenedTexture.dispose();
         attackEffects.clear();
         playerSprite.dispose();
+        alertEffects.clear();
+        alertTexture.dispose();
         if (animationFrames != null) {
             for (Texture texture : animationFrames) {
                 if (texture != null) texture.dispose();

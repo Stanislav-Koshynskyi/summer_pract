@@ -1,8 +1,10 @@
 package org.core.event;
 
+import lombok.Getter;
 import org.core.enums.AIState;
 
 public class EnemyAlertedEvent extends GameEvent {
+    @Getter
     public String enemyId;
     public float x, y;
     public AIState newState;
