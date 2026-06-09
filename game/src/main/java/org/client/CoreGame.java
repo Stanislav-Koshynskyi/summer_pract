@@ -51,6 +51,7 @@ public class CoreGame extends ApplicationAdapter {
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
+    private boolean isShooting = false;
 
     // Анімація
     private Animation<TextureRegion> walkAnimation;
@@ -154,7 +155,13 @@ public class CoreGame extends ApplicationAdapter {
             debugMode = !debugMode;
         }
 
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (gameStateView.isCurrentWeaponAutomatic()) {
+            isShooting = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
+        } else {
+            isShooting = Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
+        }
+
+        if (isShooting) {
             gameController.shoot();
         }
 

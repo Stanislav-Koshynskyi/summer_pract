@@ -122,10 +122,10 @@ public class GameController {
                         WeaponType.HITSCAN,
                         50,
                         250,
-                        1f,
+                        0.5f,
                         100,
                         false,
-                        false,
+                        true,
                         new SimpleRayCastBehavior(),
                         30
                 ))
