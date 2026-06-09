@@ -93,7 +93,7 @@ public class CoreGame extends ApplicationAdapter {
                 360f,
                 16f,
                 16f,
-                50,
+                20,
                 300
         );
 

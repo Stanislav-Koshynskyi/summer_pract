@@ -95,7 +95,7 @@ public class GameController {
                                     1f,
                                     100,
                                     false,
-                                    false,
+                                    true,
                                     new SimpleRayCastBehavior(),
                                     10
                             )),
