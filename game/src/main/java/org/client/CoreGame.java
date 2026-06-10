@@ -118,10 +118,10 @@ public class CoreGame extends ApplicationAdapter {
         spriteBatch = new SpriteBatch();
         doorOpenedTexture = new Texture(Gdx.files.internal("textures/door_opened.png"));
         doorClosedTexture = new Texture(Gdx.files.internal("textures/door_closed.png"));
-        playerSprite = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
+        playerSprite = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
-        corpseTexture = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
+        corpseTexture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Анімація
@@ -130,7 +130,7 @@ public class CoreGame extends ApplicationAdapter {
         TextureRegion[] walkFrames = new TextureRegion[frames];
 
         for (int i = 0; i < frames; i++) {
-            Texture texture = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_" + (i + 1) + ".png"));
+            Texture texture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_" + (i + 1) + ".png"));
 
             animationFrames[i] = texture;
             walkFrames[i] = new TextureRegion(texture);
