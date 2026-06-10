@@ -2,6 +2,8 @@ package org.core.controller;
 
 import lombok.Getter;
 import org.content.aim_behavior.StandardAim;
+import org.content.registry.EnemyProfileRegistry;
+import org.content.registry.WeaponRegistry;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
 import org.core.ai.EnemyAI;
 import org.core.ai.PathFinder;
@@ -54,12 +56,12 @@ public class GameController {
     private EnemyAI enemyAI;
     private PathFinder pathfinder;
 
-    private final Object weaponRegistry;
-    private final Object enemyProfileRegistry;
+    private final WeaponRegistry weaponRegistry;
+    private final EnemyProfileRegistry enemyProfileRegistry;
     private final Map<AimBehaviorType, ?> aimBehaviors;
 
-    public GameController(Object weaponRegistry,
-                          Object enemyProfileRegistry,
+    public GameController(WeaponRegistry weaponRegistry,
+                          EnemyProfileRegistry enemyProfileRegistry,
                           Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem) {
         this.weaponRegistry = weaponRegistry;
         this.enemyProfileRegistry = enemyProfileRegistry;
@@ -88,27 +90,36 @@ public class GameController {
                     .sorted(Comparator.comparingInt(w -> w.order))
                     .map(w -> new Vec2(w.x, w.y))
                     .toList();
-            enemies.add(
-                    new Enemy(
-                            d.x, d.y,
-                            (EnemyProfile) enemyProfileRegistry, // заглушка, потім дістанемо профіль за id
-                            new Weapon(new WeaponDefinition(
-                                    "1",
-                                    WeaponType.HITSCAN,
-                                    100,
-                                    2000f,
-                                    1f,
-                                    100,
-                                    false,
-                                    true,
-                                    new SimpleRayCastBehavior(),
-                                    10,
-                                    0
-                            ), true),
-                            d.enemyId,
-                            patrolPath,
-                            d.facingAngle
-                    ));
+            // create enemy profile and weapon based on spawn data
+            EnemyProfile profile = enemyProfileRegistry.get(d.enemyTypeId);
+            // use registered weapon if provided, otherwise fall back to default
+            Weapon weapon;
+            try {
+                weapon = new Weapon(weaponRegistry.get(d.weaponId), true);
+            } catch (Exception ex) {
+                // fallback to a simple default weapon (was previously hardcoded)
+                weapon = new Weapon(new WeaponDefinition(
+                        "1",
+                        WeaponType.HITSCAN,
+                        100,
+                        2000f,
+                        1f,
+                        100,
+                        false,
+                        true,
+                        new SimpleRayCastBehavior(),
+                        10,
+                        0
+                ), true);
+            }
+            enemies.add(new Enemy(
+                    d.x, d.y,
+                    profile,
+                    weapon,
+                    d.enemyId,
+                    patrolPath,
+                    d.facingAngle
+            ));
         }
         blockers.addAll(enemies);
 
