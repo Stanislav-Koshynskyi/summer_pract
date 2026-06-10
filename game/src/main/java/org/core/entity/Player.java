@@ -3,9 +3,12 @@ package org.core.entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.core.collision.Blocker;
+import org.core.definition.PlayerProfile;
 import org.core.enums.MovementMode;
 import org.core.math.Rect;
 import org.core.weapon.Weapon;
+import java.util.Optional;
+import java.util.UUID;
 
 public class Player extends Entity implements Damageable, Blocker {
     public static final float BASE_MOVE_SPEED = 100f;
@@ -22,17 +25,34 @@ public class Player extends Entity implements Damageable, Blocker {
     @Setter
     @Getter
     private float facingAngle;
-
-    private boolean isAlive;
+    @Getter
+    @Setter
+    private int hp = 1;
+    @Getter
+    @Setter
+    private float speedMultiplayer = 1;
+    @Getter
+    @Setter
+    private float ammoMultiplayer = 1;
+    @Getter
+    private final PlayerProfile playerProfile;
+    @Getter
+    @Setter
+    private int bonusDamage = 0;
 
     public Player(float x, float y, float width, float height,
-                  Weapon defaultWeapon) {
+                  PlayerProfile playerProfile) {
         super(x, y, width, height);
-        this.defaultWeapon = defaultWeapon;
-        this.currentWeapon = defaultWeapon;
         this.movementMode = MovementMode.WALK;
         this.facingAngle = 0f;
-        this.isAlive = true;
+        this.playerProfile = playerProfile;
+        this.defaultWeapon = playerProfile.getDefaultWeapon().clone();
+        this.currentWeapon = playerProfile.getDefaultWeapon().clone();
+        hp += playerProfile.getBonusHp();
+        ammoMultiplayer = playerProfile.getAmmoMultiplier();
+        speedMultiplayer = playerProfile.getSpeedMultiplier();
+        bonusDamage = playerProfile.getDamageBonus();
+
     }
 
     public void aimAt(float worldX, float worldY) {
@@ -46,14 +66,17 @@ public class Player extends Entity implements Damageable, Blocker {
     public void setCurrentWeapon(Weapon weapon) {
         this.currentWeapon = weapon != null ? weapon : defaultWeapon;
     }
-    public void applyDamage(int i){
-        if (isAlive){
-            isAlive = false;
+
+    public void applyDamage(int i) {
+        if (isAlive()) {
+            hp--;
         }
     }
-    public boolean isAlive(){
-        return isAlive;
+
+    public boolean isAlive() {
+        return hp > 0;
     }
+
     @Override
     public Rect getBounds() {
         return Rect.fromCenter(getX(), getY(), getWidth(), getHeight());
@@ -83,8 +106,19 @@ public class Player extends Entity implements Damageable, Blocker {
     public float getSoundAttenuationFactor() {
         return 1;
     }
-    public float getSpeed(){
-        return BASE_MOVE_SPEED * movementMode.getSpeedMultiply();
+
+    public float getSpeed() {
+        return BASE_MOVE_SPEED * movementMode.getSpeedMultiply() * speedMultiplayer;
+    }
+    public Optional<WeaponPickup> dropWeapon() {
+        if (currentWeapon.equals(defaultWeapon)) return Optional.empty();
+        WeaponPickup pickup = new WeaponPickup(
+                getX(), getY(),
+                currentWeapon.getDefinition().getId(),
+                currentWeapon, getCurrentWeapon().getAmmo() == 0,
+                UUID.randomUUID().toString());
+        currentWeapon = defaultWeapon.clone();
+        return Optional.of(pickup);
     }
 }
 
