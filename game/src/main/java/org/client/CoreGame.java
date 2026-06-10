@@ -52,6 +52,7 @@ public class CoreGame extends ApplicationAdapter {
     private GameController gameController;
     private EnemyProfile testEnemyProfile;
     private WeaponSystem weaponSystem;
+    private DeadBody playerCorpse;
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
@@ -118,10 +119,10 @@ public class CoreGame extends ApplicationAdapter {
         spriteBatch = new SpriteBatch();
         doorOpenedTexture = new Texture(Gdx.files.internal("textures/door_opened.png"));
         doorClosedTexture = new Texture(Gdx.files.internal("textures/door_closed.png"));
-        playerSprite = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
+        playerSprite = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
-        corpseTexture = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
+        corpseTexture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Анімація
@@ -130,7 +131,7 @@ public class CoreGame extends ApplicationAdapter {
         TextureRegion[] walkFrames = new TextureRegion[frames];
 
         for (int i = 0; i < frames; i++) {
-            Texture texture = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_" + (i + 1) + ".png"));
+            Texture texture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_" + (i + 1) + ".png"));
 
             animationFrames[i] = texture;
             walkFrames[i] = new TextureRegion(texture);
@@ -277,6 +278,17 @@ public class CoreGame extends ApplicationAdapter {
                     enemyAnimMap.remove(deadEnemy);
                 }
             }
+
+            if (event instanceof PlayerDiedEvent) {
+                if (playerCorpse == null && gameStateView != null) {
+                    Vec2 pPos = gameStateView.getPlayerPosition();
+                    playerCorpse = new DeadBody(
+                            pPos.x,
+                            pPos.y,
+                            gameStateView.getPlayerFacingAngle()
+                    );
+                }
+            }
         }
 
         for (Enemy enemy : gameController.getEnemies()) {
@@ -342,6 +354,24 @@ public class CoreGame extends ApplicationAdapter {
                         body.angle - 180
                 );
             }
+
+            if (playerCorpse != null) {
+                float width = 80f;
+                float height = 40f;
+                float originX = 9f;
+                float originY = height / 2f;
+                float drawX = playerCorpse.x - originX;
+                float drawY = playerCorpse.y - originY;
+
+                spriteBatch.draw(
+                        new TextureRegion(corpseTexture),
+                        drawX, drawY,
+                        originX, originY,
+                        width, height,
+                        1f, 1f,
+                        playerCorpse.angle - 180
+                );
+            }
             spriteBatch.end();
 
             if (isPlayerMoving) {
@@ -352,7 +382,7 @@ public class CoreGame extends ApplicationAdapter {
 
             TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 
-            if(gameStateView != null) {
+            if(gameStateView != null && playerCorpse == null) {
                 // Гравець
                 float width = 45f;
                 float height = 36f;
@@ -533,6 +563,8 @@ public class CoreGame extends ApplicationAdapter {
 
     private void restart() {
         deadBodies.clear();
+        playerCorpse = null;
+
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
         gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
