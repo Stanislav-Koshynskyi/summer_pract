@@ -45,6 +45,7 @@ public class CoreGame extends ApplicationAdapter {
     private Texture playerSprite;
     private Texture alertTexture;
     private Texture searchTexture;
+    private Texture corpseTexture;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -55,6 +56,7 @@ public class CoreGame extends ApplicationAdapter {
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
     private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
+    private final List<DeadBody> deadBodies = new ArrayList<>();
     private final Map<Enemy, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
 
@@ -119,6 +121,7 @@ public class CoreGame extends ApplicationAdapter {
         playerSprite = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
+        corpseTexture = new Texture(Gdx.files.internal("sprites/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Анімація
@@ -256,6 +259,24 @@ public class CoreGame extends ApplicationAdapter {
                     alertEffects.add(new VisualAlertEffect(enemy, 1.5f));
                 }
             }
+
+            if (event instanceof EnemyDiedEvent) {
+                EnemyDiedEvent diedEvent = (EnemyDiedEvent) event;
+
+                Enemy deadEnemy = enemyAnimMap.keySet().stream()
+                        .filter(e -> e.getEnemyId() == diedEvent.enemyId)
+                        .findFirst().orElse(null);
+
+                if (deadEnemy != null) {
+                    deadBodies.add(new DeadBody(
+                            deadEnemy.getX(),
+                            deadEnemy.getY(),
+                            deadEnemy.getFacingAngle()
+                    ));
+
+                    enemyAnimMap.remove(deadEnemy);
+                }
+            }
         }
 
         for (Enemy enemy : gameController.getEnemies()) {
@@ -301,6 +322,27 @@ public class CoreGame extends ApplicationAdapter {
 
         if (gameStateView != null) {
             Vec2 playerPos = gameStateView.getPlayerPosition();
+
+            spriteBatch.begin();
+            for (DeadBody body : deadBodies) {
+                float width = 80f;
+                float height = 40f;
+                float originX = 9f;
+                float originY = height / 2f;
+
+                float drawX = body.x - originX;
+                float drawY = body.y - originY;
+
+                spriteBatch.draw(
+                        new TextureRegion(corpseTexture),
+                        drawX, drawY,
+                        originX, originY,
+                        width, height,
+                        1f, 1f,
+                        body.angle - 180
+                );
+            }
+            spriteBatch.end();
 
             if (isPlayerMoving) {
                 stateTime += Gdx.graphics.getDeltaTime();
@@ -480,6 +522,8 @@ public class CoreGame extends ApplicationAdapter {
         playerSprite.dispose();
         alertEffects.clear();
         alertTexture.dispose();
+        deadBodies.clear();
+        corpseTexture.dispose();
         if (animationFrames != null) {
             for (Texture texture : animationFrames) {
                 if (texture != null) texture.dispose();
@@ -488,6 +532,7 @@ public class CoreGame extends ApplicationAdapter {
     }
 
     private void restart() {
+        deadBodies.clear();
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
         gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
