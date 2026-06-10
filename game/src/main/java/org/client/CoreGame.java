@@ -31,6 +31,7 @@ import org.core.weapon.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class CoreGame extends ApplicationAdapter {
 
@@ -54,6 +55,7 @@ public class CoreGame extends ApplicationAdapter {
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
     private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
+    private final Map<Enemy, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
 
     // Анімація
@@ -254,6 +256,24 @@ public class CoreGame extends ApplicationAdapter {
                     alertEffects.add(new VisualAlertEffect(enemy, 1.5f));
                 }
             }
+
+            for (Enemy enemy : gameController.getEnemies()) {
+                if (!enemy.isAlive()) continue;
+
+                EnemyAnimData data = enemyAnimMap.computeIfAbsent(enemy, k -> new EnemyAnimData());
+
+                data.isMoving = Math.abs(enemy.getX() - data.lastX) > 0.01f ||
+                        Math.abs(enemy.getY() - data.lastY) > 0.01f;
+
+                if (data.isMoving) {
+                    data.stateTime += dt;
+                } else {
+                    data.stateTime = 0f;
+                }
+
+                data.lastX = enemy.getX();
+                data.lastY = enemy.getY();
+            }
         }
     }
 
@@ -289,26 +309,28 @@ public class CoreGame extends ApplicationAdapter {
 
             TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 
-            // Гравець
-            float width = 45f;
-            float height = 36f;
-            float originX = 9f;
-            float originY = height / 2f;
-            float drawX = playerPos.x - originX;
-            float drawY = playerPos.y - originY;
-            float angle = gameStateView.getPlayerFacingAngle();
+            if(gameStateView != null) {
+                // Гравець
+                float width = 45f;
+                float height = 36f;
+                float originX = 9f;
+                float originY = height / 2f;
+                float drawX = playerPos.x - originX;
+                float drawY = playerPos.y - originY;
+                float angle = gameStateView.getPlayerFacingAngle();
 
-            spriteBatch.begin();
+                spriteBatch.begin();
 
-            spriteBatch.draw(
-                    currentFrame,
-                    drawX, drawY,
-                    originX, originY,
-                    width, height,
-                    1f, 1f,
-                    angle
-            );
-            spriteBatch.end();
+                spriteBatch.draw(
+                        currentFrame,
+                        drawX, drawY,
+                        originX, originY,
+                        width, height,
+                        1f, 1f,
+                        angle
+                );
+                spriteBatch.end();
+            }
 
             // Прицілювання мишкою та лазер
             float dirX = mouseInWorld.x - playerPos.x;
@@ -325,22 +347,31 @@ public class CoreGame extends ApplicationAdapter {
             float targetY = playerPos.y + dirY * laserLength;
 
             // Вороги (різні стани)
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            spriteBatch.begin();
 
-            if (gameController != null && gameController.getEnemies() != null) {
-                for (Enemy enemy : gameController.getEnemies()) {
-                    switch (enemy.getCurrentState()) {
-                        case ATTACK -> shapeRenderer.setColor(Color.RED);
-                        case SEARCH -> shapeRenderer.setColor(Color.YELLOW);
-                        case INVESTIGATE -> shapeRenderer.setColor(Color.GREEN);
-                        case PATROL -> shapeRenderer.setColor(Color.BLUE);
-                        case SUSPICIOUS -> shapeRenderer.setColor(Color.PURPLE);
-                        default -> shapeRenderer.setColor(Color.BLACK);
-                    }
-                    shapeRenderer.circle(enemy.getX(), enemy.getY(), 16f);
-                }
+            for (Enemy enemy : gameController.getEnemies()) {
+                if (!enemy.isAlive()) continue;
+
+                float width = 45f;
+                float height = 36f;
+                float originX = 9f;
+                float originY = height / 2f;
+
+                float drawX = enemy.getX() - originX;
+                float drawY = enemy.getY() - originY;
+                float angle = enemy.getFacingAngle();
+
+                spriteBatch.draw(
+                        currentFrame,
+                        drawX, drawY,
+                        originX, originY,
+                        width, height,
+                        1f, 1f,
+                        angle
+                );
             }
-            shapeRenderer.end();
+
+            spriteBatch.end();
 
             if (debugMode) {
                 // Візуалізація зору ворогів
