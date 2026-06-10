@@ -295,11 +295,12 @@ public class CoreGame extends ApplicationAdapter {
 
         camera.update();
         renderer.setView(camera);
+        spriteBatch.setProjectionMatrix(camera.combined);
+        shapeRenderer.setProjectionMatrix(camera.combined);
         renderer.render();
 
         if (gameStateView != null) {
             Vec2 playerPos = gameStateView.getPlayerPosition();
-            shapeRenderer.setProjectionMatrix(camera.combined);
 
             if (isPlayerMoving) {
                 stateTime += Gdx.graphics.getDeltaTime();
@@ -427,7 +428,6 @@ public class CoreGame extends ApplicationAdapter {
         shapeRenderer.end();
 
         // Тимчасові текстури дверей
-        spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         for (Door door : gameController.getDoors()) {
             float drawX = door.getX() - door.getWidth() / 2f;
