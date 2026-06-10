@@ -256,24 +256,24 @@ public class CoreGame extends ApplicationAdapter {
                     alertEffects.add(new VisualAlertEffect(enemy, 1.5f));
                 }
             }
+        }
 
-            for (Enemy enemy : gameController.getEnemies()) {
-                if (!enemy.isAlive()) continue;
+        for (Enemy enemy : gameController.getEnemies()) {
+            if (!enemy.isAlive()) continue;
 
-                EnemyAnimData data = enemyAnimMap.computeIfAbsent(enemy, k -> new EnemyAnimData());
+            EnemyAnimData data = enemyAnimMap.computeIfAbsent(enemy, k -> new EnemyAnimData());
 
-                data.isMoving = Math.abs(enemy.getX() - data.lastX) > 0.01f ||
-                        Math.abs(enemy.getY() - data.lastY) > 0.01f;
+            data.isMoving = Math.abs(enemy.getX() - data.lastX) > 0.01f ||
+                    Math.abs(enemy.getY() - data.lastY) > 0.01f;
 
-                if (data.isMoving) {
-                    data.stateTime += dt;
-                } else {
-                    data.stateTime = 0f;
-                }
-
-                data.lastX = enemy.getX();
-                data.lastY = enemy.getY();
+            if (data.isMoving) {
+                data.stateTime += dt;
+            } else {
+                data.stateTime = 0f;
             }
+
+            data.lastX = enemy.getX();
+            data.lastY = enemy.getY();
         }
     }
 
@@ -346,11 +346,15 @@ public class CoreGame extends ApplicationAdapter {
             float targetX = playerPos.x + dirX * laserLength;
             float targetY = playerPos.y + dirY * laserLength;
 
-            // Вороги (різні стани)
+            // Вороги
             spriteBatch.begin();
 
             for (Enemy enemy : gameController.getEnemies()) {
                 if (!enemy.isAlive()) continue;
+
+                EnemyAnimData data = enemyAnimMap.getOrDefault(enemy, new EnemyAnimData());
+
+                TextureRegion enemyFrame = walkAnimation.getKeyFrame(data.stateTime, true);
 
                 float width = 45f;
                 float height = 36f;
@@ -362,7 +366,7 @@ public class CoreGame extends ApplicationAdapter {
                 float angle = enemy.getFacingAngle();
 
                 spriteBatch.draw(
-                        currentFrame,
+                        enemyFrame,
                         drawX, drawY,
                         originX, originY,
                         width, height,
