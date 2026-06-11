@@ -142,8 +142,6 @@ public class EnemyAI {
             }
             return;
         }
-        enemy.setLastKnownPlayerPosition(player.getX(), player.getY());
-        enemy.resetAimMemoryTimer();
         AimBehavior behavior = aimBehaviors.get(enemy.getProfile().getAimBehaviorType());
         if (behavior != null) {
             behavior.updateAim(enemy, player, delta);
@@ -191,7 +189,7 @@ public class EnemyAI {
                 weapon.getDefinition().getSpread()
         );
         events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
-        enemy.resetReactionTimer();
+        enemy.setReactionTimer(0f);
         enemy.setShotCommitStarted(false);
     }
 
