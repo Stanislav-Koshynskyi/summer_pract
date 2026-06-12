@@ -197,7 +197,7 @@ public class LevelTmxLoader {
 
                 String doorNumber = String.valueOf(doorId);
                 DoorData doorData = new DoorData(
-                        doorNumber, centerX, centerY, widthDoor, heightDoor, initialState, blockedTiles, openingDuration
+                        doorNumber, centerX, centerY, widthDoor, heightDoor, initialState, blockedTiles, openingDuration, orientation
                 );
                 doors.add(doorData);
             }

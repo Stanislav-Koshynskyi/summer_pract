@@ -41,8 +41,8 @@ public class CoreGame extends ApplicationAdapter {
     private OrthographicCamera camera;
     private CameraInputController cameraController;
     private SpriteBatch spriteBatch;
-    private Texture doorOpenedTexture;
-    private Texture doorClosedTexture;
+    private Texture doorVerticalTexture;
+    private Texture doorHorizontalTexture;
     private Texture playerSprite;
     private Texture alertTexture;
     private Texture searchTexture;
@@ -63,6 +63,7 @@ public class CoreGame extends ApplicationAdapter {
     private final List<BulletEffect> bulletEffects = new java.util.ArrayList<>();
     private final List<DeadBody> deadBodies = new ArrayList<>();
     private final Map<String, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
+    private final java.util.Map<Door, Float> doorAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
 
     // Анімація
@@ -147,8 +148,8 @@ public class CoreGame extends ApplicationAdapter {
 
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
-        doorOpenedTexture = new Texture(Gdx.files.internal("textures/door_opened.png"));
-        doorClosedTexture = new Texture(Gdx.files.internal("textures/door_closed.png"));
+        doorVerticalTexture = new Texture(Gdx.files.internal("textures/door_closed_vertical.png"));
+        doorHorizontalTexture = new Texture(Gdx.files.internal("textures/door_closed_horizontal.png"));
         playerSprite = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
@@ -435,6 +436,21 @@ public class CoreGame extends ApplicationAdapter {
                 data.stateTime = 0f;
             }
         }
+
+        // Двері
+        for (Door door : gameController.getDoors()) {
+            float progress = doorAnimMap.getOrDefault(door, 0f);
+            float animSpeed = 5f;
+
+            if (door.getState() == DoorState.OPEN) {
+                progress = Math.min(1f, progress + Gdx.graphics.getDeltaTime() * animSpeed);
+            } else {
+                progress = Math.max(0f, progress - Gdx.graphics.getDeltaTime() * animSpeed);
+            }
+
+            doorAnimMap.put(door, progress);
+        }
+
     }
 
     private void draw() {
@@ -511,6 +527,53 @@ public class CoreGame extends ApplicationAdapter {
             }
 
             TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+
+            // Тимчасові текстури дверей
+            spriteBatch.begin();
+            for (Door door : gameController.getDoors()) {
+                float progress = doorAnimMap.getOrDefault(door, 0f);
+
+                float drawX = door.getX() - door.getWidth() / 2f;
+                float drawY = door.getY() - door.getHeight() / 2f;
+
+                float currentAngle = progress * 90f;
+
+                if (door.getOrientation().equals("horizontal")) {
+                    // Петля
+                    float originX = 6f;
+                    float originY = 6f;
+
+                    spriteBatch.draw(
+                            doorHorizontalTexture,
+                            drawX, drawY,
+                            originX, originY,
+                            door.getWidth(), door.getHeight(),
+                            1f, 1f,
+                            currentAngle,  // кут повороту = додатний --- проти годинникової
+                            0, 0,
+                            doorHorizontalTexture.getWidth(), doorHorizontalTexture.getHeight(),
+                            false, false
+                    );
+
+                } else if (door.getOrientation().equals("vertical")) {
+                    // Петля
+                    float originX = 6f;
+                    float originY = 6f;
+
+                    spriteBatch.draw(
+                            doorVerticalTexture,
+                            drawX, drawY,
+                            originX, originY,
+                            door.getWidth(), door.getHeight(),
+                            1f, 1f,
+                            -currentAngle,
+                            0, 0,
+                            doorVerticalTexture.getWidth(), doorVerticalTexture.getHeight(),
+                            false, false
+                    );
+                }
+            }
+            spriteBatch.end();
 
             if(gameStateView != null && playerCorpse == null) {
                 // Гравець
@@ -656,20 +719,6 @@ public class CoreGame extends ApplicationAdapter {
         }
         spriteBatch.end();
 
-        // Тимчасові текстури дверей
-        spriteBatch.begin();
-        for (Door door : gameController.getDoors()) {
-            float drawX = door.getX() - door.getWidth() / 2f;
-            float drawY = door.getY() - door.getHeight() / 2f;
-            if (door.getState() == DoorState.OPEN) {
-                spriteBatch.draw(doorOpenedTexture, drawX, drawY, door.getWidth(), door.getHeight());
-            }
-            if (door.getState() == DoorState.CLOSED) {
-                spriteBatch.draw(doorClosedTexture, drawX, drawY, door.getWidth(), door.getHeight());
-            }
-        }
-        spriteBatch.end();
-
         // Знак оклику/питання над ворогами
         spriteBatch.begin();
         for (Enemy enemy : gameController.getEnemies()) {
@@ -703,8 +752,8 @@ public class CoreGame extends ApplicationAdapter {
         renderer.dispose();
         shapeRenderer.dispose();
         spriteBatch.dispose();
-        doorClosedTexture.dispose();
-        doorOpenedTexture.dispose();
+        doorHorizontalTexture.dispose();
+        doorVerticalTexture.dispose();
         attackEffects.clear();
         playerSprite.dispose();
         alertEffects.clear();

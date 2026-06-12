@@ -9,9 +9,10 @@ public class DoorData {
     public DoorState initialState;
     public int[][] blockedTiles;
     public float openingDuration;
+    public String orientation;
 
     public DoorData(String doorId, float x, float y, float width, float height,
-                    DoorState initialState, int[][] blockedTiles, float openingDuration) {
+                    DoorState initialState, int[][] blockedTiles, float openingDuration, String orientation) {
         this.doorId = doorId;
         this.x = x;
         this.y = y;
@@ -20,6 +21,7 @@ public class DoorData {
         this.initialState = initialState;
         this.blockedTiles = blockedTiles;
         this.openingDuration = openingDuration;
+        this.orientation = orientation;
     }
 }
 

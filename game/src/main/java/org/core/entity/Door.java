@@ -18,20 +18,22 @@ public class Door extends Entity implements PathBlocker {
     private float pauseTimer = 0;
     private final float openingDuration;
     private final float soundAttenuationFactor;
+    private final String orientation;
 
     public Door(String doorId, float x, float y, float width, float height,
-                DoorState initialState, float openingDuration, float soundAttenuationFactor) {
+                DoorState initialState, float openingDuration, float soundAttenuationFactor, String orientation) {
         super(x, y, width, height);
         this.doorId = doorId;
         this.state = initialState;
         this.openingDuration = openingDuration;
         this.soundAttenuationFactor = soundAttenuationFactor;
+        this.orientation = orientation;
     }
 
     public Door(String doorId, float x, float y, float width, float height,
-                DoorState initialState) {
+                DoorState initialState, String orientation) {
         this(doorId, x, y, width, height, initialState,
-                DEFAULT_OPENING_DURATION, DEFAULT_SOUND_ATTENUATION);
+                DEFAULT_OPENING_DURATION, DEFAULT_SOUND_ATTENUATION, orientation);
     }
 
     public void requestOpen() {
