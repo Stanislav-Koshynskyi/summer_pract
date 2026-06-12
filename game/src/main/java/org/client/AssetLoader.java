@@ -22,7 +22,7 @@ public class AssetLoader {
                 "sprites/enemies/sprColombian/sprColombianWalkMendoza/sprColombianWalkMendoza_", 8, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianWalkMendoza/sprColombianWalkMendoza_", 1, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianDie9mm/sprColombianDie9mm_", 14, 0.1f,
-                "sprites/enemies/sprColombian/sprColombianAttackMendoza/sprColombianAttackMendoza_", 2, 0.1f
+                "sprites/enemies/sprColombian/sprColombianAttackMendoza/sprColombianAttackMendoza_", 2, 0.05f
         );
 
         registerEnemy(
@@ -30,7 +30,7 @@ public class AssetLoader {
                 "sprites/enemies/sprEGang/sprEGangWalkShotgun/sprEGangWalkShotgun_", 8, 0.1f,
                 "sprites/enemies/sprEGang/sprEGangWalkShotgun/sprEGangWalkShotgun_", 1, 0.1f,
                 "sprites/enemies/sprEGang/sprEGangDie9mm/sprEGangDie9mm_", 5, 0.1f,
-                "sprites/enemies/sprEGang/sprEGangAttackShotgun/sprEGangAttackShotgun_", 7, 0.1f
+                "sprites/enemies/sprEGang/sprEGangAttackShotgun/sprEGangAttackShotgun_", 7, 0.05f
         );
     }
 

@@ -47,6 +47,7 @@ public class CoreGame extends ApplicationAdapter {
     private Texture alertTexture;
     private Texture searchTexture;
     private Texture corpseTexture;
+    private Texture bulletTexture;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -59,6 +60,7 @@ public class CoreGame extends ApplicationAdapter {
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
     private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
+    private final List<BulletEffect> bulletEffects = new java.util.ArrayList<>();
     private final List<DeadBody> deadBodies = new ArrayList<>();
     private final Map<String, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
@@ -151,6 +153,7 @@ public class CoreGame extends ApplicationAdapter {
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
         corpseTexture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
+        bulletTexture = new Texture(Gdx.files.internal("textures/bullet_4.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Анімація гравця
@@ -261,10 +264,22 @@ public class CoreGame extends ApplicationAdapter {
             }
         }
 
+        Iterator<BulletEffect> bulletIt = bulletEffects.iterator();
+        while (bulletIt.hasNext()) {
+            BulletEffect effect = bulletIt.next();
+            effect.update(dt);
+            if (effect.lifetime <= 0) {
+                bulletIt.remove();
+            }
+        }
+
         List<GameEvent> events = gameController.drainEvents();
         for (GameEvent event : events) {
             if (event instanceof ShotFiredEvent) {
                 ShotFiredEvent shot = (ShotFiredEvent) event;
+
+                float shooterAngle = 0f;
+                boolean isPlayerShooter = true;
 
                 for (Vec2 targetPos : shot.getTargets()) {
                     attackEffects.add(new VisualAttackEffect(
@@ -289,10 +304,48 @@ public class CoreGame extends ApplicationAdapter {
                 if (shooter != null) {
                     float distSq = (shooter.getX() - shot.fromX) * (shooter.getX() - shot.fromX) + (shooter.getY() - shot.fromY) * (shooter.getY() - shot.fromY);
                     if (distSq < 2500f) {
+                        shooterAngle = shooter.getFacingAngle();
+                        isPlayerShooter = false;
+
                         EnemyAnimData data = enemyAnimMap.computeIfAbsent(shooter.getEnemyId(), k -> new EnemyAnimData());
                         data.currentState = AnimationState.ATTACK;
                         data.stateTime = 0f;
                     }
+                }
+
+                if (isPlayerShooter) {
+                    shooterAngle = gameStateView.getPlayerFacingAngle();
+                }
+
+                for (Vec2 targetPos : shot.getTargets()) {
+                    float ddx = targetPos.x - shot.fromX;
+                    float ddy = targetPos.y - shot.fromY;
+                    float distanceToTarget = (float) Math.sqrt(ddx * ddx + ddy * ddy);
+
+                    float bulletAngle = (float) Math.toDegrees(Math.atan2(ddy, ddx));
+
+                    float forwardOffset = 22f;
+                    float sideOffset = 0f;
+
+                    if (distanceToTarget < forwardOffset) {
+                        forwardOffset = Math.max(0f, distanceToTarget - 2f);
+                        sideOffset = 0f;
+                    }
+
+                    Vector2 spawnOffset = new Vector2(forwardOffset, sideOffset).rotateDeg(shooterAngle);
+                    float actualFromX = shot.fromX + spawnOffset.x;
+                    float actualFromY = shot.fromY + spawnOffset.y;
+
+                    float bulletSpeed = 4000f;
+                    float bulletLifetime = 1.2f;
+
+                    bulletEffects.add(new BulletEffect(
+                            actualFromX,
+                            actualFromY,
+                            bulletAngle,
+                            bulletSpeed,
+                            bulletLifetime
+                    ));
                 }
             }
 
@@ -570,16 +623,38 @@ public class CoreGame extends ApplicationAdapter {
                 shapeRenderer.setColor(Color.RED);
                 shapeRenderer.line(playerPos.x, playerPos.y, targetX, targetY);
                 shapeRenderer.end();
+
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                for (VisualAttackEffect effect : attackEffects) {
+                    shapeRenderer.setColor(effect.color);
+                    shapeRenderer.line(effect.fromX, effect.fromY, effect.toX, effect.toY);
+                }
+                shapeRenderer.end();
             }
         }
 
         // Постріли
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (VisualAttackEffect effect : attackEffects) {
-            shapeRenderer.setColor(effect.color);
-            shapeRenderer.line(effect.fromX, effect.fromY, effect.toX, effect.toY);
+        spriteBatch.begin();
+        for (BulletEffect effect : bulletEffects) {
+            float bulletW = 15f;
+            float bulletH = 15f;
+            float originX = bulletW / 2f;
+            float originY = bulletH / 2f;
+
+            spriteBatch.draw(
+                    bulletTexture,
+                    effect.x - originX,
+                    effect.y - originY,
+                    originX, originY,
+                    bulletW, bulletH,
+                    1f, 1f,
+                    effect.angle,
+                    0, 0,
+                    bulletTexture.getWidth(), bulletTexture.getHeight(),
+                    false, false
+            );
         }
-        shapeRenderer.end();
+        spriteBatch.end();
 
         // Тимчасові текстури дверей
         spriteBatch.begin();
@@ -636,6 +711,7 @@ public class CoreGame extends ApplicationAdapter {
         alertTexture.dispose();
         deadBodies.clear();
         corpseTexture.dispose();
+        if (bulletTexture != null) bulletTexture.dispose();
         if (assetLoader != null) assetLoader.dispose();
         if (animationFrames != null) {
             for (Texture texture : animationFrames) {
