@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+import org.content.registry.EnemyProfileRegistry;
 import org.core.controller.GameController;
 import org.core.data.*;
 import org.core.definition.EnemyProfile;
@@ -50,8 +51,8 @@ public class CoreGame extends ApplicationAdapter {
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
     private GameController gameController;
-    private EnemyProfile testEnemyProfile;
     private WeaponSystem weaponSystem;
+    private EnemyProfileRegistry enemyProfileRegistry;
     private DeadBody playerCorpse;
     private AssetLoader assetLoader;
     private boolean debugMode = false;
@@ -88,7 +89,7 @@ public class CoreGame extends ApplicationAdapter {
         //Gdx.input.setInputProcessor(cameraController);
 
         // тестовий профіль, щоб програма не падала
-        testEnemyProfile = new EnemyProfile(
+        EnemyProfile testEnemyProfile = new EnemyProfile(
                 "1",
                 100,
                 120f,
@@ -109,12 +110,35 @@ public class CoreGame extends ApplicationAdapter {
                 300
         );
 
-        weaponSystem = new WeaponSystem();
+        EnemyProfile testEnemyProfile2 = new EnemyProfile(
+                "2",
+                100,
+                120f,
+                220f,
+                300f,
+                0.5f,
+                0.1f,
+                0.5f,
+                3.0f,
+                200f,
+                AimBehaviorType.values()[0],
+                90f,
+                130f,
+                360f,
+                16f,
+                16f,
+                20,
+                300
+        );
 
+        weaponSystem = new WeaponSystem();
+        enemyProfileRegistry = new EnemyProfileRegistry();
+        enemyProfileRegistry.register(testEnemyProfile);
+        enemyProfileRegistry.register(testEnemyProfile2);
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
 
-        gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
+        gameController = new GameController(null, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
         gameController.loadLevel(levelData);
 
         this.gameStateView = gameController.getStateView();
@@ -626,7 +650,7 @@ public class CoreGame extends ApplicationAdapter {
 
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
-        gameController = new GameController(null, testEnemyProfile, new java.util.HashMap<>(), weaponSystem);
+        gameController = new GameController(null, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
         gameController.loadLevel(levelData);
         this.gameStateView = gameController.getStateView();
     }
