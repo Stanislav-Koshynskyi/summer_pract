@@ -16,6 +16,7 @@ import org.core.data.EnemySpawnData;
 import org.core.data.LevelData;
 import org.core.data.WeaponPickupData;
 import org.core.definition.EnemyProfile;
+import org.core.definition.PlayerProfile;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.Player;
@@ -134,20 +135,35 @@ public class GameController {
         Player player = new Player(
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
-                new Weapon(new WeaponDefinition(
-                        "1",
-                        WeaponType.HITSCAN,
-                        50,
-                        250,
-                        0.1f,
-                        100,
-                        false,
-                        true,
-                        new SimpleRayCastBehavior(),
-                        30,
-                        10
-                ))
-        );
+                new PlayerProfile("1",
+                        new Weapon(new WeaponDefinition(
+                                "1",
+                                WeaponType.HITSCAN,
+                                50,
+                                250,
+                                0.1f,
+                                100,
+                                false,
+                                true,
+                                new SimpleRayCastBehavior(),
+                                30,
+                                10
+                        )),
+                        new Weapon(new WeaponDefinition(
+                                "1",
+                                WeaponType.HITSCAN,
+                                50,
+                                250,
+                                0.1f,
+                                100,
+                                false,
+                                true,
+                                new SimpleRayCastBehavior(),
+                                30,
+                                10
+                        )),
+                        10,4,1,1,0
+        ));
         player.setMovementMode(pendingMovementMode);
         blockers.add(player);
 

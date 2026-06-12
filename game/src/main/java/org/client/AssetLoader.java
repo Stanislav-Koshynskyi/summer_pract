@@ -1,0 +1,87 @@
+package org.client;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import org.core.definition.EnemyProfile;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class AssetLoader {
+    private final List<Texture> allLoadedTextures = new ArrayList<>();
+    private final Map<String, EnemyAnimationSet> enemyRegistry = new HashMap<>();
+
+    public void load() {
+        registerEnemy(
+                "1",
+                "sprites/enemies/sprColombian/sprColombianWalkMendoza/sprColombianWalkMendoza_", 8, 0.1f,
+                "sprites/enemies/sprColombian/sprColombianWalkMendoza/sprColombianWalkMendoza_", 1, 0.1f,
+                "sprites/enemies/sprColombian/sprColombianDie9mm/sprColombianDie9mm_", 1, 0.1f,
+                "sprites/enemies/sprColombian/sprColombianAttackMendoza/sprColombianAttackMendoza_", 2, 0.1f
+        );
+    }
+
+    private void registerEnemy(String typeName,
+                               String walkPath, int walkFrames, float walkSpeed,
+                               String idlePath, int idleFrames, float idleSpeed,
+                               String diePath, int dieFrames, float dieSpeed,
+                               String attackPath, int attackFrames, float attackSpeed) {
+
+        EnemyAnimationSet animSet = new EnemyAnimationSet();
+
+        // ХОДЬБА
+        TextureRegion[] walkArray = new TextureRegion[walkFrames];
+        for (int i = 0; i < walkFrames; i++) {
+            Texture tex = new Texture(Gdx.files.internal(walkPath + (i + 1) + ".png"));
+            allLoadedTextures.add(tex);
+            walkArray[i] = new TextureRegion(tex);
+        }
+        animSet.addAnimation(AnimationState.WALK, new Animation<>(walkSpeed, walkArray));
+
+        // СПОКІЙ
+        TextureRegion[] idleArray = new TextureRegion[idleFrames];
+        for (int i = 0; i < idleFrames; i++) {
+            Texture tex = new Texture(Gdx.files.internal(idlePath + (i + 1) + ".png"));
+            allLoadedTextures.add(tex);
+            idleArray[i] = new TextureRegion(tex);
+        }
+        animSet.addAnimation(AnimationState.IDLE, new Animation<>(idleSpeed, idleArray));
+
+        // ТРУП
+        TextureRegion[] dieArray = new TextureRegion[dieFrames];
+        for (int i = 0; i < attackFrames; i++) {
+            Texture tex = new Texture(Gdx.files.internal(diePath + 14 + ".png"));
+            allLoadedTextures.add(tex);
+            dieArray[0] = new TextureRegion(tex);
+        }
+        animSet.addAnimation(AnimationState.DYING, new Animation<>(dieSpeed, dieArray));
+
+        // Атака
+        TextureRegion[] attackArray = new TextureRegion[attackFrames];
+        for (int i = 0; i < attackFrames; i++) {
+            Texture tex = new Texture(Gdx.files.internal(attackPath + (i + 1) + ".png"));
+            allLoadedTextures.add(tex);
+            attackArray[i] = new TextureRegion(tex);
+        }
+        animSet.addAnimation(AnimationState.ATTACK, new Animation<>(attackSpeed, attackArray));
+
+        enemyRegistry.put(typeName, animSet);
+    }
+
+    public EnemyAnimationSet getAnimationSet(String enemyProfile) {
+        return enemyRegistry.get(enemyProfile);
+    }
+
+    public void dispose() {
+        for (Texture tex : allLoadedTextures) {
+            if (tex != null) tex.dispose();
+        }
+        allLoadedTextures.clear();
+        enemyRegistry.clear();
+    }
+}

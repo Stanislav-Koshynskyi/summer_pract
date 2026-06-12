@@ -19,7 +19,8 @@ public class Weapon {
         this.cooldownTimer = 0f;
         infinityAmmo = false;
     }
-    public Weapon(WeaponDefinition definition, boolean infinityAmmo){
+
+    public Weapon(WeaponDefinition definition, boolean infinityAmmo) {
         this.definition = definition;
         this.infinityAmmo = infinityAmmo;
     }
@@ -46,5 +47,11 @@ public class Weapon {
 
     public boolean isEmpty() {
         return ammo == 0;
+    }
+
+    public Weapon clone() {
+        Weapon weapon = new Weapon(this.getDefinition());
+        weapon.ammo = this.ammo;
+        return weapon;
     }
 }

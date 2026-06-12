@@ -53,12 +53,13 @@ public class CoreGame extends ApplicationAdapter {
     private EnemyProfile testEnemyProfile;
     private WeaponSystem weaponSystem;
     private DeadBody playerCorpse;
+    private AssetLoader assetLoader;
     private boolean debugMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
     private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
     private final List<DeadBody> deadBodies = new ArrayList<>();
-    private final Map<Enemy, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
+    private final Map<String, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
 
     // Анімація
@@ -66,6 +67,9 @@ public class CoreGame extends ApplicationAdapter {
     private Texture[] animationFrames;
     private float stateTime;
     private boolean isPlayerMoving = false;
+
+    private Animation<TextureRegion> enemyWalkAnimation1;
+    private Texture[] enemyAnimationFrames;
 
     @Override
     public void create() {
@@ -125,7 +129,7 @@ public class CoreGame extends ApplicationAdapter {
         corpseTexture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        // Анімація
+        // Анімація гравця
         int frames = 6;
         animationFrames = new Texture[frames];
         TextureRegion[] walkFrames = new TextureRegion[frames];
@@ -140,6 +144,9 @@ public class CoreGame extends ApplicationAdapter {
         walkAnimation = new Animation<>(0.1f, walkFrames);
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
         stateTime = 8f;
+
+        assetLoader = new AssetLoader();
+        assetLoader.load();
     }
 
     @Override
@@ -161,6 +168,10 @@ public class CoreGame extends ApplicationAdapter {
         float dt = Gdx.graphics.getDeltaTime();
         float dx = 0f;
         float dy = 0f;
+
+        for (DeadBody body : deadBodies) {
+            body.stateTime += dt;
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
             debugMode = !debugMode;
@@ -241,41 +252,61 @@ public class CoreGame extends ApplicationAdapter {
                             Color.YELLOW
                     ));
                 }
+
+                Enemy shooter = gameController.getEnemies().stream()
+                        .filter(Enemy::isAlive)
+                        .min((e1, e2) -> {
+                            float d1 = (e1.getX() - shot.fromX) * (e1.getX() - shot.fromX) + (e1.getY() - shot.fromY) * (e1.getY() - shot.fromY);
+                            float d2 = (e2.getX() - shot.fromX) * (e2.getX() - shot.fromX) + (e2.getY() - shot.fromY) * (e2.getY() - shot.fromY);
+                            return Float.compare(d1, d2);
+                        })
+                        .orElse(null);
+
+                if (shooter != null) {
+                    float distSq = (shooter.getX() - shot.fromX) * (shooter.getX() - shot.fromX) + (shooter.getY() - shot.fromY) * (shooter.getY() - shot.fromY);
+                    if (distSq < 2500f) {
+                        EnemyAnimData data = enemyAnimMap.computeIfAbsent(shooter.getEnemyId(), k -> new EnemyAnimData());
+                        data.currentState = AnimationState.ATTACK;
+                        data.stateTime = 0f;
+                    }
+                }
             }
 
             if (event instanceof EnemyAlertedEvent) {
                 EnemyAlertedEvent alertedEvent = (EnemyAlertedEvent) event;
-                Enemy enemy =gameController.getEnemies().stream().
-                        filter(e -> e.getEnemyId() == alertedEvent.getEnemyId()).findFirst().orElse(null);
+                Enemy enemy = gameController.getEnemies().stream()
+                        .filter(e -> e.getEnemyId().equals(alertedEvent.getEnemyId()))
+                        .findFirst()
+                        .orElse(null);
 
-                boolean alreadyHasMark = false;
-                for (VisualAlertEffect effect : alertEffects) {
-                    if (effect.enemy == enemy) {
-                        alreadyHasMark = true;
-                        break;
+                if (enemy != null && enemy.isAlive()) {
+                    boolean alreadyHasMark = false;
+                    for (VisualAlertEffect effect : alertEffects) {
+                        if (effect.enemy == enemy) {
+                            alreadyHasMark = true;
+                            break;
+                        }
                     }
-                }
-
-                if (!alreadyHasMark && enemy.isAlive()) {
-                    alertEffects.add(new VisualAlertEffect(enemy, 1.5f));
+                    if (!alreadyHasMark) {
+                        alertEffects.add(new VisualAlertEffect(enemy, 1.5f));
+                    }
                 }
             }
 
             if (event instanceof EnemyDiedEvent) {
                 EnemyDiedEvent diedEvent = (EnemyDiedEvent) event;
 
-                Enemy deadEnemy = enemyAnimMap.keySet().stream()
-                        .filter(e -> e.getEnemyId() == diedEvent.enemyId)
-                        .findFirst().orElse(null);
+                EnemyAnimData data = enemyAnimMap.get(diedEvent.enemyId);
 
-                if (deadEnemy != null) {
+                if (data != null) {
                     deadBodies.add(new DeadBody(
-                            deadEnemy.getX(),
-                            deadEnemy.getY(),
-                            deadEnemy.getFacingAngle()
+                            data.lastX,
+                            data.lastY,
+                            data.lastAngle,
+                            data.enemyType
                     ));
 
-                    enemyAnimMap.remove(deadEnemy);
+                    enemyAnimMap.remove(diedEvent.enemyId);
                 }
             }
 
@@ -285,28 +316,47 @@ public class CoreGame extends ApplicationAdapter {
                     playerCorpse = new DeadBody(
                             pPos.x,
                             pPos.y,
-                            gameStateView.getPlayerFacingAngle()
+                            gameStateView.getPlayerFacingAngle(),
+                            "1"
                     );
                 }
             }
         }
 
         for (Enemy enemy : gameController.getEnemies()) {
-            if (!enemy.isAlive()) continue;
+            EnemyAnimData data = enemyAnimMap.computeIfAbsent(enemy.getEnemyId(), k -> new EnemyAnimData());
 
-            EnemyAnimData data = enemyAnimMap.computeIfAbsent(enemy, k -> new EnemyAnimData());
-
-            data.isMoving = Math.abs(enemy.getX() - data.lastX) > 0.01f ||
+            boolean moved = Math.abs(enemy.getX() - data.lastX) > 0.01f ||
                     Math.abs(enemy.getY() - data.lastY) > 0.01f;
+            data.lastX = enemy.getX();
+            data.lastY = enemy.getY();
+            data.lastAngle = enemy.getFacingAngle();
+            data.enemyType = enemy.getProfile().getEnemyTypeId();
+            data.isMoving = moved;
 
-            if (data.isMoving) {
+            String enemyType = enemy.getProfile().getEnemyTypeId();
+            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+
+            AnimationState newState = data.currentState;
+
+            if (data.currentState == AnimationState.ATTACK) {
+                if (animSet.isAnimationFinished(AnimationState.ATTACK, data.stateTime)) {
+                    newState = moved ? AnimationState.WALK : AnimationState.IDLE;
+                }
+            } else {
+                newState = moved ? AnimationState.WALK : AnimationState.IDLE;
+            }
+
+            if (data.currentState != newState) {
+                data.currentState = newState;
+                data.stateTime = 0f;
+            }
+
+            if (data.currentState == AnimationState.ATTACK || data.currentState == AnimationState.WALK) {
                 data.stateTime += dt;
             } else {
                 data.stateTime = 0f;
             }
-
-            data.lastX = enemy.getX();
-            data.lastY = enemy.getY();
         }
     }
 
@@ -337,7 +387,10 @@ public class CoreGame extends ApplicationAdapter {
 
             spriteBatch.begin();
             for (DeadBody body : deadBodies) {
-                float width = 80f;
+                EnemyAnimationSet animSet = assetLoader.getAnimationSet(body.enemyType);
+                TextureRegion frame = animSet.getKeyFrame(AnimationState.DYING, body.stateTime, false);
+
+                float width = 60f;
                 float height = 40f;
                 float originX = 9f;
                 float originY = height / 2f;
@@ -346,7 +399,7 @@ public class CoreGame extends ApplicationAdapter {
                 float drawY = body.y - originY;
 
                 spriteBatch.draw(
-                        new TextureRegion(corpseTexture),
+                        frame,
                         drawX, drawY,
                         originX, originY,
                         width, height,
@@ -425,9 +478,14 @@ public class CoreGame extends ApplicationAdapter {
             for (Enemy enemy : gameController.getEnemies()) {
                 if (!enemy.isAlive()) continue;
 
-                EnemyAnimData data = enemyAnimMap.getOrDefault(enemy, new EnemyAnimData());
+                EnemyAnimData data = enemyAnimMap.getOrDefault(enemy.getEnemyId(), new EnemyAnimData());
 
-                TextureRegion enemyFrame = walkAnimation.getKeyFrame(data.stateTime, true);
+                String enemyType = String.valueOf(enemy.getProfile().getEnemyTypeId());
+
+                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+                boolean shouldLoop = (data.currentState != AnimationState.ATTACK);
+
+                TextureRegion frame = animSet.getKeyFrame(data.currentState, data.stateTime, shouldLoop);
 
                 float width = 45f;
                 float height = 36f;
@@ -439,7 +497,7 @@ public class CoreGame extends ApplicationAdapter {
                 float angle = enemy.getFacingAngle();
 
                 spriteBatch.draw(
-                        enemyFrame,
+                        frame,
                         drawX, drawY,
                         originX, originY,
                         width, height,
@@ -554,6 +612,7 @@ public class CoreGame extends ApplicationAdapter {
         alertTexture.dispose();
         deadBodies.clear();
         corpseTexture.dispose();
+        if (assetLoader != null) assetLoader.dispose();
         if (animationFrames != null) {
             for (Texture texture : animationFrames) {
                 if (texture != null) texture.dispose();
