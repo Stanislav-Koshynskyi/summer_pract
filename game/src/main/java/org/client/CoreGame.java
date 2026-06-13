@@ -18,6 +18,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+import org.content.registry.ContentRegistries;
+import org.content.registry.WeaponRegistry;
 import org.content.registry.EnemyProfileRegistry;
 import org.core.controller.GameController;
 import org.core.data.*;
@@ -53,6 +55,7 @@ public class CoreGame extends ApplicationAdapter {
     private ShapeRenderer shapeRenderer;
     private GameController gameController;
     private WeaponSystem weaponSystem;
+    private WeaponRegistry weaponRegistry;
     private EnemyProfileRegistry enemyProfileRegistry;
     private DeadBody playerCorpse;
     private AssetLoader assetLoader;
@@ -135,13 +138,15 @@ public class CoreGame extends ApplicationAdapter {
         );
 
         weaponSystem = new WeaponSystem();
+        ContentRegistries.initAll();
+        weaponRegistry = new WeaponRegistry();
         enemyProfileRegistry = new EnemyProfileRegistry();
         enemyProfileRegistry.register(testEnemyProfile);
         enemyProfileRegistry.register(testEnemyProfile2);
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
 
-        gameController = new GameController(null, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
+        gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
         gameController.loadLevel(levelData);
 
         this.gameStateView = gameController.getStateView();
@@ -774,7 +779,7 @@ public class CoreGame extends ApplicationAdapter {
 
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
-        gameController = new GameController(null, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
+        gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
         gameController.loadLevel(levelData);
         this.gameStateView = gameController.getStateView();
     }
