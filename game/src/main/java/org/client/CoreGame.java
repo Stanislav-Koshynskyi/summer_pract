@@ -423,7 +423,9 @@ public class CoreGame extends ApplicationAdapter {
             data.isMoving = moved;
 
             String enemyType = enemy.getProfile().getEnemyTypeId();
-            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+            String weaponId = enemy.getCurrentWeapon().getDefinition().getId();
+            data.enemyType = enemyType + "_" + weaponId;
+            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType, weaponId);
 
             AnimationState newState = data.currentState;
 
@@ -648,8 +650,9 @@ public class CoreGame extends ApplicationAdapter {
                 EnemyAnimData data = enemyAnimMap.getOrDefault(enemy.getEnemyId(), new EnemyAnimData());
 
                 String enemyType = String.valueOf(enemy.getProfile().getEnemyTypeId());
+                String weaponId = enemy.getCurrentWeapon().getDefinition().getId();
 
-                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType, weaponId);
                 boolean shouldLoop = (data.currentState != AnimationState.ATTACK);
 
                 TextureRegion frame = animSet.getKeyFrame(data.currentState, data.stateTime, shouldLoop);
