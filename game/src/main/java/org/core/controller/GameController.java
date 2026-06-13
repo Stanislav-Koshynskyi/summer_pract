@@ -240,7 +240,7 @@ public class GameController {
 
 
         if (pendingInteract) {
-            // TODO: InteractionSystem.interact(player)
+            InteractionSystem.interact(player, levelState, rayCastSystem);
             pendingInteract = false;
         }
 
