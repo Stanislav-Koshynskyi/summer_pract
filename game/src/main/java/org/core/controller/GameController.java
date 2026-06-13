@@ -78,7 +78,7 @@ public class GameController {
         List<Blocker> blockers = new ArrayList<>();
 
         for (DoorData dd : data.doors) {
-            Door door = new Door(dd.doorId, dd.x, dd.y, dd.width, dd.height, dd.initialState);
+            Door door = new Door(dd.doorId, dd.x, dd.y, dd.width, dd.height, dd.initialState, dd.orientation);
             doors.add(door);
             blockers.add(door);
         }
