@@ -157,6 +157,12 @@ public class WeaponRegistry {
                 15.0f,
                 0.08f
         ));
+        // Alias numeric IDs for TMX Map compatibility
+        registerStatic("1", getStatic("Knife"));
+        registerStatic("2", getStatic("9mm"));
+        registerStatic("3", getStatic("Shotgun"));
+        registerStatic("4", getStatic("Uzi"));
+        registerStatic("5", getStatic("Famae"));
     }
 
     /**
@@ -165,6 +171,15 @@ public class WeaponRegistry {
      */
     public static void registerStatic(WeaponDefinition weapon) {
         weapons.put(weapon.getId(), weapon);
+    }
+
+    /**
+     * Registers a weapon in the static collection under a custom alias ID.
+     * @param alias the alias ID
+     * @param weapon the weapon definition to register
+     */
+    public static void registerStatic(String alias, WeaponDefinition weapon) {
+        weapons.put(alias, weapon);
     }
 
     /**

@@ -131,6 +131,9 @@ public class EnemyProfileRegistry {
                 40.0f,
                 120.0f
         ));
+        // Alias numeric IDs for TMX Map compatibility
+        registerStatic("1", getStatic("Colombian"));
+        registerStatic("2", getStatic("EGang"));
     }
 
     /**
@@ -139,6 +142,15 @@ public class EnemyProfileRegistry {
      */
     public static void registerStatic(EnemyProfile profile) {
         profiles.put(profile.getEnemyTypeId(), profile);
+    }
+
+    /**
+     * Registers an enemy profile in the static collection under a custom alias ID.
+     * @param alias the alias ID
+     * @param profile the enemy profile to register
+     */
+    public static void registerStatic(String alias, EnemyProfile profile) {
+        profiles.put(alias, profile);
     }
 
     /**
