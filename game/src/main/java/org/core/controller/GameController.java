@@ -398,4 +398,8 @@ public class GameController {
     public List<Door> getDoors() {
         return levelState.getDoors();
     }
+
+    public List<WeaponPickup> getPickups() {
+        return levelState.getPickups();
+    }
 }

@@ -50,6 +50,7 @@ public class CoreGame extends ApplicationAdapter {
     private Texture searchTexture;
     private Texture corpseTexture;
     private Texture bulletTexture;
+    private Texture weaponPickupTexture;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -160,6 +161,7 @@ public class CoreGame extends ApplicationAdapter {
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
         corpseTexture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
         bulletTexture = new Texture(Gdx.files.internal("textures/bullet_4.png"));
+        weaponPickupTexture = new Texture(Gdx.files.internal("textures/weapon_1.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Анімація гравця
@@ -218,6 +220,10 @@ public class CoreGame extends ApplicationAdapter {
 
         if (isShooting) {
             gameController.shoot();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            // підібрати зброю
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
@@ -579,6 +585,23 @@ public class CoreGame extends ApplicationAdapter {
             }
             spriteBatch.end();
 
+            spriteBatch.begin();
+            for (WeaponPickup pickup : gameController.getPickups()) {
+                if (!pickup.canPick()) continue;
+                float pickW = weaponPickupTexture.getWidth();
+                float pickH = weaponPickupTexture.getHeight();
+
+                float drawX = pickup.getX() - pickW / 2f;
+                float drawY = pickup.getY() - pickH / 2f;
+
+                spriteBatch.draw(
+                        weaponPickupTexture,
+                        drawX, drawY,
+                        pickW, pickH
+                );
+            }
+            spriteBatch.end();
+
             if(gameStateView != null && playerCorpse == null) {
                 // Гравець
                 float width = 45f;
@@ -766,6 +789,7 @@ public class CoreGame extends ApplicationAdapter {
         corpseTexture.dispose();
         if (bulletTexture != null) bulletTexture.dispose();
         if (assetLoader != null) assetLoader.dispose();
+        if (weaponPickupTexture != null) weaponPickupTexture.dispose();
         if (animationFrames != null) {
             for (Texture texture : animationFrames) {
                 if (texture != null) texture.dispose();
