@@ -409,6 +409,31 @@ public class CoreGame extends ApplicationAdapter {
                     );
                 }
             }
+
+            if (event instanceof MeleeAttackEvent) {
+                MeleeAttackEvent meleeEvent = (MeleeAttackEvent) event;
+                Enemy attacker = gameController.getEnemies().stream()
+                        .filter(Enemy::isAlive)
+                        .min((e1, e2) -> {
+                            float d1 = (e1.getX() - meleeEvent.attackerX) * (e1.getX() - meleeEvent.attackerX) +
+                                    (e1.getY() - meleeEvent.attackerY) * (e1.getY() - meleeEvent.attackerY);
+                            float d2 = (e2.getX() - meleeEvent.attackerX) * (e2.getX() - meleeEvent.attackerX) +
+                                    (e2.getY() - meleeEvent.attackerY) * (e2.getY() - meleeEvent.attackerY);
+                            return Float.compare(d1, d2);
+                        })
+                        .orElse(null);
+
+                if (attacker != null) {
+                    float distSq = (attacker.getX() - meleeEvent.attackerX) * (attacker.getX() - meleeEvent.attackerX) +
+                            (attacker.getY() - meleeEvent.attackerY) * (attacker.getY() - meleeEvent.attackerY);
+
+                    if (distSq < 2500f) {
+                        EnemyAnimData data = enemyAnimMap.computeIfAbsent(attacker.getEnemyId(), k -> new EnemyAnimData());
+                        data.currentState = AnimationState.ATTACK;
+                        data.stateTime = 0f;
+                    }
+                }
+            }
         }
 
         for (Enemy enemy : gameController.getEnemies()) {
@@ -423,7 +448,9 @@ public class CoreGame extends ApplicationAdapter {
             data.isMoving = moved;
 
             String enemyType = enemy.getProfile().getEnemyTypeId();
-            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+            String weaponId = enemy.getCurrentWeapon().getDefinition().getId();
+            data.enemyType = enemyType + "_" + weaponId;
+            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType, weaponId);
 
             AnimationState newState = data.currentState;
 
@@ -648,8 +675,9 @@ public class CoreGame extends ApplicationAdapter {
                 EnemyAnimData data = enemyAnimMap.getOrDefault(enemy.getEnemyId(), new EnemyAnimData());
 
                 String enemyType = String.valueOf(enemy.getProfile().getEnemyTypeId());
+                String weaponId = enemy.getCurrentWeapon().getDefinition().getId();
 
-                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType, weaponId);
                 boolean shouldLoop = (data.currentState != AnimationState.ATTACK);
 
                 TextureRegion frame = animSet.getKeyFrame(data.currentState, data.stateTime, shouldLoop);
