@@ -269,7 +269,7 @@ public class CoreGame extends ApplicationAdapter {
         while (bulletIt.hasNext()) {
             BulletEffect effect = bulletIt.next();
             effect.update(dt);
-            if (effect.lifetime <= 0) {
+            if (effect.lifetime <= 0 || effect.isArrived()) {
                 bulletIt.remove();
             }
         }
@@ -323,8 +323,6 @@ public class CoreGame extends ApplicationAdapter {
                     float ddy = targetPos.y - shot.fromY;
                     float distanceToTarget = (float) Math.sqrt(ddx * ddx + ddy * ddy);
 
-                    float bulletAngle = (float) Math.toDegrees(Math.atan2(ddy, ddx));
-
                     float forwardOffset = 22f;
                     float sideOffset = 0f;
 
@@ -337,13 +335,14 @@ public class CoreGame extends ApplicationAdapter {
                     float actualFromX = shot.fromX + spawnOffset.x;
                     float actualFromY = shot.fromY + spawnOffset.y;
 
-                    float bulletSpeed = 4000f;
+                    float bulletSpeed = 3000f;
                     float bulletLifetime = 1.2f;
 
                     bulletEffects.add(new BulletEffect(
                             actualFromX,
                             actualFromY,
-                            bulletAngle,
+                            targetPos.x,
+                            targetPos.y,
                             bulletSpeed,
                             bulletLifetime
                     ));
