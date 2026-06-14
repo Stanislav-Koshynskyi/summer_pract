@@ -53,7 +53,7 @@ public class StartMenu implements Screen {
     private final float[] btnY;
 
     private static final MenuStatus[] BUTTON_TARGETS = {
-            MenuStatus.PLAY_GAME_MENU,
+            MenuStatus.INTRO_MENU,
             MenuStatus.ABOUT_AUTHORS_MENU,
             MenuStatus.SETTINGS_MENU,
             MenuStatus.RULES_MENU

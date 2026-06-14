@@ -2,6 +2,7 @@ package org.core.enums;
 
 public enum MenuStatus {
     START_MENU,
+    INTRO_MENU,
     PLAY_GAME_MENU,
     SETTINGS_MENU,
     RULES_MENU,

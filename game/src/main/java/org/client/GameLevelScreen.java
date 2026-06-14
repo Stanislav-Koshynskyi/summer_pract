@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+import org.client.menu.SwitchMenu;
 import org.content.registry.ContentRegistries;
 import org.content.registry.EnemyProfileRegistry;
 import org.content.registry.WeaponRegistry;
@@ -83,8 +84,11 @@ public class GameLevelScreen implements Screen {
     private Animation<TextureRegion> enemyWalkAnimation1;
     private Texture[] enemyAnimationFrames;
 
-    public GameLevelScreen(MainGame game) {
+    private final SwitchMenu switchMenu;
+
+    public GameLevelScreen(MainGame game, SwitchMenu switchMenu) {
         this.game = game;
+        this.switchMenu = switchMenu;
     }
 
     @Override

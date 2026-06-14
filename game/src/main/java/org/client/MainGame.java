@@ -31,6 +31,10 @@ public class MainGame extends Game {
         // РЕЄСТРАЦІЯ ЕКРАНІВ
         switchMenu.registerScreen(MenuStatus.START_MENU, () -> new StartMenu(this, switchMenu));
 
+        switchMenu.registerScreen(MenuStatus.INTRO_MENU, () -> new IntroMenu(this, switchMenu));
+
+        switchMenu.registerScreen(MenuStatus.PLAY_GAME_MENU, () -> new GameLevelScreen(this, switchMenu));
+
         // Передаємо базовий шлях та динамічно актуальну мову через метод getCurrentLanguage()
         switchMenu.registerScreen(MenuStatus.ABOUT_AUTHORS_MENU,
                 () -> new MarkdownMenuScreen(this, switchMenu, "markdownForMenu/aboutAuthors", getCurrentLanguage()));
