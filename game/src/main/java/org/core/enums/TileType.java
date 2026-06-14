@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public enum TileType {
     FLOOR(true, false, false, 1.0f, 1f),
-    WALL(false, true, true, 0.33f, Float.MAX_VALUE),
+    WALL(false, true, true, 0.75f, Float.MAX_VALUE),
     LOW_OBSTACLE(false, false, false, 1.0f, 1f),
     VENT(true, true, true, 1.0f, 1f);
 

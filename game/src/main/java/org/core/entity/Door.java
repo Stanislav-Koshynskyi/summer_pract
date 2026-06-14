@@ -8,7 +8,7 @@ import org.core.math.Rect;
 @Getter
 public class Door extends Entity implements PathBlocker {
     public static final float DEFAULT_OPENING_DURATION = 0.35f;
-    public static final float DEFAULT_SOUND_ATTENUATION = 0.33f; // CLOSED блокує звук
+    public static final float DEFAULT_SOUND_ATTENUATION = 0.75f; // CLOSED блокує звук
     private static final float DEFAULT_PAUSE_DURATION = 1;
 
     private final String doorId;

@@ -10,10 +10,13 @@ import org.core.enums.AimBehaviorType;
 import org.core.enums.RayCastType;
 import org.core.event.EnemyAlertedEvent;
 import org.core.event.GameEvent;
+import org.core.event.SoundEvent;
+import org.core.event.SoundEventQueue;
 import org.core.geometry.WorldGeometry;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
+import org.core.state.LevelState;
 import org.core.weapon.Weapon;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
@@ -59,9 +62,10 @@ public class EnemyAI {
         this.worldGeometry = worldGeometry;
     }
 
-    public List<GameEvent> update(float delta) {
+    public List<GameEvent> update(float delta, SoundEventQueue queue) {
         Set<Entity> ignoredEntities = new HashSet<>(enemies);
         List<GameEvent> events = new ArrayList<>();
+        List<SoundEvent> soundEvents = queue.drain();
         for (Enemy enemy : enemies) {
             if (!enemy.isAlive()) continue;
             float vx = enemy.getVelocityX();
@@ -70,12 +74,18 @@ public class EnemyAI {
             if (Math.abs(vx) > 0.1f || Math.abs(vy) > 0.1f) {
                 continue;
             }
+            for (SoundEvent s: soundEvents){
+                if (rayCastSystem.canHear(enemy, s)){
+                    onSoundHeard(enemy, s);
+                    break;
+                }
+            }
 
             updateTimers(enemy, delta);
 
             boolean seesPlayer = visionSystem.canEnemySeePlayer(enemy, player, ignoredEntities);
             tryOpenDoorInPath(enemy);
-            processState(enemy, seesPlayer, delta, events);
+            processState(enemy, seesPlayer, delta, events, queue);
         }
         return events;
     }
@@ -89,10 +99,10 @@ public class EnemyAI {
         }
     }
 
-    private void processState(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
+    private void processState(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events, SoundEventQueue queue) {
         switch (enemy.getCurrentState()) {
             case PATROL -> updatePatrol(enemy, seesPlayer, delta, events);
-            case ATTACK -> updateAttack(enemy, seesPlayer, delta, events);
+            case ATTACK -> updateAttack(enemy, seesPlayer, delta, events, queue);
             case SEARCH -> updateSearch(enemy, seesPlayer, delta, events);
             case INVESTIGATE -> updateInvestigate(enemy, seesPlayer, delta, events);
         }
@@ -131,7 +141,8 @@ public class EnemyAI {
         moveAlongPath(enemy, enemy.getProfile().getPatrolSpeed(), delta, false, true);
     }
 
-    private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events) {
+    private void updateAttack(Enemy enemy, boolean seesPlayer, float delta, List<GameEvent> events,
+                              SoundEventQueue queue) {
         enemy.setIntendMove(0, 0);
         if (!seesPlayer) {
             enemy.setReactionTimer(0f);
@@ -186,7 +197,7 @@ public class EnemyAI {
                 target, enemy.getCurrentWeapon().getDefinition().getRange(),
                 Set.of(enemy), enemy.getCurrentWeapon().getDefinition().getDamage(),
                 weapon.getDefinition().getKnockbackForce(),
-                weapon.getDefinition().getSpread()
+                weapon.getDefinition().getSpread(), queue
         );
         events.addAll(weaponSystem.useWeapon(weaponFireContext, enemy.getCurrentWeapon()));
         enemy.setReactionTimer(0f);
@@ -216,14 +227,19 @@ public class EnemyAI {
 
     }
 
-    public List<GameEvent> onSoundHeard(Enemy enemy, float worldX, float worldY) {
+    public List<GameEvent> onSoundHeard(Enemy enemy, SoundEvent soundEvent) {
         if (enemy.getCurrentState() == AIState.ATTACK) return new ArrayList<>();
-        enemy.setLastKnownPlayerPosition(worldX, worldY);
+        if (enemy.getCurrentState() == AIState.SEARCH || enemy.getCurrentState() == AIState.INVESTIGATE){
+            if (!(soundEvent.getWho() instanceof Player)){
+                return new ArrayList<>();
+            }
+        }
+        enemy.setLastKnownPlayerPosition(soundEvent.getX(), soundEvent.getY());
         enemy.changeState(AIState.INVESTIGATE);
         enemy.setReactionTimer(0);
         enemy.resetAimMemoryTimer();
 
-        List<Vec2> path = pathfinder.findPath(enemy, worldX, worldY, List.of(player));
+        List<Vec2> path = pathfinder.findPath(enemy, soundEvent.getX(), soundEvent.getY(), List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
 
         return List.of(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.INVESTIGATE));

@@ -1,24 +1,23 @@
 package org.core.event;
 
-public abstract class SoundEvent {
-    public float x, y;
-    public float radius;
+import lombok.Getter;
+import org.core.entity.Entity;
+import org.core.math.Vec2;
+@Getter
+public class SoundEvent {
+    private final float x, y;
+    private final float radius;
+    private final Entity who;
 
-    public SoundEvent(float x, float y, float radius) {
+
+    public SoundEvent(float x, float y, float radius, Entity who) {
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.who = who;
     }
-
-    public abstract SoundType getSoundType();
-    public abstract float getRadius();
-
-    public enum SoundType {
-        GUNSHOT,
-        SUPPRESSED_SHOT,
-        FOOTSTEP_RUN,
-        FOOTSTEP_WALK,
-        BODY_FALL
+    public Vec2 getPoint(){
+        return new Vec2(x, y);
     }
 }
 
