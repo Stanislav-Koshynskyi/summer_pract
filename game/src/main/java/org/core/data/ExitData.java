@@ -11,6 +11,8 @@ public class ExitData {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.x = x + width / 2;
+        this.y = y + height / 2;
     }
 }
 
