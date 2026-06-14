@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="61" height="46" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="37">
+ <properties>
+  <property name="goalType" value="kill_target"/>
+  <property name="targetEnemyId" type="int" value="36"/>
+ </properties>
+ <tileset firstgid="1" source="tests/wallsTest.tsx"/>
+ <tileset firstgid="2" source="tests/floorTest.tsx"/>
+ <layer id="1" name="floor" width="61" height="46">
+  <data encoding="base64" compression="zlib">
+   eJzt1FsOgCAMRNFG3P8aXKrxw4QQIygt5XEnmU9sjwZFyJ0gcmi01RyNfTBjxjym2eu9Yh7D/LZ/zlp7tmZWev6reTesxfMxYy79F81utvRhxoy5nfkqZswzmi3mY8aMGTNmzF5mzYxkXvE7a+73lBD1T3q+z0G5mDH3cp8x65njpE7N5Gbnzmiat4JazPcoZsxpvXfFPJa5l7S8z70E8xrm1XICQWebPg==
+  </data>
+ </layer>
+ <objectgroup id="2" name="objects">
+  <object id="10" name="PlayerSpawn" type="PlayerSpawn" x="88" y="648">
+   <point/>
+  </object>
+  <object id="11" name="ArmWalker" type="EnemySpawn" x="400" y="504">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="1"/>
+    <property name="weaponId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="12" name="LowerDoorGuard1" type="EnemySpawn" x="704" y="504">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="290"/>
+    <property name="patrolPath" type="int" value="0"/>
+    <property name="weaponId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="13" name="LowerDoorGuard2" type="EnemySpawn" x="816" y="504">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="250"/>
+    <property name="patrolPath" type="int" value="0"/>
+    <property name="weaponId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="14" name="MainLeftWalker" type="EnemySpawn" x="448" y="296">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="180"/>
+    <property name="patrolPath" type="int" value="2"/>
+    <property name="weaponId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" name="MainTopWalker" type="EnemySpawn" x="144" y="64">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="3"/>
+    <property name="weaponId" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="16" name="UpperDoorGuard" type="EnemySpawn" x="720" y="48">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="135"/>
+    <property name="patrolPath" type="int" value="0"/>
+    <property name="weaponId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="36" name="Boss" type="EnemySpawn" x="864" y="288">
+   <properties>
+    <property name="enemyType" type="int" value="3"/>
+    <property name="facingAngle" type="float" value="120"/>
+    <property name="patrolPath" type="int" value="0"/>
+    <property name="weaponId" type="int" value="6"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="17" name="Arm0" type="Waypoint" x="576" y="504">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="19" name="MainLeft0" type="Waypoint" x="88" y="296">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" name="MainLeft1" type="Waypoint" x="88" y="144">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="21" name="MainLeft2" type="Waypoint" x="192" y="144">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="22" name="MainLeft3" type="Waypoint" x="192" y="64">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="23" name="MainLeft4" type="Waypoint" x="328" y="64">
+   <properties>
+    <property name="order" type="int" value="4"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="25" name="MainTop0" type="Waypoint" x="328" y="64">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="26" name="MainTop1" type="Waypoint" x="328" y="192">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="30" name="MainTop2" type="Waypoint" x="560" y="192">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="31" name="MainTop3" type="Waypoint" x="560" y="208">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="32" name="MainTop4" type="Waypoint" x="384" y="208">
+   <properties>
+    <property name="order" type="int" value="4"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="33" name="MainTop5" type="Waypoint" x="384" y="296">
+   <properties>
+    <property name="order" type="int" value="5"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="34" name="MainTop6" type="Waypoint" x="120" y="296">
+   <properties>
+    <property name="order" type="int" value="6"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="35" name="MainTop7" type="Waypoint" x="120" y="64">
+   <properties>
+    <property name="order" type="int" value="7"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="24" name="MainLeft5" type="Waypoint" x="328" y="296">
+   <properties>
+    <property name="order" type="int" value="5"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="18" name="Arm1" type="Waypoint" x="400" y="504">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="3" name="doors">
+  <object id="1" name="SpawnDoorTop" type="Door" x="64" y="560" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="1"/>
+    <property name="initialState" value="open"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="2" name="SpawnDoorRight" type="Door" x="160" y="624" width="16" height="48">
+   <properties>
+    <property name="doorId" type="int" value="2"/>
+    <property name="initialState" value="open"/>
+    <property name="orientation" value="vertical"/>
+   </properties>
+  </object>
+  <object id="3" name="ArmDoorBottom" type="Door" x="432" y="560" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="3"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="4" name="ArmDoorLeft" type="Door" x="336" y="480" width="16" height="48">
+   <properties>
+    <property name="doorId" type="int" value="4"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="vertical"/>
+   </properties>
+  </object>
+  <object id="5" name="MainDoorLeft" type="Door" x="160" y="272" width="16" height="48">
+   <properties>
+    <property name="doorId" type="int" value="5"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="vertical"/>
+   </properties>
+  </object>
+  <object id="6" name="MainDoorTop" type="Door" x="304" y="128" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="6"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="7" name="MainDoorExit" type="Door" x="544" y="128" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="7"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="8" name="BossRoomDoorTop" type="Door" x="736" y="128" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="8"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="9" name="BossRoomDoorBottom" type="Door" x="736" y="464" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="9"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="4" name="low_obstacles" width="61" height="46">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAgLcBK9gAAQ==
+  </data>
+ </layer>
+ <layer id="5" name="walls" width="61" height="46">
+  <data encoding="base64" compression="zlib">
+   eJztmFEOgCAMQ/X+l/YAisjWdov0JfworryEYfQ47pzgMQKdk1nP2zpXmTmrsfP8OjIDnfOVXZ1Xz51IRuQeC7TfKCNyj4Wd488/1cm8MxnzUb1buUcyNe28/jyTamf2O22Uyai54qzGzriadtbmV2QqzqEMdsbVtLM2vyLTzvr8ikw76/MrMu2sz6/IZDlH/tWovlWZzgh2da78B+h+1mBnXM3u/YxmZ2fkeYg+a9F072cGdp7P/QOsnumMnbWZ1ePrWhF02Fd2zs9T1cnQtZeYXJ9jAYM=
+  </data>
+ </layer>
+</map>
