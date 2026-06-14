@@ -1,5 +1,7 @@
 package org.content.registry;
 
+import org.content.weapon_behavior.MeleeBehavior;
+import org.content.weapon_behavior.ShotgunBehavior;
 import org.core.definition.WeaponDefinition;
 import org.core.enums.WeaponType;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
@@ -32,7 +34,7 @@ public class WeaponRegistry {
                 -1,              // maxAmmo (-1 for infinite)
                 true,            // isSuppressed
                 false,           // isAutomatic
-                new SimpleRayCastBehavior(),
+                new MeleeBehavior(),
                 5.0f,            // knockbackForce
                 0.0f             // spread
         ));
@@ -47,7 +49,7 @@ public class WeaponRegistry {
                 -1,
                 false,
                 false,
-                new SimpleRayCastBehavior(),
+                new MeleeBehavior(),
                 15.0f,
                 0.0f
         ));
@@ -62,7 +64,7 @@ public class WeaponRegistry {
                 -1,
                 false,
                 false,
-                new SimpleRayCastBehavior(),
+                new MeleeBehavior(),
                 12.0f,
                 0.0f
         ));
@@ -77,7 +79,7 @@ public class WeaponRegistry {
                 -1,
                 true,
                 false,
-                new SimpleRayCastBehavior(),
+                new MeleeBehavior(),
                 8.0f,
                 0.0f
         ));
@@ -117,13 +119,13 @@ public class WeaponRegistry {
         registerStatic(new WeaponDefinition(
                 "Shotgun",
                 WeaponType.HITSCAN,
-                120,
+                30,
                 250.0f,
                 0.8f,
                 6,
                 false,
                 false,
-                new SimpleRayCastBehavior(),
+                new ShotgunBehavior(),
                 30.0f,
                 0.3f
         ));
