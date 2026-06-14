@@ -135,7 +135,7 @@ public class GameController {
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
                 new PlayerProfile("1",
-                        new Weapon(weaponRegistry.get("Famae")),
+                        new Weapon(weaponRegistry.get("Silencer")),
                         new Weapon(weaponRegistry.get("Knife")),
                         0, 1, 1, 1, 0, 1
                 ));
@@ -220,6 +220,7 @@ public class GameController {
             InteractionSystem.interact(player, levelState, rayCastSystem);
             pendingInteract = false;
         }
+        moveToCorpsAndRecord(true);
         if (pendingDrop){
             Optional<WeaponPickup> weaponPickup = player.dropWeapon();
             if (weaponPickup.isPresent()){
@@ -254,25 +255,7 @@ public class GameController {
             pendingShoot = false;
         }
         // Крок 10. Перевірити deaths → перемістити в corpses
-        List<Enemy> deadEnemies = levelState.flushDeadEnemies();
-        List<GameEvent> deadEvent = new ArrayList<>();
-        for (Enemy enemy : deadEnemies) {
-            deadEvent.add(new EnemyDiedEvent(enemy.getX(), enemy.getY(), enemy.getEnemyId()));
-            levelState.getSoundEventQueue().add(
-                    new SoundEvent(
-                            enemy.getX(), enemy.getY(),
-                            FALL_BODY_SOUND, enemy
-                    )
-            );
-            if (enemy.getCurrentWeapon() != null) {
-                WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
-                Weapon weapon = new Weapon(definition);
-                WeaponPickup pickup = new WeaponPickup(enemy.getX(), enemy.getY(),
-                        definition.getId(), weapon, false, UUID.randomUUID().toString());
-                levelState.getPickups().add(pickup);
-            }
-        }
-        levelState.addAllGameEvent(deadEvent);
+        moveToCorpsAndRecord(false);
         for (Enemy enemy : levelState.getEnemies()) {
             if (enemy.isDamaged()) {
                 levelState.addAllGameEvent(enemyAI.onEnemyHit(enemy, player));
@@ -398,5 +381,27 @@ public class GameController {
 
     public Player getPlayer() {
         return levelState.getPlayer();
+    }
+    private void moveToCorpsAndRecord(boolean silent){
+        List<Enemy> deadEnemies = levelState.flushDeadEnemies();
+        List<GameEvent> deadEvent = new ArrayList<>();
+        for (Enemy enemy : deadEnemies) {
+            deadEvent.add(new EnemyDiedEvent(enemy.getX(), enemy.getY(), enemy.getEnemyId()));
+            levelState.getSoundEventQueue().add(
+                    new SoundEvent(
+                            enemy.getX(), enemy.getY(),
+                            FALL_BODY_SOUND, enemy
+                    )
+            );
+            levelState.getStats().recordKill(false);
+            if (enemy.getCurrentWeapon() != null) {
+                WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
+                Weapon weapon = new Weapon(definition);
+                WeaponPickup pickup = new WeaponPickup(enemy.getX(), enemy.getY(),
+                        definition.getId(), weapon, false, UUID.randomUUID().toString());
+                levelState.getPickups().add(pickup);
+            }
+        }
+        levelState.addAllGameEvent(deadEvent);
     }
 }
