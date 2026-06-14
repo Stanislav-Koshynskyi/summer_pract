@@ -913,6 +913,23 @@ public class GameLevelScreen implements Screen {
                 spriteBatch.end();
             }
         }
+
+        spriteBatch.begin();
+        if (gameController != null) {
+            String ammoText;
+            float ammoX = camera.position.x - camera.viewportWidth / 4f + 30f;
+            float ammoY = camera.position.y - camera.viewportHeight / 4f + 40f;
+            int currentAmmo = gameController.getPlayer().getCurrentWeapon().getAmmo();
+
+            if (currentAmmo == -1) {
+                ammoText = "AMMO: " + "INF";
+            } else {
+                ammoText = "AMMO: " + currentAmmo;
+            }
+
+            font.draw(spriteBatch, ammoText, ammoX, ammoY);
+        }
+        spriteBatch.end();
     }
 
     @Override
