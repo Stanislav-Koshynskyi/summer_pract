@@ -69,14 +69,8 @@ public class CoreGame extends ApplicationAdapter {
     private final java.util.Map<Door, Float> doorAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
 
-    // Анімація
-    private Animation<TextureRegion> walkAnimation;
-    private Texture[] animationFrames;
     private float stateTime;
     private boolean isPlayerMoving = false;
-
-    private Animation<TextureRegion> enemyWalkAnimation1;
-    private Texture[] enemyAnimationFrames;
 
     @Override
     public void create() {
@@ -712,6 +706,21 @@ public class CoreGame extends ApplicationAdapter {
                 float originX = 9f;
                 float originY = height / 2f;
 
+                // Милиці (запам'ятати на життя - працювати тільки зі спрайтшитами)
+                if (enemy.getCurrentWeapon().getDefinition().getId().equals("Knife") && enemy.getProfile().getEnemyTypeId().equals("2")) {
+                    width = 60f;
+                    height = 60f;
+                    originX = 30f;
+                    originY = 30f;
+                }
+
+                if (enemy.getCurrentWeapon().getDefinition().getId().equals("Knife") && enemy.getProfile().getEnemyTypeId().equals("1")) {
+                    width = 46f;
+                    height = 46f;
+                    originX = 18f;
+                    originY = 16f;
+                }
+
                 float drawX = enemy.getX() - originX;
                 float drawY = enemy.getY() - originY;
                 float angle = enemy.getFacingAngle();
@@ -841,11 +850,7 @@ public class CoreGame extends ApplicationAdapter {
         if (bulletTexture != null) bulletTexture.dispose();
         if (assetLoader != null) assetLoader.dispose();
         if (weaponPickupTexture != null) weaponPickupTexture.dispose();
-        if (animationFrames != null) {
-            for (Texture texture : animationFrames) {
-                if (texture != null) texture.dispose();
-            }
-        }
+        if (assetLoader != null) assetLoader.dispose();
     }
 
     private void restart() {
