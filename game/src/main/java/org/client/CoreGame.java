@@ -46,10 +46,8 @@ public class CoreGame extends ApplicationAdapter {
     private SpriteBatch spriteBatch;
     private Texture doorVerticalTexture;
     private Texture doorHorizontalTexture;
-    private Texture playerSprite;
     private Texture alertTexture;
     private Texture searchTexture;
-    private Texture corpseTexture;
     private Texture bulletTexture;
     private Texture weaponPickupTexture;
     private BitmapFont font;
@@ -69,6 +67,7 @@ public class CoreGame extends ApplicationAdapter {
     private final List<BulletEffect> bulletEffects = new java.util.ArrayList<>();
     private final List<DeadBody> deadBodies = new ArrayList<>();
     private final Map<String, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
+    private final EnemyAnimData playerAnimData = new EnemyAnimData();
     private final java.util.Map<Door, Float> doorAnimMap = new java.util.HashMap<>();
     private boolean isShooting = false;
 
@@ -86,7 +85,7 @@ public class CoreGame extends ApplicationAdapter {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        map = new TmxMapLoader().load("maps/level_01.tmx");
+        map = new TmxMapLoader().load("maps/level_02.tmx");
         float unitScale = 1f;
         renderer = new OrthogonalTiledMapRenderer(map, unitScale);
 
@@ -161,29 +160,11 @@ public class CoreGame extends ApplicationAdapter {
         font.setColor(Color.WHITE);
         doorVerticalTexture = new Texture(Gdx.files.internal("textures/door_closed_vertical.png"));
         doorHorizontalTexture = new Texture(Gdx.files.internal("textures/door_closed_horizontal.png"));
-        playerSprite = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_1.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
-        corpseTexture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossDie/sprSwatBossDie_34.png"));
         bulletTexture = new Texture(Gdx.files.internal("textures/bullet_4.png"));
         weaponPickupTexture = new Texture(Gdx.files.internal("textures/weapon_1.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-        // Анімація гравця
-        int frames = 6;
-        animationFrames = new Texture[frames];
-        TextureRegion[] walkFrames = new TextureRegion[frames];
-
-        for (int i = 0; i < frames; i++) {
-            Texture texture = new Texture(Gdx.files.internal("sprites/enemies/sprSwatBoss/sprSwatBossWalk/sprSwatBossWalk_" + (i + 1) + ".png"));
-
-            animationFrames[i] = texture;
-            walkFrames[i] = new TextureRegion(texture);
-        }
-
-        walkAnimation = new Animation<>(0.1f, walkFrames);
-        walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
-        stateTime = 8f;
 
         assetLoader = new AssetLoader();
         assetLoader.load();
@@ -213,6 +194,10 @@ public class CoreGame extends ApplicationAdapter {
             body.stateTime += dt;
         }
 
+        if (playerCorpse != null) {
+            playerCorpse.stateTime += dt;
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
             debugMode = !debugMode;
         }
@@ -225,6 +210,9 @@ public class CoreGame extends ApplicationAdapter {
 
         if (isShooting) {
             gameController.shoot();
+
+            playerAnimData.currentState = AnimationState.ATTACK;
+            playerAnimData.stateTime = 0f;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -406,12 +394,40 @@ public class CoreGame extends ApplicationAdapter {
             if (event instanceof PlayerDiedEvent) {
                 if (playerCorpse == null && gameStateView != null) {
                     Vec2 pPos = gameStateView.getPlayerPosition();
+                    String playerWeapon = "1";
+
                     playerCorpse = new DeadBody(
                             pPos.x,
                             pPos.y,
                             gameStateView.getPlayerFacingAngle(),
-                            "1"
+                            playerWeapon
                     );
+                    playerCorpse.stateTime = 0f;
+                }
+            }
+
+            if (event instanceof MeleeAttackEvent) {
+                MeleeAttackEvent meleeEvent = (MeleeAttackEvent) event;
+                Enemy attacker = gameController.getEnemies().stream()
+                        .filter(Enemy::isAlive)
+                        .min((e1, e2) -> {
+                            float d1 = (e1.getX() - meleeEvent.attackerX) * (e1.getX() - meleeEvent.attackerX) +
+                                    (e1.getY() - meleeEvent.attackerY) * (e1.getY() - meleeEvent.attackerY);
+                            float d2 = (e2.getX() - meleeEvent.attackerX) * (e2.getX() - meleeEvent.attackerX) +
+                                    (e2.getY() - meleeEvent.attackerY) * (e2.getY() - meleeEvent.attackerY);
+                            return Float.compare(d1, d2);
+                        })
+                        .orElse(null);
+
+                if (attacker != null) {
+                    float distSq = (attacker.getX() - meleeEvent.attackerX) * (attacker.getX() - meleeEvent.attackerX) +
+                            (attacker.getY() - meleeEvent.attackerY) * (attacker.getY() - meleeEvent.attackerY);
+
+                    if (distSq < 2500f) {
+                        EnemyAnimData data = enemyAnimMap.computeIfAbsent(attacker.getEnemyId(), k -> new EnemyAnimData());
+                        data.currentState = AnimationState.ATTACK;
+                        data.stateTime = 0f;
+                    }
                 }
             }
         }
@@ -428,7 +444,9 @@ public class CoreGame extends ApplicationAdapter {
             data.isMoving = moved;
 
             String enemyType = enemy.getProfile().getEnemyTypeId();
-            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+            String weaponId = enemy.getCurrentWeapon().getDefinition().getId();
+            data.enemyType = enemyType + "_" + weaponId;
+            EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType, weaponId);
 
             AnimationState newState = data.currentState;
 
@@ -464,6 +482,32 @@ public class CoreGame extends ApplicationAdapter {
             }
 
             doorAnimMap.put(door, progress);
+        }
+
+        Vec2 playerPos = gameStateView.getPlayerPosition();
+        String playerWeaponId = gameController.getPlayer().getCurrentWeapon().getDefinition().getId();
+
+        boolean playerMoved = Math.abs(playerPos.x - playerAnimData.lastX) > 0.01f ||
+                Math.abs(playerPos.y - playerAnimData.lastY) > 0.01f;
+
+        playerAnimData.lastX = playerPos.x;
+        playerAnimData.lastY = playerPos.y;
+
+        playerAnimData.stateTime += Gdx.graphics.getDeltaTime();
+
+        EnemyAnimationSet playerAnimSet = assetLoader.getPlayerAnimationSet(playerWeaponId);
+
+        if (playerAnimData.currentState == AnimationState.ATTACK) {
+            if (playerAnimSet.isAnimationFinished(AnimationState.ATTACK, playerAnimData.stateTime)) {
+                playerAnimData.currentState = playerMoved ? AnimationState.WALK : AnimationState.IDLE;
+                playerAnimData.stateTime = 0f;
+            }
+        } else {
+            AnimationState targetState = playerMoved ? AnimationState.WALK : AnimationState.IDLE;
+            if (playerAnimData.currentState != targetState) {
+                playerAnimData.currentState = targetState;
+                playerAnimData.stateTime = 0f;
+            }
         }
 
     }
@@ -517,15 +561,19 @@ public class CoreGame extends ApplicationAdapter {
             }
 
             if (playerCorpse != null) {
-                float width = 80f;
-                float height = 40f;
+                EnemyAnimationSet animSet = assetLoader.getPlayerAnimationSet(playerCorpse.enemyType);
+                TextureRegion frame = animSet.getKeyFrame(AnimationState.DYING, playerCorpse.stateTime, false);
+
+                float width = 64f;
+                float height = 64f;
                 float originX = 9f;
                 float originY = height / 2f;
+
                 float drawX = playerCorpse.x - originX;
                 float drawY = playerCorpse.y - originY;
 
                 spriteBatch.draw(
-                        new TextureRegion(corpseTexture),
+                        frame,
                         drawX, drawY,
                         originX, originY,
                         width, height,
@@ -540,8 +588,6 @@ public class CoreGame extends ApplicationAdapter {
             } else {
                 stateTime = 0f;
             }
-
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 
             // Тимчасові текстури дверей
             spriteBatch.begin();
@@ -609,10 +655,16 @@ public class CoreGame extends ApplicationAdapter {
 
             if(gameStateView != null && playerCorpse == null) {
                 // Гравець
-                float width = 45f;
-                float height = 36f;
-                float originX = 9f;
-                float originY = height / 2f;
+                String playerWeaponId = gameController.getPlayer().getCurrentWeapon().getDefinition().getId();
+                EnemyAnimationSet playerAnimSet = assetLoader.getPlayerAnimationSet(playerWeaponId);
+
+                boolean loopPlayer = (playerAnimData.currentState != AnimationState.ATTACK);
+                TextureRegion playerFrame = playerAnimSet.getKeyFrame(playerAnimData.currentState, playerAnimData.stateTime, loopPlayer);
+
+                float pW = 50f;
+                float pH = 32f;
+                float originX = 15f;
+                float originY = pH / 2;
                 float drawX = playerPos.x - originX;
                 float drawY = playerPos.y - originY;
                 float angle = gameStateView.getPlayerFacingAngle();
@@ -620,10 +672,10 @@ public class CoreGame extends ApplicationAdapter {
                 spriteBatch.begin();
 
                 spriteBatch.draw(
-                        currentFrame,
+                        playerFrame,
                         drawX, drawY,
                         originX, originY,
-                        width, height,
+                        pW, pH,
                         1f, 1f,
                         angle
                 );
@@ -653,8 +705,9 @@ public class CoreGame extends ApplicationAdapter {
                 EnemyAnimData data = enemyAnimMap.getOrDefault(enemy.getEnemyId(), new EnemyAnimData());
 
                 String enemyType = String.valueOf(enemy.getProfile().getEnemyTypeId());
+                String weaponId = enemy.getCurrentWeapon().getDefinition().getId();
 
-                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType);
+                EnemyAnimationSet animSet = assetLoader.getAnimationSet(enemyType, weaponId);
                 boolean shouldLoop = (data.currentState != AnimationState.ATTACK);
 
                 TextureRegion frame = animSet.getKeyFrame(data.currentState, data.stateTime, shouldLoop);
@@ -869,11 +922,9 @@ public class CoreGame extends ApplicationAdapter {
         doorHorizontalTexture.dispose();
         doorVerticalTexture.dispose();
         attackEffects.clear();
-        playerSprite.dispose();
         alertEffects.clear();
         alertTexture.dispose();
         deadBodies.clear();
-        corpseTexture.dispose();
         if (bulletTexture != null) bulletTexture.dispose();
         if (assetLoader != null) assetLoader.dispose();
         if (weaponPickupTexture != null) weaponPickupTexture.dispose();

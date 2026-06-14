@@ -135,7 +135,7 @@ public class WeaponRegistry {
                 25,
                 350.0f,
                 0.08f,
-                30,
+                10,
                 false,
                 true,
                 new SimpleRayCastBehavior(),

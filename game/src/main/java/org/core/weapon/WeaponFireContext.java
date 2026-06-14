@@ -2,10 +2,12 @@ package org.core.weapon;
 
 import lombok.Getter;
 import org.core.entity.Entity;
+import org.core.event.SoundEventQueue;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
 import org.core.enums.RayCastType;
+import org.core.state.LevelState;
 
 import java.util.Set;
 @Getter
@@ -19,6 +21,7 @@ public class WeaponFireContext {
     private final int damage;
     private final float knockbackForce;
     private final float spreadAngle;
+    private final SoundEventQueue queue;
 
     public WeaponFireContext(RayCastSystem raycastSystem,
                              Entity shooter,
@@ -28,7 +31,8 @@ public class WeaponFireContext {
                              Set<Entity> ignoredEntities,
                              int damage,
                              float knockbackForce,
-                             float spreadAngle) {
+                             float spreadAngle,
+                             SoundEventQueue queue) {
         this.raycastSystem = raycastSystem;
         this.shooter = shooter;
         this.origin = origin;
@@ -38,6 +42,7 @@ public class WeaponFireContext {
         this.damage = damage;
         this.knockbackForce = knockbackForce;
         this.spreadAngle = spreadAngle;
+        this.queue = queue;
     }
 
     /**
@@ -47,7 +52,7 @@ public class WeaponFireContext {
         this(weaponFireContext.getRaycastSystem(), weaponFireContext.getShooter(),
                 weaponFireContext.getOrigin(), direction, weaponFireContext.getMaxDistance(),
                 weaponFireContext.getIgnoredEntities(), weaponFireContext.getDamage(), weaponFireContext.getKnockbackForce(),
-                weaponFireContext.getSpreadAngle()
+                weaponFireContext.getSpreadAngle(), weaponFireContext.getQueue()
         );
     }
 

@@ -14,10 +14,11 @@ public class PlayerProfile {
     private final float speedMultiplier;
     private final float ammoMultiplier;
     private final int damageBonus;
+    private final float moveSoundModify;
 
     public PlayerProfile(String id, Weapon startingWeapon, Weapon defaultWeapon, int bonusHp,
                          float speedMultiplier, float ammoMultiplier, float interactRadiusMultiplier,
-                         int damageBonus) {
+                         int damageBonus, float moveSoundModify) {
         this.id = id;
         this.startingWeapon = startingWeapon;
         this.defaultWeapon = defaultWeapon;
@@ -25,5 +26,6 @@ public class PlayerProfile {
         this.ammoMultiplier = ammoMultiplier;
         this.bonusHp = bonusHp;
         this.damageBonus = damageBonus;
+        this.moveSoundModify = moveSoundModify;
     }
 }

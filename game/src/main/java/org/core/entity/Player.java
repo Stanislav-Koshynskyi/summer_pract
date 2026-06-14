@@ -120,5 +120,8 @@ public class Player extends Entity implements Damageable, Blocker {
         currentWeapon = defaultWeapon.clone();
         return Optional.of(pickup);
     }
+    public float getMoveSoundModify(){
+        return playerProfile.getMoveSoundModify();
+    }
 }
 

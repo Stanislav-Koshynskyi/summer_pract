@@ -22,10 +22,7 @@ import org.core.entity.Enemy;
 import org.core.entity.Player;
 import org.core.entity.WeaponPickup;
 import org.core.enums.*;
-import org.core.event.EnemyDiedEvent;
-import org.core.event.GameEvent;
-import org.core.event.LevelCompletedEvent;
-import org.core.event.PlayerDiedEvent;
+import org.core.event.*;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
@@ -60,6 +57,8 @@ public class GameController {
     private final WeaponRegistry weaponRegistry;
     private final EnemyProfileRegistry enemyProfileRegistry;
     private final Map<AimBehaviorType, ?> aimBehaviors;
+
+    private final static float FALL_BODY_SOUND = 250;
 
     public GameController(WeaponRegistry weaponRegistry,
                           EnemyProfileRegistry enemyProfileRegistry,
@@ -152,18 +151,18 @@ public class GameController {
                         new Weapon(new WeaponDefinition(
                                 "1",
                                 WeaponType.HITSCAN,
-                                50,
+                                25,
                                 250,
                                 0.1f,
-                                100,
+                                30,
                                 false,
                                 true,
                                 new SimpleRayCastBehavior(),
                                 30,
                                 10
                         )),
-                        10,4,1,1,0
-        ));
+                        0, 1, 1, 1, 0, 1
+                ));
         player.setMovementMode(pendingMovementMode);
         blockers.add(player);
 
@@ -183,8 +182,8 @@ public class GameController {
         pathfinder = new PathFinder(data.worldGeometry, collisionSystem, blockers);
         Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
         aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
-        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem
-                , aimBehaviorMap, doors, levelState.getWorldGeometry());
+        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem ,
+                aimBehaviorMap, doors, levelState.getWorldGeometry());
         clearPendingCommands();
 
 
@@ -208,15 +207,12 @@ public class GameController {
         if (pendingAimX != player.getX() || pendingAimY != player.getY()) {
             player.aimAt(pendingAimX, pendingAimY);
         }
-        //TODO
-        // Крок 3. FootstepEmitter – згенерувати footstep SoundEvents
-        // Крок 4. HearingSystem – обробити SoundEventQueue
 
         for (Enemy enemy : levelState.getEnemies()) {
             enemy.resetDamageFlag();
         }
 
-        List<GameEvent> aIEvents = enemyAI.update(delta);
+        List<GameEvent> aIEvents = enemyAI.update(delta, levelState.getSoundEventQueue());
         levelState.addAllGameEvent(aIEvents);
 
 
@@ -235,6 +231,11 @@ public class GameController {
 
         if (pendingDx != 0f || pendingDy != 0f) {
             collisionSystem.move(player, pendingDx, pendingDy);
+            levelState.getSoundEventQueue().add(
+                    new SoundEvent(player.getX(), player.getY(),
+                            player.getMovementMode().getSound() * player.getMoveSoundModify(),
+                            player)
+            );
         }
         // додати для інших ентіті коли вони з'являться
 
@@ -250,7 +251,6 @@ public class GameController {
         }
 
         // Крок 9. WeaponSystem – cooldowns, hitscan, apply damage
-        // TODO: реалізувати автоматичну стрільбу
         player.getCurrentWeapon().updateCooldown(delta);
         if (pendingShoot) {
             Weapon weapon = player.getCurrentWeapon();
@@ -263,7 +263,8 @@ public class GameController {
                         Set.of(player),
                         weapon.getDefinition().getDamage(),
                         weapon.getDefinition().getKnockbackForce(),
-                        weapon.getDefinition().getSpread()
+                        weapon.getDefinition().getSpread(),
+                        levelState.getSoundEventQueue()
                 );
                 List<GameEvent> weaponEvents = weaponSystem.useWeapon(context, weapon);
                 levelState.addAllGameEvent(weaponEvents);
@@ -275,6 +276,12 @@ public class GameController {
         List<GameEvent> deadEvent = new ArrayList<>();
         for (Enemy enemy : deadEnemies) {
             deadEvent.add(new EnemyDiedEvent(enemy.getX(), enemy.getY(), enemy.getEnemyId()));
+            levelState.getSoundEventQueue().add(
+                    new SoundEvent(
+                            enemy.getX(), enemy.getY(),
+                            FALL_BODY_SOUND, enemy
+                    )
+            );
             if (enemy.getCurrentWeapon() != null) {
                 WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
                 Weapon weapon = new Weapon(definition);
@@ -401,5 +408,9 @@ public class GameController {
 
     public List<WeaponPickup> getPickups() {
         return levelState.getPickups();
+    }
+
+    public Player getPlayer() {
+        return levelState.getPlayer();
     }
 }

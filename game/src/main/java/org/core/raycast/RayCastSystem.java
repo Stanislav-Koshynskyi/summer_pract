@@ -2,8 +2,10 @@ package org.core.raycast;
 
 
 import org.core.collision.Blocker;
+import org.core.entity.Enemy;
 import org.core.enums.RayCastType;
 import org.core.enums.TileType;
+import org.core.event.SoundEvent;
 import org.core.geometry.WorldGeometry;
 import org.core.math.Rect;
 import org.core.math.Vec2;
@@ -112,5 +114,91 @@ public class RayCastSystem {
             Vec2 endPoint = from.copy().add(dir.copy().scale(maxDistance));
             return new RayCastResult(endPoint, maxDistance, null, null);
         }
+    }
+    /*
+    тут рахуємо чи дістається звук до цілі. Об'єкти зменшують ефективний радіус звуку,
+    тобто якщо радіус 200 метрів, звук пройшов 100 і вперся і стіну,
+    то зменшиться радіус той, що залишився тобто 100 метрів.
+    Тоді загальний радіус буде 100 + 100 * модифікатор стіни.
+    Метод повертає на скільки пікселів звук вийшов за ціль
+     */
+    public float castSound(Vec2 from, Vec2 to, float baseRadius, Entity source) {
+        float remainingRadius = baseRadius;
+        float dist = from.distanceTo(to);
+        if (dist < 0.0001f) return remainingRadius;
+
+        Vec2 dir = to.copy().sub(from).normalize();
+        float ts = geometry.getTileSize();
+
+        int tx = (int) Math.floor(from.x / ts);
+        int ty = (int) Math.floor(from.y / ts);
+        int endTX = (int) Math.floor(to.x / ts);
+        int endTY = (int) Math.floor(to.y / ts);
+
+        int stepX = (dir.x > 0) ? 1 : -1;
+        int stepY = (dir.y > 0) ? 1 : -1;
+
+        float tDeltaX = (Math.abs(dir.x) > 0.0001f) ? Math.abs(ts / dir.x) : Float.MAX_VALUE;
+        float tDeltaY = (Math.abs(dir.y) > 0.0001f) ? Math.abs(ts / dir.y) : Float.MAX_VALUE;
+
+        float tMaxX, tMaxY;
+        if (dir.x > 0) {
+            tMaxX = ((tx + 1) * ts - from.x) / dir.x;
+        } else if (dir.x < 0) {
+            tMaxX = (tx * ts - from.x) / dir.x;
+        } else {
+            tMaxX = Float.MAX_VALUE;
+        }
+        if (dir.y > 0) {
+            tMaxY = ((ty + 1) * ts - from.y) / dir.y;
+        } else if (dir.y < 0) {
+            tMaxY = (ty * ts - from.y) / dir.y;
+        } else {
+            tMaxY = Float.MAX_VALUE;
+        }
+
+        float traveled = 0f;
+        while (traveled < dist) {
+            remainingRadius = baseRadius - traveled;
+            if (remainingRadius <= 0f) return 0f;
+
+            TileType tile = geometry.getTile(tx, ty);
+            if (tile.attenuatesSound()) {
+                remainingRadius *= tile.getSoundAttenuationFactor();
+                baseRadius = remainingRadius + traveled;
+            }
+
+            Rect tileRect = new Rect(tx * ts, ty * ts, ts, ts);
+            for (Blocker blocker : blockers) {
+                if (!blocker.blocksSound()) continue;
+                if (blocker.getBounds().overlaps(tileRect)) {
+                    remainingRadius *= blocker.getSoundAttenuationFactor();
+                    baseRadius = remainingRadius + traveled;
+                }
+            }
+
+            if (remainingRadius <= 0f) return 0f;
+            if (tx == endTX && ty == endTY) break;
+
+            float nextT;
+            if (tMaxX < tMaxY) {
+                nextT = tMaxX;
+                tx += stepX;
+                tMaxX += tDeltaX;
+            } else {
+                nextT = tMaxY;
+                ty += stepY;
+                tMaxY += tDeltaY;
+            }
+            if (nextT > dist) break;
+            traveled = nextT;
+        }
+
+        return Math.max(0f, baseRadius - dist);
+    }
+    public boolean canHear(Entity entity, SoundEvent event){
+        Vec2 entityPos = new Vec2(entity.getX(), entity.getY());
+        return (castSound(new Vec2(event.getX(), event.getY()),
+                entityPos, event.getRadius(), event.getWho()) > 0);
     }
 }

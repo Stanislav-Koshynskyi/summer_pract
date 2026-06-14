@@ -6,6 +6,7 @@ import org.core.enums.WeaponType;
 import org.core.event.GameEvent;
 import org.core.event.MeleeAttackEvent;
 import org.core.event.ShotFiredEvent;
+import org.core.event.SoundEvent;
 import org.core.math.Vec2;
 import org.core.raycast.RayCastResult;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class WeaponSystem {
+    public static final float SUPPRESSED_MULTIPLAYER = 1 /3f;
     public List<GameEvent> useWeapon(WeaponFireContext context, Weapon weapon) {
         WeaponBehavior behavior = weapon.getBehavior();
         WeaponDefinition def = weapon.getDefinition();
@@ -56,6 +58,13 @@ public class WeaponSystem {
         }
 
         weapon.onFire();
+
+        float noiseRadius = weapon.getDefinition().getWeaponType().getSoundRadius() * (
+                weapon.getDefinition().isSuppressed() ? SUPPRESSED_MULTIPLAYER : 1
+                );
+        context.getQueue().add(new SoundEvent(
+                context.getShooter().getX(), context.getShooter().getY(),
+                noiseRadius, context.getShooter()));
 
         return events;
     }

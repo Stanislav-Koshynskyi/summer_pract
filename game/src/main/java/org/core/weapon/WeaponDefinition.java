@@ -14,7 +14,6 @@ public class WeaponDefinition {
     private final boolean isSuppressed;
     private final boolean isAutomatic;
     private final WeaponBehavior behavior;
-    @Getter
     private final float knockbackForce;
     private final float spread;
 
