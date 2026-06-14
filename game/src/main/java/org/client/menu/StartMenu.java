@@ -1,5 +1,5 @@
 package org.client.menu;
-
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 // ── LibGDX: ядро фреймворку ──────────────────────────────────────────────────
 import com.badlogic.gdx.Gdx;                        // доступ до екрану, введення, файлів
 import com.badlogic.gdx.Screen;                     // інтерфейс екрану LibGDX
@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer; // малює прямо
 import com.badlogic.gdx.utils.ScreenUtils;          // допоміжний метод очищення екрану
 import com.badlogic.gdx.utils.viewport.FitViewport; // зберігає пропорції при зміні розміру вікна
 import com.badlogic.gdx.utils.viewport.Viewport;
+import org.core.enums.MenuStatus;
 
 /**
  * Головне меню гри "One By One".
@@ -38,6 +39,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * ──────────────────────────────────────────────────────────────────────────────
  */
 public class StartMenu implements Screen {
+
+    ///status menu
+    private static final MenuStatus STATUS = MenuStatus.START_MENU;
 
     // ── Кольори (підібрані під скриншот) ─────────────────────────────────────
     /** Темно-сірий фон, як на скриншоті (#2E3240) */
@@ -76,10 +80,10 @@ public class StartMenu implements Screen {
 
     // ── Підписи кнопок (за скриншотом) ───────────────────────────────────────
     private static final String[] LABELS = {
-            "Start game",   // 0 — запускає рівень
-            "About authors",  // 1 — екран з інформацією про авторів (поки заглушка)
-            "Settings", // 2 — екран налаштувань (поки заглушка)
-            "Rules"       // 3 — екран правил (поки заглушка)
+            "Почати гру",   // 0 — запускає рівень
+            "Про авторів",  // 1 — екран з інформацією про авторів (поки заглушка)
+            "Налаштування", // 2 — екран налаштувань (поки заглушка)
+            "Правила"       // 3 — екран правил (поки заглушка)
     };
 
     // ── LibGDX об'єкти ────────────────────────────────────────────────────────
@@ -124,9 +128,21 @@ public class StartMenu implements Screen {
      *
      * @param game головний клас гри (CoreGame)
      */
-    public StartMenu(com.badlogic.gdx.Game game) {
-        this.game = game;
+    // 1. Додаємо масив статусів, що відповідають кнопкам (порядок такий самий, як у LABELS)
+    private static final MenuStatus[] BUTTON_TARGETS = {
+            MenuStatus.PLAY_GAME_MENU,      // 0 — Start game (або ігровий екран)
+            MenuStatus.ABOUT_AUTHORS_MENU,  // 1 — About authors
+            MenuStatus.SETTINGS_MENU,       // 2 — Settings
+            MenuStatus.RULES_MENU           // 3 — Rules
+    };
 
+    // 2. Зберігаємо посилання на SwitchMenu
+    private final SwitchMenu switchMenu;
+
+    // 3. Оновлюємо конструктор, щоб він приймав SwitchMenu
+    public StartMenu(com.badlogic.gdx.Game game, SwitchMenu switchMenu) {
+        this.game = game;
+        this.switchMenu = switchMenu;
         // Створюємо 2D камеру та прив'язуємо FitViewport до логічних розмірів
         camera   = new OrthographicCamera();
         viewport = new FitViewport(WORLD_W, WORLD_H, camera);
@@ -141,14 +157,33 @@ public class StartMenu implements Screen {
         // ── Шрифт заголовку ───────────────────────────────────────────────────
         // BitmapFont() без аргументів завантажує вбудований Arial 15px.
         // Масштабуємо його через setScale, щоб виглядало як великий заголовок.
-        titleFont = new BitmapFont();
-        titleFont.getData().setScale(5f);        // великий заголовок
-        titleFont.setColor(Color.WHITE);
+        // Замість старого titleFont = new BitmapFont(); та font = new BitmapFont(); робимо так:
+        if (Gdx.files.internal("fonts/Roboto-Regular.ttf").exists()) {
+            FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
+            FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 
-        // ── Шрифт кнопок ──────────────────────────────────────────────────────
-        font = new BitmapFont();
-        font.getData().setScale(2.8f);           // середній розмір для кнопок
-        font.setColor(Color.WHITE);
+            // Додаємо набір українських літер
+            parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя";
+
+            // 1. Великий шрифт для головного заголовку "One By One"
+            parameter.size = 70;
+            titleFont = generator.generateFont(parameter);
+            titleFont.setColor(Color.WHITE);
+
+            // 2. Середній шрифт для кнопок меню
+            parameter.size = 32;
+            font = generator.generateFont(parameter);
+            font.setColor(Color.WHITE);
+
+            generator.dispose(); // Звільняємо пам'ять генератора (генератор більше не потрібен)
+        } else {
+            // Фолбек (запасний варіант), якщо файл шрифту кудись зник
+            titleFont = new BitmapFont();
+            titleFont.getData().setScale(5f);
+            font = new BitmapFont();
+            font.getData().setScale(2.8f);
+            Gdx.app.error("FontError", "Шрифт fonts/Roboto-Regular.ttf не знайдено! Українська мова не працюватиме.");
+        }
 
         // ── Розрахунок позицій кнопок ─────────────────────────────────────────
         // Кнопки розміщуємо по центру по горизонталі.
@@ -183,6 +218,11 @@ public class StartMenu implements Screen {
     public void render(float delta) {
         // 1. Очищаємо екран кольором фону
         ScreenUtils.clear(BG_COLOR);
+
+        // 🟢 ЗАКЛИНАННЯ ВІД ВИЛІТУ:
+        // Якщо після кліку active screen став іншим (не цим класом),
+        // ми НЕГАЙНО виходимо з методу і не чіпаємо shapeRenderer/batch!
+        if (game.getScreen() != this) return;
 
         // 2. Оновлюємо камеру перед малюванням
         camera.update();
@@ -344,25 +384,11 @@ public class StartMenu implements Screen {
      * @param index індекс кнопки (0 = "Почати гру", 1 = "Про авторів", ...)
      */
     private void onButtonClick(int index) {
-        switch (index) {
-            case 0 -> {
-                // ── "Почати гру" ──────────────────────────────────────────────
-                // Переходимо до CoreGame (ігровий рівень).
-                // CoreGame реалізує ApplicationAdapter, тому обгортаємо його в Screen.
-                // Найпростіший спосіб — викликати dispose() меню і
-                // запустити CoreGame через game.setScreen(new GameScreen(game)).
-                //
-                // ЗАРАЗ: просто логуємо, щоб не зламати проект поки GameScreen не готовий.
-                // Розкоментуй рядок нижче, коли створиш GameScreen:
-                //
-                //   game.setScreen(new GameScreen(game));
-                //
-                Gdx.app.log("StartMenu", "Почати гру → перехід до рівня");
-                game.setScreen(null); // Прибираємо меню, щоб увімкнувся ігровий цикл CoreGame
-                }
-            case 1 -> Gdx.app.log("StartMenu", "Про авторів (заглушка)");
-            case 2 -> Gdx.app.log("StartMenu", "Налаштування (заглушка)");
-            case 3 -> Gdx.app.log("StartMenu", "Правила (заглушка)");
+        if (index >= 0 && index < BUTTON_TARGETS.length) {
+            Gdx.app.log("StartMenu", "Натиснуто кнопку: " + LABELS[index] + " -> Перехід до " + BUTTON_TARGETS[index]);
+
+            // Перемикаємо меню через наш OCP менеджер
+            switchMenu.switchMenu(BUTTON_TARGETS[index]);
         }
     }
 
