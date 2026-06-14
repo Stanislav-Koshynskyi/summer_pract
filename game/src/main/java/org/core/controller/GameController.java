@@ -17,6 +17,7 @@ import org.core.data.LevelData;
 import org.core.data.WeaponPickupData;
 import org.core.definition.EnemyProfile;
 import org.core.definition.PlayerProfile;
+import org.core.definition.WeaponDefinition;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.Player;
@@ -27,8 +28,8 @@ import org.core.math.Vec2;
 import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
+import org.core.state.LevelStats;
 import org.core.weapon.Weapon;
-import org.core.definition.WeaponDefinition;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
 
@@ -127,7 +128,7 @@ public class GameController {
         List<WeaponPickup> pickups = new ArrayList<>();
         for (WeaponPickupData w : data.weaponPickups) {
             pickups.add(new WeaponPickup(
-                    w.x, w.y, weaponRegistry.get(w.weaponId).getId(), new Weapon(weaponRegistry.get(w.weaponId)), false,  UUID.randomUUID().toString()
+                    w.x, w.y, weaponRegistry.get(w.weaponId).getId(), new Weapon(weaponRegistry.get(w.weaponId)), false, UUID.randomUUID().toString()
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
@@ -158,7 +159,7 @@ public class GameController {
         pathfinder = new PathFinder(data.worldGeometry, collisionSystem, blockers);
         Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
         aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
-        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem ,
+        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem,
                 aimBehaviorMap, doors, levelState.getWorldGeometry(), levelState.getStats());
         clearPendingCommands();
 
@@ -221,9 +222,9 @@ public class GameController {
             pendingInteract = false;
         }
         moveToCorpsAndRecord(true);
-        if (pendingDrop){
+        if (pendingDrop) {
             Optional<WeaponPickup> weaponPickup = player.dropWeapon();
-            if (weaponPickup.isPresent()){
+            if (weaponPickup.isPresent()) {
                 levelState.getPickups().add(weaponPickup.get());
             }
         }
@@ -291,7 +292,8 @@ public class GameController {
     public void shoot() {
         pendingShoot = true;
     }
-    public void drop(){
+
+    public void drop() {
         pendingDrop = true;
     }
 
@@ -347,13 +349,23 @@ public class GameController {
         if (completed) {
             levelState.setPhase(GamePhase.LEVEL_COMPLETED);
             levelState.addGameEvent(new LevelCompletedEvent(outcome));
-            System.out.println(levelState.getStats());
         }
 
     }
 
     private LevelOutcome determineOutcome() {
-        // Заглушка: для MVP-0 завжди MIXED, бо немає статистики
+        LevelStats stats = levelState.getStats();
+        int totalEnemies = levelState.getEnemies().size() + levelState.getCorpses().size(); // загальна кількість на старті рівня
+
+        if (stats.getUniqueEnemiesEnteredAttack() == 0) {
+            return LevelOutcome.FULL_STEALTH;
+        }
+
+        int attackCount = stats.getUniqueEnemiesEnteredAttack();
+        if (totalEnemies > 0 && attackCount >= totalEnemies * 0.5f) {
+            return LevelOutcome.ASSAULT;
+        }
+
         return LevelOutcome.MIXED;
     }
 
@@ -383,7 +395,8 @@ public class GameController {
     public Player getPlayer() {
         return levelState.getPlayer();
     }
-    private void moveToCorpsAndRecord(boolean silent){
+
+    private void moveToCorpsAndRecord(boolean silent) {
         List<Enemy> deadEnemies = levelState.flushDeadEnemies();
         List<GameEvent> deadEvent = new ArrayList<>();
         for (Enemy enemy : deadEnemies) {
