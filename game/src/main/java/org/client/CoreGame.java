@@ -1,6 +1,8 @@
 package org.client;
 
 import com.badlogic.gdx.ApplicationAdapter;
+///Changes
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -18,6 +20,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+///Changes
+import org.client.menu.StartMenu;
 import org.content.registry.ContentRegistries;
 import org.content.registry.WeaponRegistry;
 import org.content.registry.EnemyProfileRegistry;
@@ -35,8 +39,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-public class CoreGame extends ApplicationAdapter {
+///Changes
+public class CoreGame extends Game {
 
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -182,14 +186,25 @@ public class CoreGame extends ApplicationAdapter {
 
         assetLoader = new AssetLoader();
         assetLoader.load();
+        setScreen(new StartMenu(this)); // показати меню при старті
     }
 
+
+
+    /// Changes
     @Override
     public void render() {
-        input();
-        logic();
-        draw();
+        if (getScreen() != null) {
+            // Якщо є активний екран (наприклад, стартове меню), малюємо його
+            super.render();
+        } else {
+            // Якщо екрану немає, запускається твій стандартний ігровий цикл
+            input();
+            logic();
+            draw();
+        }
     }
+
 
     private void input() {
         // Placeholder
