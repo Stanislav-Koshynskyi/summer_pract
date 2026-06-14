@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="71" height="77" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="58">
+ <properties>
+  <property name="goalType" value="kill_all"/>
+ </properties>
+ <tileset firstgid="1" source="tests/wallsTest.tsx"/>
+ <tileset firstgid="2" source="tests/lowObstacleTest.tsx"/>
+ <tileset firstgid="3" source="tests/floorTest.tsx"/>
+ <layer id="1" name="floor" width="71" height="77">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3aQQ6CUAwEUBL1/lc27kxMIfCh/cU3SVcGZnhrl0XW8rroPnk2PTZs2LBhU39s2IzYfGfr973PVH/jqE31jhmPDRs2bDrZ7E23rm57M7u67c3sytybGTZx2MRhE4dNHDZx2MTpZtOtq9vezK5uezO7Rt5x12PDhs2xb99K9U42cx0bNmzYsKk/NmyutKveMeOxudZmb7p1dds7W9fIxoq9Z3WN/hc0e29mFxs2bM7tYsPmqq6RjRV7z+rqtjezq9vezK6Rd9z12LBhw4ZN/bHZttlK9U42cx0bNmzYsKk/NuM2dw+T3zxW7t/DJg6bOGzisDmeN5WQQIpsVQAA
+  </data>
+ </layer>
+ <objectgroup id="3" name="objects">
+  <object id="7" name="PlayerSpawn" type="PlayerSpawn" x="1064" y="1176">
+   <point/>
+  </object>
+  <object id="9" name="Femae" type="WeaponPickup" x="624" y="464">
+   <properties>
+    <property name="weaponId" type="int" value="5"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" name="Shotgun" type="WeaponPickup" x="208" y="48">
+   <properties>
+    <property name="weaponId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="11" name="Uzi" type="WeaponPickup" x="160" y="48">
+   <properties>
+    <property name="weaponId" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="12" name="PassageGuard" type="EnemySpawn" x="104" y="760">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="330"/>
+    <property name="patrolPath" type="int" value="0"/>
+    <property name="weaponId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="13" name="TopMainWalker" type="EnemySpawn" x="480" y="128">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="1"/>
+    <property name="weaponId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="14" name="TopMainDelayWalker" type="EnemySpawn" x="272" y="208">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="1"/>
+    <property name="weaponId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" name="RightMainWalker1" type="EnemySpawn" x="688" y="512">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="2"/>
+    <property name="weaponId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="17" name="LeftMainArmWalker" type="EnemySpawn" x="128" y="624">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="90"/>
+    <property name="patrolPath" type="int" value="4"/>
+    <property name="weaponId" type="int" value="5"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="18" name="BottomMainHorWalker" type="EnemySpawn" x="288" y="1056">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="5"/>
+    <property name="weaponId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="19" name="BottomMainVerWalker" type="EnemySpawn" x="568" y="688">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="0"/>
+    <property name="patrolPath" type="int" value="6"/>
+    <property name="weaponId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" name="RestRoundWalker1" type="EnemySpawn" x="48" y="64">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="270"/>
+    <property name="patrolPath" type="int" value="7"/>
+    <property name="weaponId" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="21" name="RestRoundWalker2" type="EnemySpawn" x="48" y="112">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="270"/>
+    <property name="patrolPath" type="int" value="8"/>
+    <property name="weaponId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="22" name="RestRoundWalker3" type="EnemySpawn" x="224" y="112">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="270"/>
+    <property name="patrolPath" type="int" value="9"/>
+    <property name="weaponId" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="23" name="RestRoundWalker4" type="EnemySpawn" x="176" y="224">
+   <properties>
+    <property name="enemyType" type="int" value="2"/>
+    <property name="facingAngle" type="float" value="270"/>
+    <property name="patrolPath" type="int" value="10"/>
+    <property name="weaponId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="16" name="RightMainWalker2" type="EnemySpawn" x="896" y="624">
+   <properties>
+    <property name="enemyType" type="int" value="1"/>
+    <property name="facingAngle" type="float" value="180"/>
+    <property name="patrolPath" type="int" value="3"/>
+    <property name="weaponId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="25" name="TopMain0" type="Waypoint" x="480" y="128">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="26" name="TopMain1" type="Waypoint" x="1008" y="128">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="27" name="TopMain2" type="Waypoint" x="1008" y="368">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="29" name="RightMainTop0" type="Waypoint" x="896" y="512">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="31" name="RightMainBottom0" type="Waypoint" x="688" y="624">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="35" name="BottomMainHor0" type="Waypoint" x="848" y="1072">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="5"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="36" name="BottomMainHor1" type="Waypoint" x="288" y="1056">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="5"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="37" name="BottomMainVer0" type="Waypoint" x="568" y="1000">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="6"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="39" name="RestingRound1_0" type="Waypoint" x="208" y="640">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="46" name="RestingRound2_0" type="Waypoint" x="176" y="472">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="8"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="47" name="RestingRound2_1" type="Waypoint" x="672" y="472">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="8"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="48" name="RestingRound2_2" type="Waypoint" x="672" y="664">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="8"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="49" name="RestingRound2_3" type="Waypoint" x="176" y="664">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="8"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="50" name="RestingRound3_0" type="Waypoint" x="496" y="208">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="9"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="54" name="RestingRound4_0" type="Waypoint" x="496" y="160">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="10"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="55" name="RestingRound4_1" type="Waypoint" x="960" y="160">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="10"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="56" name="RestingRound4_2" type="Waypoint" x="960" y="320">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="10"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="57" name="RestingRound4_3" type="Waypoint" x="960" y="160">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="10"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="51" name="RestingRound3_1" type="Waypoint" x="928" y="208">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="9"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="52" name="RestingRound3_2" type="Waypoint" x="928" y="736">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="9"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="53" name="RestingRound3_3" type="Waypoint" x="928" y="208">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="9"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="40" name="RestingRound1_1" type="Waypoint" x="480" y="640">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="41" name="RestingRound1_2" type="Waypoint" x="528" y="688">
+   <properties>
+    <property name="order" type="int" value="2"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="42" name="RestingRound1_3" type="Waypoint" x="528" y="904">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="43" name="RestingRound1_4" type="Waypoint" x="912" y="904">
+   <properties>
+    <property name="order" type="int" value="4"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="44" name="RestingRound1_5" type="Waypoint" x="912" y="472">
+   <properties>
+    <property name="order" type="int" value="5"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="45" name="RestingRound1_6" type="Waypoint" x="208" y="472">
+   <properties>
+    <property name="order" type="int" value="6"/>
+    <property name="pathId" type="int" value="7"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="38" name="BottomMainVer1" type="Waypoint" x="568" y="688">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="6"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="33" name="LeftMain0" type="Waypoint" x="128" y="272">
+   <properties>
+    <property name="order" type="int" value="0"/>
+    <property name="pathId" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="34" name="LeftMain1" type="Waypoint" x="128" y="624">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="32" name="RightMainBottom1" type="Waypoint" x="896" y="624">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="30" name="RightMainTop1" type="Waypoint" x="688" y="512">
+   <properties>
+    <property name="order" type="int" value="1"/>
+    <property name="pathId" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="28" name="TopMain3" type="Waypoint" x="1008" y="128">
+   <properties>
+    <property name="order" type="int" value="3"/>
+    <property name="pathId" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="4" name="doors">
+  <object id="2" name="SpawnDoor" type="Door" x="1040" y="1120" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="1"/>
+    <property name="initialState" value="open"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="3" name="PassageDoorBottom" type="Door" x="160" y="832" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="2"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="4" name="PassageDoorTop" type="Door" x="160" y="720" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="3"/>
+    <property name="initialState" value="closed"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="5" name="RestingDoorLeft" type="Door" x="64" y="144" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="4"/>
+    <property name="initialState" value="open"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+  <object id="6" name="RestingDoorRight" type="Door" x="272" y="144" width="48" height="16">
+   <properties>
+    <property name="doorId" type="int" value="5"/>
+    <property name="initialState" value="open"/>
+    <property name="orientation" value="horizontal"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="5" name="low_obstacles" width="71" height="77">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu3YQQ6DIBRFUdP9L7oDh82riC2g/5zEsXJVULYNqOzVeFSkDQAAwM4/UaYNAHB3rXvhFb93tMl6xjmyTZX70EObT9Xe3zNWbrPqdc1WcU1qMXrNntX+7BhnfNNoc3zO0bT5rSrzTS/r1He6rMtzm2lzTJtMG+5m9T3RmbTJtMm0ybTJtAGuMidk2vAPV/eNnrzvpE2mTaYNUI05K9Mm0ybTJtMGAJ7vDSp+OCFsVQAA
+  </data>
+ </layer>
+ <layer id="2" name="walls" width="71" height="77">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAACu2YUQ6DIBQE7f0v3RNMtCBbF2cSvorsY0zqg89xHB8HjlWsXHs1umF0w+iG0Q2jG0Y3jG6Ys15npD9K9U6raa9/JbphdMPohtENc4eb5Jn/H1mza6yY+4SstnqTWel6U/dwbW6S6IbRDaMbRjdMmxu/U/fMfUJWW73JrMYzTst5ald0w+iGebObxH9WK1f2rZu5OTuiG0Y3jG4Y3TC6YexvxtENoxum9U6l5f5m93u/X9/B6PtpdDO7xoq5T8hqqzeZ1VZvMqut3mRWW73JrLZ6k1l+w/n5tnqTWY19fMuZYVd0w+iG0Q2jG0Y3jG6YRJ/QypV962Zuzo7ohtENoxtGN4xumKtudh+037dytnfdjP++M7phdMPohrny/foCKedKqmxVAAA=
+  </data>
+ </layer>
+</map>
