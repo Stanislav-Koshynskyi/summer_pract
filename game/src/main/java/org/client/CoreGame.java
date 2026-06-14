@@ -50,6 +50,11 @@ public class CoreGame extends ApplicationAdapter {
     private Texture searchTexture;
     private Texture bulletTexture;
     private Texture weaponPickupTexture;
+    private Texture famaeTexture;
+    private Texture uziTexture;
+    private Texture knifeTexture;
+    private Texture shotgunTexture;
+    private Texture ninemmTexture;
     private BitmapFont font;
     @Setter
     private GameStateView gameStateView;
@@ -112,7 +117,11 @@ public class CoreGame extends ApplicationAdapter {
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
         searchTexture = new Texture(Gdx.files.internal("textures/SearchEnemy.png"));
         bulletTexture = new Texture(Gdx.files.internal("textures/bullet_4.png"));
-        weaponPickupTexture = new Texture(Gdx.files.internal("textures/weapon_1.png"));
+        famaeTexture = new Texture(Gdx.files.internal("textures/weapons/famae/famae_1.png"));
+        uziTexture = new Texture(Gdx.files.internal("textures/weapons/uzi/uzi_1.png"));
+        shotgunTexture = new Texture(Gdx.files.internal("textures/weapons/shotgun/shotgun_1.png"));
+        ninemmTexture = new Texture(Gdx.files.internal("textures/weapons/9mm/9mm_1.png"));
+        knifeTexture = new Texture(Gdx.files.internal("textures/weapons/knife/knife_2.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         assetLoader = new AssetLoader();
@@ -591,6 +600,23 @@ public class CoreGame extends ApplicationAdapter {
             spriteBatch.begin();
             for (WeaponPickup pickup : gameController.getPickups()) {
                 if (!pickup.canPick()) continue;
+
+                if (pickup.getWeaponId().equals("Famae")){
+                    weaponPickupTexture = famaeTexture;
+                }
+                if (pickup.getWeaponId().equals("Uzi")){
+                    weaponPickupTexture = uziTexture;
+                }
+                if (pickup.getWeaponId().equals("Shotgun")){
+                    weaponPickupTexture = shotgunTexture;
+                }
+                if (pickup.getWeaponId().equals("9mm")){
+                    weaponPickupTexture = ninemmTexture;
+                }
+                if (pickup.getWeaponId().equals("Knife")){
+                    weaponPickupTexture = knifeTexture;
+                }
+
                 float pickW = weaponPickupTexture.getWidth();
                 float pickH = weaponPickupTexture.getHeight();
 
@@ -892,6 +918,11 @@ public class CoreGame extends ApplicationAdapter {
         alertEffects.clear();
         alertTexture.dispose();
         deadBodies.clear();
+        famaeTexture.dispose();
+        uziTexture.dispose();
+        knifeTexture.dispose();
+        shotgunTexture.dispose();
+        ninemmTexture.dispose();
         if (bulletTexture != null) bulletTexture.dispose();
         if (assetLoader != null) assetLoader.dispose();
         if (weaponPickupTexture != null) weaponPickupTexture.dispose();
