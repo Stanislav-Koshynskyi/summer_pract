@@ -1,6 +1,6 @@
 package org.content.registry;
 
-import org.core.weapon.WeaponDefinition;
+import org.core.definition.WeaponDefinition;
 import org.core.enums.WeaponType;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
 
