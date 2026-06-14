@@ -402,4 +402,8 @@ public class GameController {
     public List<WeaponPickup> getPickups() {
         return levelState.getPickups();
     }
+
+    public Player getPlayer() {
+        return levelState.getPlayer();
+    }
 }
