@@ -69,7 +69,6 @@ public class LevelTmxLoader {
         }
 
         // Об'єкти
-        int enemyId = 1;
         MapLayer objectsLayer = map.getLayers().get("objects");
         if (objectsLayer != null) {
             for (MapObject object : objectsLayer.getObjects()) {
@@ -98,6 +97,7 @@ public class LevelTmxLoader {
                     int weaponId = objectProps.get("weaponId", Integer.class);
                     int patrolPathId = objectProps.get("patrolPath", Integer.class);
                     float facingAngle = objectProps.get("facingAngle", Float.class);
+                    int enemyId = objectProps.get("id", Integer.class);
 
                     String enemyType = String.valueOf(enemyTypeId);
                     String weapon = String.valueOf(weaponId);
@@ -108,7 +108,6 @@ public class LevelTmxLoader {
                             worldX, worldY, enemyType, weapon, patrolPath, facingAngle, enemy
                     );
                     enemySpawns.add(enemyData);
-                    enemyId++;
                 }
                 if (objectType.equals("WeaponPickup")) {
                     int weaponId = objectProps.get("weaponId", Integer.class);
