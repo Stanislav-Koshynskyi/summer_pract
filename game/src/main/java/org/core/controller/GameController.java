@@ -127,7 +127,7 @@ public class GameController {
         List<WeaponPickup> pickups = new ArrayList<>();
         for (WeaponPickupData w : data.weaponPickups) {
             pickups.add(new WeaponPickup(
-                    w.x, w.y, "test", null, false, "test"
+                    w.x, w.y, weaponRegistry.get(w.weaponId).getId(), new Weapon(weaponRegistry.get(w.weaponId)), false,  UUID.randomUUID().toString()
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
