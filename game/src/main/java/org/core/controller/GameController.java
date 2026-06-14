@@ -135,32 +135,8 @@ public class GameController {
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
                 new PlayerProfile("1",
-                        new Weapon(new WeaponDefinition(
-                                "1",
-                                WeaponType.HITSCAN,
-                                50,
-                                250,
-                                0.1f,
-                                100,
-                                false,
-                                true,
-                                new SimpleRayCastBehavior(),
-                                30,
-                                10
-                        )),
-                        new Weapon(new WeaponDefinition(
-                                "1",
-                                WeaponType.HITSCAN,
-                                25,
-                                250,
-                                0.1f,
-                                30,
-                                false,
-                                true,
-                                new SimpleRayCastBehavior(),
-                                30,
-                                10
-                        )),
+                        new Weapon(weaponRegistry.get("Famae")),
+                        new Weapon(weaponRegistry.get("Knife")),
                         0, 1, 1, 1, 0, 1
                 ));
         player.setMovementMode(pendingMovementMode);

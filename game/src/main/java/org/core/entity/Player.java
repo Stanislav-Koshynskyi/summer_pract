@@ -47,7 +47,7 @@ public class Player extends Entity implements Damageable, Blocker {
         this.facingAngle = 0f;
         this.playerProfile = playerProfile;
         this.defaultWeapon = playerProfile.getDefaultWeapon().clone();
-        this.currentWeapon = playerProfile.getDefaultWeapon().clone();
+        this.currentWeapon = playerProfile.getStartingWeapon().clone();
         hp += playerProfile.getBonusHp();
         ammoMultiplayer = playerProfile.getAmmoMultiplier();
         speedMultiplayer = playerProfile.getSpeedMultiplier();
