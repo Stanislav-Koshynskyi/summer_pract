@@ -1,6 +1,5 @@
 package org.client;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -41,7 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class GameScreen implements Screen {
+public class GameLevelScreen implements Screen {
     private final MainGame game;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
@@ -84,7 +83,7 @@ public class GameScreen implements Screen {
     private Animation<TextureRegion> enemyWalkAnimation1;
     private Texture[] enemyAnimationFrames;
 
-    public GameScreen(MainGame game) {
+    public GameLevelScreen(MainGame game) {
         this.game = game;
     }
 

@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import org.client.MainGame;
 import org.core.enums.MenuStatus;
 import org.core.enums.LanguageUI;
 
@@ -79,6 +80,7 @@ public class MarkdownMenuScreen implements Screen {
     private final float scrollbarX = WORLD_W - 40;
     private final float scrollbarW = 10;
     private boolean isDraggingScrollbar = false;
+    private LanguageUI language;
 
     public MarkdownMenuScreen(Game game, SwitchMenu switchMenu, String baseFilePath, LanguageUI language) {
         this.game = game;
@@ -88,7 +90,7 @@ public class MarkdownMenuScreen implements Screen {
         this.glyphLayout = new GlyphLayout();
         this.camera = new OrthographicCamera();
         this.viewport = new FitViewport(WORLD_W, WORLD_H, camera);
-
+        this.language = language;
         initUkrainianFont();
         parseMarkdownFile(baseFilePath, language);
         calculateContentHeight();
@@ -356,8 +358,14 @@ public class MarkdownMenuScreen implements Screen {
         // Кнопка BACK
         font.getData().setScale(1.1f);
         font.setColor(Color.WHITE);
-        glyphLayout.setText(font, "BACK");
-        font.draw(batch, "BACK", backBtnX + (backBtnW - glyphLayout.width) / 2, backBtnY + (backBtnH + glyphLayout.height) / 2);
+        String back;
+        if (language==LanguageUI.ENGLISH)
+            back = "Back";
+            else
+            back = "Назад";
+
+        glyphLayout.setText(font, back);
+        font.draw(batch, back, backBtnX + (backBtnW - glyphLayout.width) / 2, backBtnY + (backBtnH + glyphLayout.height) / 2);
 
         // Малювання тексту вкладок з перевіркою на довжину і переносом рядків
         currentTabX = tabStartX;
