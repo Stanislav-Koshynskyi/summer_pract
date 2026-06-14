@@ -159,7 +159,7 @@ public class GameController {
         Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
         aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
         enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem ,
-                aimBehaviorMap, doors, levelState.getWorldGeometry());
+                aimBehaviorMap, doors, levelState.getWorldGeometry(), levelState.getStats());
         clearPendingCommands();
 
 
@@ -347,6 +347,7 @@ public class GameController {
         if (completed) {
             levelState.setPhase(GamePhase.LEVEL_COMPLETED);
             levelState.addGameEvent(new LevelCompletedEvent(outcome));
+            System.out.println(levelState.getStats());
         }
 
     }
