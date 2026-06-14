@@ -294,12 +294,11 @@ public class MarkdownMenuScreen implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(0.1f, 0.11f, 0.15f, 1f);
 
-        float mx = Gdx.input.getX();
-        float my = WORLD_H - Gdx.input.getY();
-        float scaleX = WORLD_W / (float) viewport.getScreenWidth();
-        float scaleY = WORLD_H / (float) viewport.getScreenHeight();
-        float wx = (mx - viewport.getLeftGutterWidth()) * scaleX;
-        float wy = (my - viewport.getBottomGutterHeight()) * scaleY;
+        com.badlogic.gdx.math.Vector3 touchPos = new com.badlogic.gdx.math.Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+        viewport.unproject(touchPos);
+
+        float wx = touchPos.x;
+        float wy = touchPos.y;
 
         handleInput(wx, wy);
 
