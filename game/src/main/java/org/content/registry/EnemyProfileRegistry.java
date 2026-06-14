@@ -24,7 +24,7 @@ public class EnemyProfileRegistry {
         // Colombian: Standard patrol/chase unit
         registerStatic(new EnemyProfile(
                 "Colombian",                     // enemyTypeId
-                80,                              // hp
+                40,                              // hp
                 80.0f,                           // patrolSpeed
                 150.0f,                          // chaseSpeed
                 300.0f,                          // visionRange
@@ -46,7 +46,7 @@ public class EnemyProfileRegistry {
         // EGang: Slightly tougher, faster regular enemy
         registerStatic(new EnemyProfile(
                 "EGang",
-                100,
+                80,
                 90.0f,
                 160.0f,
                 320.0f,

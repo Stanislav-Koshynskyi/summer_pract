@@ -152,17 +152,17 @@ public class GameController {
                         new Weapon(new WeaponDefinition(
                                 "1",
                                 WeaponType.HITSCAN,
-                                50,
+                                25,
                                 250,
                                 0.1f,
-                                100,
+                                30,
                                 false,
                                 true,
                                 new SimpleRayCastBehavior(),
                                 30,
                                 10
                         )),
-                        10,4,1,1,0
+                        0,4,1,1,0
         ));
         player.setMovementMode(pendingMovementMode);
         blockers.add(player);
