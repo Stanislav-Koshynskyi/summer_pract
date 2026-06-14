@@ -162,7 +162,7 @@ public class GameController {
                                 30,
                                 10
                         )),
-                        0,4,1,1,0
+                        0,1,1,1,0
         ));
         player.setMovementMode(pendingMovementMode);
         blockers.add(player);
