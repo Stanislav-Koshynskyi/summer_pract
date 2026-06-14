@@ -28,7 +28,7 @@ import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
 import org.core.weapon.Weapon;
-import org.core.weapon.WeaponDefinition;
+import org.core.definition.WeaponDefinition;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
 
@@ -123,7 +123,6 @@ public class GameController {
         }
         blockers.addAll(enemies);
 
-        // сейм
         List<WeaponPickup> pickups = new ArrayList<>();
         for (WeaponPickupData w : data.weaponPickups) {
             pickups.add(new WeaponPickup(

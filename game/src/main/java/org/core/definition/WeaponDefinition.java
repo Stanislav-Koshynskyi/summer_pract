@@ -1,4 +1,4 @@
-package org.core.weapon;
+package org.core.definition;
 
 import lombok.Getter;
 import org.core.behavior.WeaponBehavior;
@@ -32,6 +32,12 @@ public class WeaponDefinition {
         this.behavior = behavior;
         this.knockbackForce = knockbackForce;
         this.spread = spread;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof WeaponDefinition that)) return false;
+        return id.equals(that.id);
     }
 
 }

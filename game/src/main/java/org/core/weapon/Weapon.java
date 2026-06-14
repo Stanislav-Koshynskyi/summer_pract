@@ -2,6 +2,7 @@ package org.core.weapon;
 
 import lombok.Getter;
 import org.core.behavior.WeaponBehavior;
+import org.core.definition.WeaponDefinition;
 
 public class Weapon {
     @Getter
@@ -53,5 +54,18 @@ public class Weapon {
         Weapon weapon = new Weapon(this.getDefinition());
         weapon.ammo = this.ammo;
         return weapon;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Weapon w){
+            return getDefinition().equals(w.getDefinition());
+        }
+        return false;
+    }
+    public void refillAmmo(int amount) {
+        if (!infinityAmmo && amount > 0) {
+            ammo = Math.min(ammo + amount, definition.getMaxAmmo());
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.core.weapon;
 
 import org.core.behavior.WeaponBehavior;
+import org.core.definition.WeaponDefinition;
 import org.core.entity.Entity;
 import org.core.enums.WeaponType;
 import org.core.event.GameEvent;

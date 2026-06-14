@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class InteractionSystem {
-    private static final float STEALTH_KILL_RANGE = 32f;
+    private static final float STEALTH_KILL_RANGE = 48f;
     private static final float MAX_AIM_DEVIATION = 45f; // degrees
     private static final float INTERACT_RANGE = 48f;
 
@@ -91,8 +91,12 @@ public class InteractionSystem {
             if (dropped.isPresent()) {
                 levelState.getPickups().add(dropped.get());
             }
-
-            player.setCurrentWeapon(nearestPickup.getWeapon());
+            if (nearestPickup.getWeapon().equals(player.getCurrentWeapon())){
+                player.getCurrentWeapon().refillAmmo(nearestPickup.getWeapon().getAmmo());
+            }
+            else {
+                player.setCurrentWeapon(nearestPickup.getWeapon());
+            }
             levelState.removeWeaponPickup(nearestPickup);
             levelState.addGameEvent(new WeaponPickedUpEvent(nearestPickup.getWeaponId(), player.getX(), player.getY()));
             return true;
