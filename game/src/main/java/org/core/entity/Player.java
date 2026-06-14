@@ -117,7 +117,7 @@ public class Player extends Entity implements Damageable, Blocker {
                 currentWeapon.getDefinition().getId(),
                 currentWeapon, getCurrentWeapon().getAmmo() == 0,
                 UUID.randomUUID().toString());
-        currentWeapon = defaultWeapon.clone();
+        currentWeapon = defaultWeapon;
         return Optional.of(pickup);
     }
     public float getMoveSoundModify(){

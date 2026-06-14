@@ -28,7 +28,7 @@ import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
 import org.core.weapon.Weapon;
-import org.core.weapon.WeaponDefinition;
+import org.core.definition.WeaponDefinition;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
 
@@ -123,11 +123,10 @@ public class GameController {
         }
         blockers.addAll(enemies);
 
-        // сейм
         List<WeaponPickup> pickups = new ArrayList<>();
         for (WeaponPickupData w : data.weaponPickups) {
             pickups.add(new WeaponPickup(
-                    w.x, w.y, "test", null, false, "test"
+                    w.x, w.y, weaponRegistry.get(w.weaponId).getId(), new Weapon(weaponRegistry.get(w.weaponId)), false,  UUID.randomUUID().toString()
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
@@ -241,7 +240,7 @@ public class GameController {
 
 
         if (pendingInteract) {
-            // TODO: InteractionSystem.interact(player)
+            InteractionSystem.interact(player, levelState, rayCastSystem);
             pendingInteract = false;
         }
 

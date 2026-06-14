@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
@@ -49,6 +50,7 @@ public class CoreGame extends ApplicationAdapter {
     private Texture searchTexture;
     private Texture bulletTexture;
     private Texture weaponPickupTexture;
+    private BitmapFont font;
     @Setter
     private GameStateView gameStateView;
     private ShapeRenderer shapeRenderer;
@@ -147,6 +149,9 @@ public class CoreGame extends ApplicationAdapter {
 
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
+        font = new BitmapFont();
+        font.getData().setScale(1.0f);
+        font.setColor(Color.WHITE);
         doorVerticalTexture = new Texture(Gdx.files.internal("textures/door_closed_vertical.png"));
         doorHorizontalTexture = new Texture(Gdx.files.internal("textures/door_closed_horizontal.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
@@ -205,7 +210,7 @@ public class CoreGame extends ApplicationAdapter {
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-            // підібрати зброю
+            gameController.interact();
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
@@ -833,6 +838,87 @@ public class CoreGame extends ApplicationAdapter {
         }
 
         spriteBatch.end();
+
+        // Малювання підказок взаємодії (Interaction prompts)
+        if (gameController != null && gameStateView != null) {
+            Vec2 pPos = gameStateView.getPlayerPosition();
+            float playerFacing = gameStateView.getPlayerFacingAngle();
+
+            String prompt = null;
+            float promptX = 0;
+            float promptY = 0;
+
+            // 1. Пошук цілі для безшумного вбивства
+            float bestAimDeviation = Float.MAX_VALUE;
+            float silentKillRange = 32f;
+            float maxAimDeviation = 45f;
+
+            for (int i = 0; i < gameStateView.getEnemyCount(); i++) {
+                GameStateView.EnemyView enemy = gameStateView.getEnemy(i);
+                float dist = pPos.distanceTo(enemy.getX(), enemy.getY());
+                if (dist > silentKillRange) continue;
+
+                // Перевірка, чи гравець позаду ворога
+                Vec2 enemyFacingVec = Vec2.fromAngleDeg(enemy.getFacingAngle());
+                Vec2 enemyToPlayer = new Vec2(pPos.x - enemy.getX(), pPos.y - enemy.getY()).normalize();
+                boolean isBehind = enemyFacingVec.dot(enemyToPlayer) < 0;
+                if (!isBehind) continue;
+
+                // Перевірка, чи ворог не заагресований
+                if ("ATTACK".equals(enemy.getAiState())) continue;
+
+                // Перевірка кута наведення
+                Vec2 playerToEnemy = new Vec2(enemy.getX() - pPos.x, enemy.getY() - pPos.y);
+                float angleToEnemy = playerToEnemy.angleDeg();
+                float aimDeviation = Math.abs(Vec2.angleDiff(playerFacing, angleToEnemy));
+                if (aimDeviation > maxAimDeviation) continue;
+
+                if (aimDeviation < bestAimDeviation) {
+                    bestAimDeviation = aimDeviation;
+                    prompt = "[E] Silent Kill";
+                    promptX = enemy.getX();
+                    promptY = enemy.getY() + 25f;
+                }
+            }
+
+            // 2. Пошук зброї для підбору
+            if (prompt == null) {
+                float minPickupDist = 48f;
+                for (int i = 0; i < gameStateView.getPickupCount(); i++) {
+                    GameStateView.PickupView pickup = gameStateView.getPickup(i);
+                    float dist = pPos.distanceTo(pickup.getX(), pickup.getY());
+                    if (dist < minPickupDist) {
+                        minPickupDist = dist;
+                        prompt = "[E] Pick up " + pickup.getWeaponId();
+                        promptX = pickup.getX();
+                        promptY = pickup.getY() + 20f;
+                    }
+                }
+            }
+
+            // 3. Пошук дверей для взаємодії
+            if (prompt == null) {
+                float minDoorDist = 48f;
+                for (int i = 0; i < gameStateView.getDoorCount(); i++) {
+                    GameStateView.DoorView door = gameStateView.getDoor(i);
+                    float dist = pPos.distanceTo(door.getX(), door.getY());
+                    if (dist < minDoorDist) {
+                        minDoorDist = dist;
+                        prompt = door.isOpen() ? "[E] Close Door" : "[E] Open Door";
+                        promptX = door.getX();
+                        promptY = door.getY() + 20f;
+                    }
+                }
+            }
+
+            // Малюємо напис
+            if (prompt != null) {
+                spriteBatch.setProjectionMatrix(camera.combined);
+                spriteBatch.begin();
+                font.draw(spriteBatch, prompt, promptX - 40f, promptY);
+                spriteBatch.end();
+            }
+        }
     }
 
     @Override
@@ -841,6 +927,7 @@ public class CoreGame extends ApplicationAdapter {
         renderer.dispose();
         shapeRenderer.dispose();
         spriteBatch.dispose();
+        if (font != null) font.dispose();
         doorHorizontalTexture.dispose();
         doorVerticalTexture.dispose();
         attackEffects.clear();
