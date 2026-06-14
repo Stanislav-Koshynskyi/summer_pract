@@ -146,6 +146,30 @@ public class AssetLoader {
                 "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
                 "sprites/players/sprJacket/sprJacketAttackKalashnikov/sprJacketAttackKalashnikov_", 2, 0.05f
         );
+
+        registerPlayer(
+                "Pipe",
+                "sprites/players/sprJacket/sprJacketWalkPipe/sprJacketWalkPipe_", 8, 0.1f,
+                "sprites/players/sprJacket/sprJacketWalkPipe/sprJacketWalkPipe_", 1, 0.1f,
+                "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
+                "sprites/players/sprJacket/sprJacketAttackPipe/sprJacketAttackPipe_", 9, 0.05f
+        );
+
+        registerPlayer(
+                "Bat",
+                "sprites/players/sprJacket/sprJacketWalkBat/sprJacketWalkBat_", 8, 0.1f,
+                "sprites/players/sprJacket/sprJacketWalkBat/sprJacketWalkBat_", 1, 0.1f,
+                "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
+                "sprites/players/sprJacket/sprJacketAttackBat/sprJacketAttackBat_", 9, 0.05f
+        );
+
+        registerPlayer(
+                "Silencer",
+                "sprites/players/sprJacket/sprJacketWalkSilencer/sprJacketWalkSilencer_", 8, 0.1f,
+                "sprites/players/sprJacket/sprJacketWalkSilencer/sprJacketWalkSilencer_", 1, 0.1f,
+                "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
+                "sprites/players/sprJacket/sprJacketAttackSilencer/sprJacketAttackSilencer_", 2, 0.05f
+        );
     }
 
     private void registerEnemy(String typeName, String weaponId,
