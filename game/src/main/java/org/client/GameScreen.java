@@ -1,10 +1,9 @@
 package org.client;
 
-import com.badlogic.gdx.ApplicationAdapter;
-///Changes
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,28 +19,30 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
-///Changes
-import org.client.menu.StartMenu;
 import org.content.registry.ContentRegistries;
-import org.content.registry.WeaponRegistry;
 import org.content.registry.EnemyProfileRegistry;
+import org.content.registry.WeaponRegistry;
 import org.core.controller.GameController;
-import org.core.data.*;
+import org.core.data.LevelData;
 import org.core.definition.EnemyProfile;
-import org.core.entity.*;
-import org.core.enums.*;
+import org.core.entity.Door;
+import org.core.entity.Enemy;
+import org.core.entity.WeaponPickup;
+import org.core.enums.AimBehaviorType;
+import org.core.enums.DoorState;
+import org.core.enums.MovementMode;
 import org.core.event.*;
 import org.core.math.Vec2;
-import org.core.state.*;
-import org.core.weapon.*;
+import org.core.state.GameStateView;
+import org.core.weapon.WeaponSystem;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-///Changes
-public class CoreGame extends Game {
 
+public class GameScreen implements Screen {
+    private final MainGame game;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
@@ -83,8 +84,12 @@ public class CoreGame extends Game {
     private Animation<TextureRegion> enemyWalkAnimation1;
     private Texture[] enemyAnimationFrames;
 
+    public GameScreen(MainGame game) {
+        this.game = game;
+    }
+
     @Override
-    public void create() {
+    public void show() {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
@@ -186,28 +191,12 @@ public class CoreGame extends Game {
 
         assetLoader = new AssetLoader();
         assetLoader.load();
-        setScreen(new StartMenu(this)); // показати меню при старті
     }
 
-
-
-    /// Changes
     @Override
-    public void render() {
-        if (getScreen() != null) {
-            // Якщо є активний екран (наприклад, стартове меню), малюємо його
-            super.render();
-        } else {
-            // Якщо екрану немає, запускається твій стандартний ігровий цикл
-            input();
-            logic();
-            draw();
-        }
-    }
-
-
-    private void input() {
-        // Placeholder
+    public void render(float delta) {
+        logic();
+        draw();
     }
 
     private void logic() {
@@ -817,6 +806,17 @@ public class CoreGame extends Game {
     }
 
     @Override
+    public void resize(int width, int height) {
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        camera.update();
+    }
+
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() { dispose(); }
+
+    @Override
     public void dispose () {
         map.dispose();
         renderer.dispose();
@@ -850,5 +850,4 @@ public class CoreGame extends Game {
         gameController.loadLevel(levelData);
         this.gameStateView = gameController.getStateView();
     }
-
 }
