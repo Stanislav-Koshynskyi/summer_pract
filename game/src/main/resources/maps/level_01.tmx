@@ -109,7 +109,7 @@
   <object id="17" name="BottomGuard1" type="EnemySpawn" x="320" y="720">
    <properties>
     <property name="enemyType" type="int" value="2"/>
-    <property name="facingAngle" type="float" value="330"/>
+    <property name="facingAngle" type="float" value="340"/>
     <property name="patrolPath" type="int" value="0"/>
     <property name="weaponId" type="int" value="3"/>
    </properties>
@@ -124,10 +124,10 @@
    </properties>
    <point/>
   </object>
-  <object id="18" name="BottomGuard2" type="EnemySpawn" x="1184" y="720">
+  <object id="18" name="BottomGuard2" type="EnemySpawn" x="1184" y="704">
    <properties>
     <property name="enemyType" type="int" value="2"/>
-    <property name="facingAngle" type="float" value="210"/>
+    <property name="facingAngle" type="float" value="200"/>
     <property name="patrolPath" type="int" value="0"/>
     <property name="weaponId" type="int" value="3"/>
    </properties>
