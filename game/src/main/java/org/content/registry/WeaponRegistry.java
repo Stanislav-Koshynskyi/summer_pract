@@ -165,6 +165,7 @@ public class WeaponRegistry {
         registerStatic("3", getStatic("Shotgun"));
         registerStatic("4", getStatic("Uzi"));
         registerStatic("5", getStatic("Famae"));
+        registerStatic("6", getStatic("Machete"));
     }
 
     /**

@@ -391,6 +391,9 @@ public class CoreGame extends ApplicationAdapter {
                     }
                 }
             }
+            if (event instanceof LevelCompletedEvent) {
+                System.out.println("Level completed");
+            }
         }
 
         for (Enemy enemy : gameController.getEnemies()) {

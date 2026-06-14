@@ -134,6 +134,7 @@ public class EnemyProfileRegistry {
         // Alias numeric IDs for TMX Map compatibility
         registerStatic("1", getStatic("Colombian"));
         registerStatic("2", getStatic("EGang"));
+        registerStatic("3", getStatic("GangLeader"));
     }
 
     /**

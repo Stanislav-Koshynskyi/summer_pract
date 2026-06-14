@@ -63,7 +63,7 @@ public class LevelTmxLoader {
         }
 
         // Противник
-        String targetEnemyId = mapProperties.get("targetEnemyId", String.class);
+        String targetEnemyId = String.valueOf(mapProperties.get("targetEnemyId", Integer.class));
         if (targetEnemyId == null) {
             System.err.println("No target!");
         }
