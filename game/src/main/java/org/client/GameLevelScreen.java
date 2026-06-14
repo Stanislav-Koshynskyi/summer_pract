@@ -1,8 +1,8 @@
 package org.client;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,26 +19,31 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+import org.client.menu.SwitchMenu;
 import org.content.registry.ContentRegistries;
-import org.content.registry.WeaponRegistry;
 import org.content.registry.EnemyProfileRegistry;
+import org.content.registry.WeaponRegistry;
 import org.core.controller.GameController;
-import org.core.data.*;
+import org.core.data.LevelData;
 import org.core.definition.EnemyProfile;
-import org.core.entity.*;
-import org.core.enums.*;
+import org.core.entity.Door;
+import org.core.entity.Enemy;
+import org.core.entity.WeaponPickup;
+import org.core.enums.AimBehaviorType;
+import org.core.enums.DoorState;
+import org.core.enums.MovementMode;
 import org.core.event.*;
 import org.core.math.Vec2;
-import org.core.state.*;
-import org.core.weapon.*;
+import org.core.state.GameStateView;
+import org.core.weapon.WeaponSystem;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class CoreGame extends ApplicationAdapter {
-
+public class GameLevelScreen implements Screen {
+    private final MainGame game;
     private TiledMap map;
     private OrthogonalTiledMapRenderer renderer;
     private OrthographicCamera camera;
@@ -79,8 +84,18 @@ public class CoreGame extends ApplicationAdapter {
     private float stateTime;
     private boolean isPlayerMoving = false;
 
+    private Animation<TextureRegion> enemyWalkAnimation1;
+    private Texture[] enemyAnimationFrames;
+
+    private final SwitchMenu switchMenu;
+
+    public GameLevelScreen(MainGame game, SwitchMenu switchMenu) {
+        this.game = game;
+        this.switchMenu = switchMenu;
+    }
+
     @Override
-    public void create() {
+    public void show() {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
@@ -129,14 +144,9 @@ public class CoreGame extends ApplicationAdapter {
     }
 
     @Override
-    public void render() {
-        input();
+    public void render(float delta) {
         logic();
         draw();
-    }
-
-    private void input() {
-        // Placeholder
     }
 
     private void logic() {
@@ -906,6 +916,17 @@ public class CoreGame extends ApplicationAdapter {
     }
 
     @Override
+    public void resize(int width, int height) {
+        camera.viewportWidth = width;
+        camera.viewportHeight = height;
+        camera.update();
+    }
+
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() { dispose(); }
+
+    @Override
     public void dispose () {
         map.dispose();
         renderer.dispose();
@@ -942,5 +963,4 @@ public class CoreGame extends ApplicationAdapter {
         gameController.loadLevel(levelData);
         this.gameStateView = gameController.getStateView();
     }
-
 }
