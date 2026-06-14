@@ -90,55 +90,10 @@ public class CoreGame extends ApplicationAdapter {
         //cameraController = new CameraInputController(camera);
         //Gdx.input.setInputProcessor(cameraController);
 
-        // тестовий профіль, щоб програма не падала
-        EnemyProfile testEnemyProfile = new EnemyProfile(
-                "1",
-                100,
-                120f,
-                220f,
-                300f,
-                0.5f,
-                0.1f,
-                0.5f,
-                3.0f,
-                200f,
-                AimBehaviorType.values()[0],
-                90f,
-                130f,
-                360f,
-                16f,
-                16f,
-                20,
-                300
-        );
-
-        EnemyProfile testEnemyProfile2 = new EnemyProfile(
-                "2",
-                100,
-                120f,
-                220f,
-                300f,
-                0.5f,
-                0.1f,
-                0.5f,
-                3.0f,
-                200f,
-                AimBehaviorType.values()[0],
-                90f,
-                130f,
-                360f,
-                16f,
-                16f,
-                20,
-                300
-        );
-
         weaponSystem = new WeaponSystem();
         ContentRegistries.initAll();
         weaponRegistry = new WeaponRegistry();
         enemyProfileRegistry = new EnemyProfileRegistry();
-        enemyProfileRegistry.register(testEnemyProfile);
-        enemyProfileRegistry.register(testEnemyProfile2);
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
 
@@ -715,14 +670,14 @@ public class CoreGame extends ApplicationAdapter {
                 float originY = height / 2f;
 
                 // Милиці (запам'ятати на життя - працювати тільки зі спрайтшитами)
-                if (enemy.getCurrentWeapon().getDefinition().getId().equals("Knife") && enemy.getProfile().getEnemyTypeId().equals("2")) {
+                if (enemy.getCurrentWeapon().getDefinition().getId().equals("Knife") && enemy.getProfile().getEnemyTypeId().equals("EGang")) {
                     width = 60f;
                     height = 60f;
                     originX = 30f;
                     originY = 30f;
                 }
 
-                if (enemy.getCurrentWeapon().getDefinition().getId().equals("Knife") && enemy.getProfile().getEnemyTypeId().equals("1")) {
+                if (enemy.getCurrentWeapon().getDefinition().getId().equals("Knife") && enemy.getProfile().getEnemyTypeId().equals("Colombian")) {
                     width = 46f;
                     height = 46f;
                     originX = 18f;
@@ -940,11 +895,14 @@ public class CoreGame extends ApplicationAdapter {
         if (bulletTexture != null) bulletTexture.dispose();
         if (assetLoader != null) assetLoader.dispose();
         if (weaponPickupTexture != null) weaponPickupTexture.dispose();
-        if (assetLoader != null) assetLoader.dispose();
     }
 
     private void restart() {
         deadBodies.clear();
+        attackEffects.clear();
+        alertEffects.clear();
+        enemyAnimMap.clear();
+        doorAnimMap.clear();
         playerCorpse = null;
 
         LevelTmxLoader levelLoader = new LevelTmxLoader();

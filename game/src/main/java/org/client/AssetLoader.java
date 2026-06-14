@@ -19,7 +19,7 @@ public class AssetLoader {
 
     public void load() {
         registerEnemy(
-                "1",
+                "Colombian",
                 "Knife",
                 "sprites/enemies/sprColombian/sprColombianWalkKnife/sprColombianWalkKnife_", 8, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianWalkKnife/sprColombianWalkKnife_", 1, 0.1f,
@@ -28,7 +28,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "1",
+                "Colombian",
                 "9mm",
                 "sprites/enemies/sprColombian/sprColombianWalkSilencer/sprColombianWalkSilencer_", 8, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianWalkSilencer/sprColombianWalkSilencer_", 1, 0.1f,
@@ -37,7 +37,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "1",
+                "Colombian",
                 "Shotgun",
                 "sprites/enemies/sprColombian/sprColombianWalkShotgun/sprColombianWalkShotgun_", 8, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianWalkShotgun/sprColombianWalkShotgun_", 1, 0.1f,
@@ -46,7 +46,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "1",
+                "Colombian",
                 "Uzi",
                 "sprites/enemies/sprColombian/sprColombianWalkMendoza/sprColombianWalkMendoza_", 8, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianWalkMendoza/sprColombianWalkMendoza_", 1, 0.1f,
@@ -55,7 +55,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "1",
+                "Colombian",
                 "Famae",
                 "sprites/enemies/sprColombian/sprColombianWalkFamae/sprColombianWalkFamae_", 8, 0.1f,
                 "sprites/enemies/sprColombian/sprColombianWalkFamae/sprColombianWalkFamae_", 1, 0.1f,
@@ -64,7 +64,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "2",
+                "EGang",
                 "Knife",
                 "sprites/enemies/sprEGang/sprEGangWalkKnife/sprEGangWalkKnife_", 8, 0.1f,
                 "sprites/enemies/sprEGang/sprEGangWalkKnife/sprEGangWalkKnife_", 1, 0.1f,
@@ -73,7 +73,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "2",
+                "EGang",
                 "9mm",
                 "sprites/enemies/sprEGang/sprEGangWalk9mm/sprEGangWalk9mm_", 8, 0.1f,
                 "sprites/enemies/sprEGang/sprEGangWalk9mm/sprEGangWalk9mm_", 1, 0.1f,
@@ -82,7 +82,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "2",
+                "EGang",
                 "Shotgun",
                 "sprites/enemies/sprEGang/sprEGangWalkShotgun/sprEGangWalkShotgun_", 8, 0.1f,
                 "sprites/enemies/sprEGang/sprEGangWalkShotgun/sprEGangWalkShotgun_", 1, 0.1f,
@@ -91,7 +91,7 @@ public class AssetLoader {
         );
 
         registerEnemy(
-                "2",
+                "EGang",
                 "Uzi",
                 "sprites/enemies/sprEGang/sprEGangWalkUzi/sprEGangWalkUzi_", 8, 0.1f,
                 "sprites/enemies/sprEGang/sprEGangWalkUzi/sprEGangWalkUzi_", 1, 0.1f,
