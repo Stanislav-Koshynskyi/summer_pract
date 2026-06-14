@@ -30,7 +30,7 @@ public class EnemyProfileRegistry {
                 300.0f,                          // visionRange
                 0.4f,                            // reactionTime
                 0.2f,                            // shotCommitDuration
-                1.0f,                            // aimMemoryDuration
+                0.5f,                            // aimMemoryDuration
                 5.0f,                            // searchMemoryDuration
                 150.0f,                          // preferredAttackRange
                 AimBehaviorType.STANDARD,        // aimBehaviorType
@@ -52,7 +52,7 @@ public class EnemyProfileRegistry {
                 320.0f,
                 0.35f,
                 0.15f,
-                1.5f,
+                0.6f,
                 6.0f,
                 200.0f,
                 AimBehaviorType.STANDARD,
@@ -75,7 +75,7 @@ public class EnemyProfileRegistry {
                 350.0f,
                 0.25f,
                 0.1f,
-                2.0f,
+                0.7f,
                 8.0f,
                 220.0f,
                 AimBehaviorType.STANDARD,
@@ -97,7 +97,7 @@ public class EnemyProfileRegistry {
                 400.0f,
                 0.2f,
                 0.1f,
-                2.5f,
+                0.7f,
                 10.0f,
                 250.0f,
                 AimBehaviorType.STANDARD,
@@ -119,7 +119,7 @@ public class EnemyProfileRegistry {
                 250.0f,
                 0.5f,
                 0.3f,
-                1.5f,
+                0.6f,
                 7.0f,
                 100.0f,
                 AimBehaviorType.STANDARD,
