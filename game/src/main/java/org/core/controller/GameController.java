@@ -267,7 +267,7 @@ public class GameController {
                         rayCastSystem, player, from, target,
                         weapon.getDefinition().getRange(),
                         Set.of(player),
-                        weapon.getDefinition().getDamage(),
+                        weapon.getDefinition().getDamage() + player.getBonusDamage(),
                         weapon.getDefinition().getKnockbackForce(),
                         weapon.getDefinition().getSpread(),
                         levelState.getSoundEventQueue()
