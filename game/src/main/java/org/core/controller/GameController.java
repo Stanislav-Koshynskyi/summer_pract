@@ -45,6 +45,7 @@ public class GameController {
     private float pendingDx, pendingDy;
     private float pendingAimX, pendingAimY;
     private boolean pendingShoot;
+    private boolean pendingDrop;
     private boolean pendingInteract;
     private MovementMode pendingMovementMode;
     private final WeaponSystem weaponSystem;
@@ -243,6 +244,12 @@ public class GameController {
             InteractionSystem.interact(player, levelState, rayCastSystem);
             pendingInteract = false;
         }
+        if (pendingDrop){
+            Optional<WeaponPickup> weaponPickup = player.dropWeapon();
+            if (weaponPickup.isPresent()){
+                levelState.getPickups().add(weaponPickup.get());
+            }
+        }
 
         // Крок 8b DoorSystem
         for (Door door : levelState.getDoors()) {
@@ -325,6 +332,9 @@ public class GameController {
     public void shoot() {
         pendingShoot = true;
     }
+    public void drop(){
+        pendingDrop = true;
+    }
 
     public void interact() {
         pendingInteract = true;
@@ -392,6 +402,7 @@ public class GameController {
         pendingDy = 0f;
         pendingShoot = false;
         pendingInteract = false;
+        pendingDrop = false;
     }
 
     public List<Enemy> getEnemies() {

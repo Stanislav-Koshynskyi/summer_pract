@@ -212,6 +212,9 @@ public class CoreGame extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             gameController.interact();
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)){
+            gameController.drop();
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             restart();
