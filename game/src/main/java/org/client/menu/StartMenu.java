@@ -13,23 +13,28 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.client.MainGame;
-import org.core.enums.MenuStatus;
 import org.core.enums.LanguageUI;
+import org.core.enums.MenuStatus;
 
 public class StartMenu implements Screen {
 
-    private static final Color BG_COLOR      = new Color(0x2e3240ff);
-    private static final Color BTN_COLOR     = new Color(0x3a3f52ff);
-    private static final Color BTN_BORDER    = new Color(0x6b7280ff);
-    private static final Color BTN_HOVER     = new Color(0x4a5068ff);
+    private static final Color BG_COLOR = new Color(0x2e3240ff);
+    private static final Color BTN_COLOR = new Color(0x3a3f52ff);
+    private static final Color BTN_BORDER = new Color(0x6b7280ff);
+    private static final Color BTN_HOVER = new Color(0x4a5068ff);
 
-    private static final float WORLD_W   = 1280f;
-    private static final float WORLD_H   = 720f;
-    private static final float BTN_W     = 440f;
-    private static final float BTN_H     = 80f;
-    private static final float BTN_GAP   = 20f;
-    private static final float BORDER    = 3f;
-    private static final int   RADIUS    = 18;
+    private static final float WORLD_W = 1280f;
+    private static final float WORLD_H = 720f;
+    private static final float BTN_W = 440f;
+    private static final float BTN_H = 80f;
+    private static final float BTN_GAP = 20f;
+    private static final float BORDER = 3f;
+    private static final int RADIUS = 18;
+
+    private final float exitBtnW = 60f;
+    private final float exitBtnH = 60f;
+    private final float exitBtnX = WORLD_W - exitBtnW - 40f;
+    private final float exitBtnY = WORLD_H - exitBtnH - 40f;
 
     // Динамічний масив підписів кнопок
     private final String[] labels;
@@ -76,13 +81,13 @@ public class StartMenu implements Screen {
         btnX = new float[labels.length];
         btnY = new float[labels.length];
 
-        camera   = new OrthographicCamera();
+        camera = new OrthographicCamera();
         viewport = new FitViewport(WORLD_W, WORLD_H, camera);
         camera.setToOrtho(false, WORLD_W, WORLD_H);
 
-        shapes    = new ShapeRenderer();
-        batch     = new SpriteBatch();
-        layout    = new GlyphLayout();
+        shapes = new ShapeRenderer();
+        batch = new SpriteBatch();
+        layout = new GlyphLayout();
 
         if (Gdx.files.internal("fonts/Roboto-Regular.ttf").exists()) {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
@@ -108,7 +113,7 @@ public class StartMenu implements Screen {
         }
 
         float totalHeight = labels.length * BTN_H + (labels.length - 1) * BTN_GAP;
-        float startY      = (WORLD_H - totalHeight) / 2f - 30f;
+        float startY = (WORLD_H - totalHeight) / 2f - 30f;
 
         for (int i = 0; i < labels.length; i++) {
             btnX[i] = (WORLD_W - BTN_W) / 2f;
@@ -116,7 +121,9 @@ public class StartMenu implements Screen {
         }
     }
 
-    @Override public void show() {}
+    @Override
+    public void show() {
+    }
 
     @Override
     public void render(float delta) {
@@ -143,6 +150,8 @@ public class StartMenu implements Screen {
         // Малювання кнопки мови
         boolean langHovered = isMouseOverLang();
         drawRoundRect(langBtnX, langBtnY, langBtnW, langBtnH, RADIUS, langHovered ? BTN_HOVER : BTN_COLOR);
+        boolean exitHovered = isMouseOverExit();
+        drawRoundRect(exitBtnX, exitBtnY, exitBtnW, exitBtnH, RADIUS, exitHovered ? BTN_HOVER : BTN_COLOR);
 
         shapes.end();
 
@@ -157,8 +166,12 @@ public class StartMenu implements Screen {
         // Обводка кнопки мови
         drawRoundRectOutline(langBtnX, langBtnY, langBtnW, langBtnH, RADIUS);
 
+        drawRoundRectOutline(exitBtnX, exitBtnY, exitBtnW, exitBtnH, RADIUS);
+
+
         shapes.end();
         Gdx.gl.glLineWidth(1f);
+
     }
 
     private void drawRoundRect(float x, float y, float w, float h, int r, Color color) {
@@ -166,21 +179,21 @@ public class StartMenu implements Screen {
         shapes.rect(x + r, y, w - 2 * r, h);
         shapes.rect(x, y + r, r, h - 2 * r);
         shapes.rect(x + w - r, y + r, r, h - 2 * r);
-        shapes.circle(x + r,         y + r,         r, 20);
-        shapes.circle(x + w - r,     y + r,         r, 20);
-        shapes.circle(x + r,         y + h - r,     r, 20);
-        shapes.circle(x + w - r,     y + h - r,     r, 20);
+        shapes.circle(x + r, y + r, r, 20);
+        shapes.circle(x + w - r, y + r, r, 20);
+        shapes.circle(x + r, y + h - r, r, 20);
+        shapes.circle(x + w - r, y + h - r, r, 20);
     }
 
     private void drawRoundRectOutline(float x, float y, float w, float h, int r) {
-        shapes.line(x + r,     y,         x + w - r, y);
-        shapes.line(x + r,     y + h,     x + w - r, y + h);
-        shapes.line(x,         y + r,     x,         y + h - r);
-        shapes.line(x + w,     y + r,     x + w,     y + h - r);
-        shapes.arc(x + r,         y + r,         r, 180, 90, 12);
-        shapes.arc(x + w - r,     y + r,         r, 270, 90, 12);
-        shapes.arc(x + r,         y + h - r,     r,  90, 90, 12);
-        shapes.arc(x + w - r,     y + h - r,     r,   0, 90, 12);
+        shapes.line(x + r, y, x + w - r, y);
+        shapes.line(x + r, y + h, x + w - r, y + h);
+        shapes.line(x, y + r, x, y + h - r);
+        shapes.line(x + w, y + r, x + w, y + h - r);
+        shapes.arc(x + r, y + r, r, 180, 90, 12);
+        shapes.arc(x + w - r, y + r, r, 270, 90, 12);
+        shapes.arc(x + r, y + h - r, r, 90, 90, 12);
+        shapes.arc(x + w - r, y + h - r, r, 0, 90, 12);
     }
 
     private void drawText() {
@@ -195,6 +208,10 @@ public class StartMenu implements Screen {
             layout.setText(font, labels[i]);
             font.draw(batch, labels[i], btnX[i] + (BTN_W - layout.width) / 2f, btnY[i] + (BTN_H + layout.height) / 2f);
         }
+
+        String exitText = "X";
+        layout.setText(font, exitText);
+        font.draw(batch, exitText, exitBtnX + (exitBtnW - layout.width) / 2f, exitBtnY + (exitBtnH + layout.height) / 2f);
 
         // Відображення поточної мови на кнопці (UA або EN)
         MainGame mainGame = (MainGame) game;
@@ -213,7 +230,7 @@ public class StartMenu implements Screen {
 
         float scaleX = WORLD_W / (float) viewport.getScreenWidth();
         float scaleY = WORLD_H / (float) viewport.getScreenHeight();
-        float wx = (mx - viewport.getLeftGutterWidth())  * scaleX;
+        float wx = (mx - viewport.getLeftGutterWidth()) * scaleX;
         float wy = (my - viewport.getBottomGutterHeight()) * scaleY;
 
         // Клік по кнопці мови
@@ -226,6 +243,11 @@ public class StartMenu implements Screen {
             }
             // Перезапускаємо екран меню для миттєвого оновлення
             switchMenu.switchMenu(MenuStatus.START_MENU);
+            return;
+        }
+        // вихід
+        if (wx >= exitBtnX && wx <= exitBtnX + exitBtnW && wy >= exitBtnY && wy <= exitBtnY + exitBtnH) {
+            Gdx.app.exit();
             return;
         }
 
@@ -279,14 +301,37 @@ public class StartMenu implements Screen {
         return wx >= langBtnX && wx <= langBtnX + langBtnW && wy >= langBtnY && wy <= langBtnY + langBtnH;
     }
 
-    @Override public void resize(int width, int height) { viewport.update(width, height, true); }
-    @Override public void pause()  {}
-    @Override public void resume() {}
-    @Override public void hide()   {}
-    @Override public void dispose() {
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void dispose() {
         shapes.dispose();
         batch.dispose();
         font.dispose();
         titleFont.dispose();
+    }
+    private boolean isMouseOverExit() {
+        float mx = Gdx.input.getX();
+        float my = Gdx.graphics.getHeight() - Gdx.input.getY();
+        float scaleX = WORLD_W / (float) viewport.getScreenWidth();
+        float scaleY = WORLD_H / (float) viewport.getScreenHeight();
+        float wx = (mx - viewport.getLeftGutterWidth()) * scaleX;
+        float wy = (my - viewport.getBottomGutterHeight()) * scaleY;
+        return wx >= exitBtnX && wx <= exitBtnX + exitBtnW && wy >= exitBtnY && wy <= exitBtnY + exitBtnH;
     }
 }
