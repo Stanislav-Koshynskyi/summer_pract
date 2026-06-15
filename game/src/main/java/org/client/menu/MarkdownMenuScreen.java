@@ -62,7 +62,7 @@ public class MarkdownMenuScreen implements Screen {
     private final float backBtnY = WORLD_H - 160;
     private final float backBtnW = 140;
     private final float backBtnH = 60; // Збільшили висоту з 45 до 60, щоб вмістити 2 рядки тексту
-    private static final int   RADIUS    = 18;
+    private static final int   RADIUS    = 10;
 
     // Чіткі межі вікна прокручування контенту
     private final float contentLeft = 100;
@@ -319,15 +319,19 @@ public class MarkdownMenuScreen implements Screen {
         // РЕНДЕРИНГ ЗАДНЬОГО ФОНУ КНОПОК
         // =========================================================================
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.FIREBRICK);
-        shapeRenderer.rect(backBtnX, backBtnY, backBtnW, backBtnH);
 
+// Задаємо радіус заокруглення в пікселях (наприклад, 12)
+
+
+// Малюємо кнопку Назад із заокругленням
+        drawRoundRect(backBtnX, backBtnY, backBtnW, backBtnH, RADIUS, Color.FIREBRICK);
+
+// Малюємо вкладки із заокругленням
         float currentTabX = tabStartX;
         for (int i = 0; i < tabs.size(); i++) {
-            if (i == activeTabIndex) shapeRenderer.setColor(Color.DARK_GRAY);
-            else shapeRenderer.setColor(Color.BLACK);
+            Color tabColor = (i == activeTabIndex) ? Color.DARK_GRAY : Color.BLACK;
 
-            shapeRenderer.rect(currentTabX, backBtnY, tabW, backBtnH);
+            drawRoundRect(currentTabX, backBtnY, tabW, backBtnH, RADIUS, tabColor);
             currentTabX += tabW + gap;
         }
 
@@ -339,8 +343,8 @@ public class MarkdownMenuScreen implements Screen {
             shapeRenderer.rect(scrollbarX, contentBottom, scrollbarW, contentHeight);
 
             shapeRenderer.setColor(isDraggingScrollbar ? Color.GOLD : Color.LIGHT_GRAY);
-            shapeRenderer.rect(scrollbarX, scrollThumbY, scrollbarW, scrollbarH);
-        }
+// Малюємо "повзунок" із невеликим радіусом заокруглення (наприклад, 4 пікселі)
+            drawRoundRect(scrollbarX, scrollThumbY, scrollbarW, scrollbarH, 4, isDraggingScrollbar ? Color.GOLD : Color.LIGHT_GRAY);        }
         shapeRenderer.end();
 
         // =========================================================================
@@ -460,6 +464,17 @@ public class MarkdownMenuScreen implements Screen {
         batch.end();
 
         Gdx.gl.glDisable(GL20.GL_SCISSOR_TEST);
+    }
+
+    private void drawRoundRect(float x, float y, float w, float h, int r, Color color) {
+        shapeRenderer.setColor(color);
+        shapeRenderer.rect(x + r, y, w - 2 * r, h);
+        shapeRenderer.rect(x, y + r, r, h - 2 * r);
+        shapeRenderer.rect(x + w - r, y + r, r, h - 2 * r);
+        shapeRenderer.circle(x + r, y + r, r, 20);
+        shapeRenderer.circle(x + w - r, y + r, r, 20);
+        shapeRenderer.circle(x + r, y + h - r, r, 20);
+        shapeRenderer.circle(x + w - r, y + h - r, r, 20);
     }
 
     @Override public void resize(int width, int height) { viewport.update(width, height, true); }
