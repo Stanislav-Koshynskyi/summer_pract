@@ -60,6 +60,7 @@ public class GameLevelScreen implements Screen {
     private Texture knifeTexture;
     private Texture shotgunTexture;
     private Texture ninemmTexture;
+    private Texture silencerTexture;
     private BitmapFont font;
     @Setter
     private GameStateView gameStateView;
@@ -138,6 +139,7 @@ public class GameLevelScreen implements Screen {
         shotgunTexture = new Texture(Gdx.files.internal("textures/weapons/shotgun/shotgun_1.png"));
         ninemmTexture = new Texture(Gdx.files.internal("textures/weapons/9mm/9mm_1.png"));
         knifeTexture = new Texture(Gdx.files.internal("textures/weapons/knife/knife_2.png"));
+        silencerTexture = new Texture(Gdx.files.internal("textures/weapons/allWeapons/silenced_9mm_1.png"));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         assetLoader = new AssetLoader();
@@ -639,6 +641,9 @@ public class GameLevelScreen implements Screen {
                 if (pickup.getWeaponId().equals("Knife")) {
                     weaponPickupTexture = knifeTexture;
                 }
+                if (pickup.getWeaponId().equals("Silencer")) {
+                    weaponPickupTexture = silencerTexture;
+                }
 
                 float pickW = weaponPickupTexture.getWidth();
                 float pickH = weaponPickupTexture.getHeight();
@@ -1024,6 +1029,10 @@ public class GameLevelScreen implements Screen {
         if (ninemmTexture != null) {
             ninemmTexture.dispose();
             ninemmTexture = null;
+        }
+        if (silencerTexture != null) {
+            silencerTexture.dispose();
+            silencerTexture = null;
         }
         if (assetLoader != null) {
             assetLoader.dispose();
