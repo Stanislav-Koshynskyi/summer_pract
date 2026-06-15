@@ -919,7 +919,6 @@ public class GameLevelScreen implements Screen {
 
         spriteBatch.end();
 
-        // Малювання підказок взаємодії (Interaction prompts)
         if (gameController != null && gameStateView != null) {
             Vec2 pPos = gameStateView.getPlayerPosition();
             float playerFacing = gameStateView.getPlayerFacingAngle();
@@ -928,7 +927,8 @@ public class GameLevelScreen implements Screen {
             float promptX = 0;
             float promptY = 0;
 
-            // 1. Пошук цілі для безшумного вбивства
+            boolean isUa = game.getCurrentLanguage() == LanguageUI.UKRAINIAN;
+
             float bestAimDeviation = Float.MAX_VALUE;
             float silentKillRange = 32f;
             float maxAimDeviation = 45f;
@@ -938,16 +938,13 @@ public class GameLevelScreen implements Screen {
                 float dist = pPos.distanceTo(enemy.getX(), enemy.getY());
                 if (dist > silentKillRange) continue;
 
-                // Перевірка, чи гравець позаду ворога
                 Vec2 enemyFacingVec = Vec2.fromAngleDeg(enemy.getFacingAngle());
                 Vec2 enemyToPlayer = new Vec2(pPos.x - enemy.getX(), pPos.y - enemy.getY()).normalize();
                 boolean isBehind = enemyFacingVec.dot(enemyToPlayer) < 0;
                 if (!isBehind) continue;
 
-                // Перевірка, чи ворог не заагресований
                 if ("ATTACK".equals(enemy.getAiState())) continue;
 
-                // Перевірка кута наведення
                 Vec2 playerToEnemy = new Vec2(enemy.getX() - pPos.x, enemy.getY() - pPos.y);
                 float angleToEnemy = playerToEnemy.angleDeg();
                 float aimDeviation = Math.abs(Vec2.angleDiff(playerFacing, angleToEnemy));
@@ -955,13 +952,12 @@ public class GameLevelScreen implements Screen {
 
                 if (aimDeviation < bestAimDeviation) {
                     bestAimDeviation = aimDeviation;
-                    prompt = "[E] Silent Kill";
+                    prompt = isUa ? "[E] Безшумне вбивство" : "[E] Silent Kill";
                     promptX = enemy.getX();
                     promptY = enemy.getY() + 25f;
                 }
             }
 
-            // 2. Пошук зброї для підбору
             if (prompt == null) {
                 float minPickupDist = 48f;
                 for (int i = 0; i < gameStateView.getPickupCount(); i++) {
@@ -969,14 +965,13 @@ public class GameLevelScreen implements Screen {
                     float dist = pPos.distanceTo(pickup.getX(), pickup.getY());
                     if (dist < minPickupDist) {
                         minPickupDist = dist;
-                        prompt = "[E] Pick up " + pickup.getWeaponId();
+                        prompt = (isUa ? "[E] Підібрати " : "[E] Pick up ") + pickup.getWeaponId();
                         promptX = pickup.getX();
                         promptY = pickup.getY() + 20f;
                     }
                 }
             }
 
-            // 3. Пошук дверей для взаємодії
             if (prompt == null) {
                 float minDoorDist = 48f;
                 for (int i = 0; i < gameStateView.getDoorCount(); i++) {
@@ -984,7 +979,11 @@ public class GameLevelScreen implements Screen {
                     float dist = pPos.distanceTo(door.getX(), door.getY());
                     if (dist < minDoorDist) {
                         minDoorDist = dist;
-                        prompt = door.isOpen() ? "[E] Close Door" : "[E] Open Door";
+                        if (door.isOpen()) {
+                            prompt = isUa ? "[E] Зачинити двері" : "[E] Close Door";
+                        } else {
+                            prompt = isUa ? "[E] Відчинити двері" : "[E] Open Door";
+                        }
                         promptX = door.getX();
                         promptY = door.getY() + 20f;
                     }

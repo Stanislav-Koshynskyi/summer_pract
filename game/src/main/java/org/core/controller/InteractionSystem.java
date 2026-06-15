@@ -19,49 +19,41 @@ import java.util.Set;
 
 public class InteractionSystem {
     private static final float STEALTH_KILL_RANGE = 48f;
-    private static final float MAX_AIM_DEVIATION = 45f; // degrees
+    private static final float MAX_AIM_DEVIATION = 45f;
     private static final float INTERACT_RANGE = 48f;
 
     public static boolean interact(Player player, LevelState levelState, RayCastSystem rayCastSystem) {
         Vec2 playerPos = new Vec2(player.getX(), player.getY());
 
-        // 1. Спроба безшумного вбивства (Silent Kill)
         Enemy targetEnemy = null;
         float bestAimDeviation = Float.MAX_VALUE;
 
         for (Enemy enemy : levelState.getEnemies()) {
             if (!enemy.isAlive()) continue;
 
-            // Перевірка відстані
             float dist = playerPos.distanceTo(enemy.getX(), enemy.getY());
             if (dist > STEALTH_KILL_RANGE) continue;
 
-            // Перевірка, чи гравець позаду ворога
             Vec2 enemyFacingVec = Vec2.fromAngleDeg(enemy.getFacingAngle());
             Vec2 enemyToPlayer = playerPos.copy().sub(enemy.getX(), enemy.getY()).normalize();
             boolean isBehind = enemyFacingVec.dot(enemyToPlayer) < 0;
             if (!isBehind) continue;
 
-            // Перевірка, чи ворог не заагнений
             if (enemy.getCurrentState() == AIState.ATTACK) continue;
 
-            // Перевірка кута наведення гравця (Aim Direction)
             Vec2 playerToEnemy = new Vec2(enemy.getX() - player.getX(), enemy.getY() - player.getY());
             float angleToEnemy = playerToEnemy.angleDeg();
             float aimDeviation = Math.abs(Vec2.angleDiff(player.getFacingAngle(), angleToEnemy));
             if (aimDeviation > MAX_AIM_DEVIATION) continue;
 
-            // Рейкаст: чи немає перешкод (стіни/зачинені двері)
             if (dist > 0.001f) {
                 Vec2 dir = playerToEnemy.copy().normalize();
                 RayCastResult result = rayCastSystem.cast(playerPos, dir, dist, player, Set.of(player), RayCastType.VISION);
                 if (result.hitTile() || (result.hitBlocker() && result.getTarget() != enemy)) {
-                    // Перешкода заважає вбивству
                     continue;
                 }
             }
 
-            // Обираємо ворога з найменшим відхиленням прицілу
             if (aimDeviation < bestAimDeviation) {
                 targetEnemy = enemy;
                 bestAimDeviation = aimDeviation;
@@ -69,12 +61,10 @@ public class InteractionSystem {
         }
 
         if (targetEnemy != null) {
-            // Миттєве вбивство
             targetEnemy.applyDamage(targetEnemy.getHp());
             return true;
         }
 
-        // 2. Спроба підбору зброї (Weapon Swap)
         WeaponPickup nearestPickup = null;
         float minPickupDist = INTERACT_RANGE;
 
@@ -102,7 +92,6 @@ public class InteractionSystem {
             return true;
         }
 
-        // 3. Спроба взаємодії з дверима (Toggle Door)
         Door nearestDoor = null;
         float minDoorDist = INTERACT_RANGE;
 
