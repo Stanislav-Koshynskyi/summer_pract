@@ -17,6 +17,7 @@ import org.core.data.LevelData;
 import org.core.data.WeaponPickupData;
 import org.core.definition.EnemyProfile;
 import org.core.definition.PlayerProfile;
+import org.core.definition.WeaponDefinition;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.Player;
@@ -27,8 +28,8 @@ import org.core.math.Vec2;
 import org.core.raycast.RayCastSystem;
 import org.core.state.GameStateView;
 import org.core.state.LevelState;
+import org.core.state.LevelStats;
 import org.core.weapon.Weapon;
-import org.core.definition.WeaponDefinition;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
 
@@ -127,7 +128,7 @@ public class GameController {
         List<WeaponPickup> pickups = new ArrayList<>();
         for (WeaponPickupData w : data.weaponPickups) {
             pickups.add(new WeaponPickup(
-                    w.x, w.y, weaponRegistry.get(w.weaponId).getId(), new Weapon(weaponRegistry.get(w.weaponId)), false,  UUID.randomUUID().toString()
+                    w.x, w.y, weaponRegistry.get(w.weaponId).getId(), new Weapon(weaponRegistry.get(w.weaponId)), false, UUID.randomUUID().toString()
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
@@ -135,7 +136,7 @@ public class GameController {
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
                 new PlayerProfile("1",
-                        new Weapon(weaponRegistry.get("Famae")),
+                        new Weapon(weaponRegistry.get("Silencer")),
                         new Weapon(weaponRegistry.get("Knife")),
                         0, 1, 1, 1, 0, 1
                 ));
@@ -158,8 +159,8 @@ public class GameController {
         pathfinder = new PathFinder(data.worldGeometry, collisionSystem, blockers);
         Map<AimBehaviorType, AimBehavior> aimBehaviorMap = new HashMap<>();
         aimBehaviorMap.put(AimBehaviorType.STANDARD, new StandardAim());
-        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem ,
-                aimBehaviorMap, doors, levelState.getWorldGeometry());
+        enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem,
+                aimBehaviorMap, doors, levelState.getWorldGeometry(), levelState.getStats());
         clearPendingCommands();
 
 
@@ -220,9 +221,10 @@ public class GameController {
             InteractionSystem.interact(player, levelState, rayCastSystem);
             pendingInteract = false;
         }
-        if (pendingDrop){
+        moveToCorpsAndRecord(true);
+        if (pendingDrop) {
             Optional<WeaponPickup> weaponPickup = player.dropWeapon();
-            if (weaponPickup.isPresent()){
+            if (weaponPickup.isPresent()) {
                 levelState.getPickups().add(weaponPickup.get());
             }
         }
@@ -254,25 +256,7 @@ public class GameController {
             pendingShoot = false;
         }
         // Крок 10. Перевірити deaths → перемістити в corpses
-        List<Enemy> deadEnemies = levelState.flushDeadEnemies();
-        List<GameEvent> deadEvent = new ArrayList<>();
-        for (Enemy enemy : deadEnemies) {
-            deadEvent.add(new EnemyDiedEvent(enemy.getX(), enemy.getY(), enemy.getEnemyId()));
-            levelState.getSoundEventQueue().add(
-                    new SoundEvent(
-                            enemy.getX(), enemy.getY(),
-                            FALL_BODY_SOUND, enemy
-                    )
-            );
-            if (enemy.getCurrentWeapon() != null) {
-                WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
-                Weapon weapon = new Weapon(definition);
-                WeaponPickup pickup = new WeaponPickup(enemy.getX(), enemy.getY(),
-                        definition.getId(), weapon, false, UUID.randomUUID().toString());
-                levelState.getPickups().add(pickup);
-            }
-        }
-        levelState.addAllGameEvent(deadEvent);
+        moveToCorpsAndRecord(false);
         for (Enemy enemy : levelState.getEnemies()) {
             if (enemy.isDamaged()) {
                 levelState.addAllGameEvent(enemyAI.onEnemyHit(enemy, player));
@@ -286,7 +270,6 @@ public class GameController {
         }
 
         // Крок 11. Оновити LevelStats і перевірити LevelGoal
-        // TODO: MVP-2 – розширити статистику (alerted enemies, silent kills тощо)
         checkLevelGoals();
         levelState.getStats().addElapsedTime(delta);
 
@@ -308,7 +291,8 @@ public class GameController {
     public void shoot() {
         pendingShoot = true;
     }
-    public void drop(){
+
+    public void drop() {
         pendingDrop = true;
     }
 
@@ -363,13 +347,24 @@ public class GameController {
 
         if (completed) {
             levelState.setPhase(GamePhase.LEVEL_COMPLETED);
-            levelState.addGameEvent(new LevelCompletedEvent(outcome));
+            levelState.addGameEvent(new LevelCompletedEvent(outcome, levelState.getStats()));
         }
 
     }
 
     private LevelOutcome determineOutcome() {
-        // Заглушка: для MVP-0 завжди MIXED, бо немає статистики
+        LevelStats stats = levelState.getStats();
+        int totalEnemies = levelState.getEnemies().size() + levelState.getCorpses().size(); // загальна кількість на старті рівня
+
+        if (stats.getUniqueEnemiesEnteredAttack() == 0) {
+            return LevelOutcome.FULL_STEALTH;
+        }
+
+        int attackCount = stats.getUniqueEnemiesEnteredAttack();
+        if (totalEnemies > 0 && attackCount >= totalEnemies * 0.5f) {
+            return LevelOutcome.ASSAULT;
+        }
+
         return LevelOutcome.MIXED;
     }
 
@@ -398,5 +393,28 @@ public class GameController {
 
     public Player getPlayer() {
         return levelState.getPlayer();
+    }
+
+    private void moveToCorpsAndRecord(boolean silent) {
+        List<Enemy> deadEnemies = levelState.flushDeadEnemies();
+        List<GameEvent> deadEvent = new ArrayList<>();
+        for (Enemy enemy : deadEnemies) {
+            deadEvent.add(new EnemyDiedEvent(enemy.getX(), enemy.getY(), enemy.getEnemyId()));
+            levelState.getSoundEventQueue().add(
+                    new SoundEvent(
+                            enemy.getX(), enemy.getY(),
+                            FALL_BODY_SOUND, enemy
+                    )
+            );
+            levelState.getStats().recordKill(false);
+            if (enemy.getCurrentWeapon() != null) {
+                WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
+                Weapon weapon = new Weapon(definition);
+                WeaponPickup pickup = new WeaponPickup(enemy.getX(), enemy.getY(),
+                        definition.getId(), weapon, false, UUID.randomUUID().toString());
+                levelState.getPickups().add(pickup);
+            }
+        }
+        levelState.addAllGameEvent(deadEvent);
     }
 }

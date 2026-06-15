@@ -75,7 +75,7 @@ public class Door extends Entity implements PathBlocker {
 
     @Override
     public boolean blocksVision() {
-        return state == DoorState.CLOSED;
+        return state != DoorState.OPEN && state != DoorState.CLOSING;
     }
 
     @Override
