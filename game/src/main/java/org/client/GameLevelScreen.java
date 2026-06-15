@@ -3,6 +3,7 @@ package org.client;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -82,6 +83,7 @@ public class GameLevelScreen implements Screen {
     private final Map<String, Sound> weaponSounds = new HashMap<>();
     private boolean isShooting = false;
     private float shootCooldownTimer = 0f;
+    private Music backgroundMusic;
 
     private float stateTime;
     private boolean isPlayerMoving = false;
@@ -153,6 +155,10 @@ public class GameLevelScreen implements Screen {
         weaponSounds.put("Shotgun", Gdx.audio.newSound(Gdx.files.internal("sounds/shotgun-39753.ogg")));
         weaponSounds.put("Uzi", Gdx.audio.newSound(Gdx.files.internal("sounds/9mm-pistol-shot-6349.ogg")));
         weaponSounds.put("Famae", Gdx.audio.newSound(Gdx.files.internal("sounds/famae.wav")));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_3.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.02f);
+        backgroundMusic.play();
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         assetLoader = new AssetLoader();
@@ -240,10 +246,10 @@ public class GameLevelScreen implements Screen {
             gameController.drop();
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-            restart();
-            return;
-        }
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+//            restart();
+//            return;
+//        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
             gameController.setMovementMode(MovementMode.RUN);
@@ -1013,10 +1019,16 @@ public class GameLevelScreen implements Screen {
 
     @Override
     public void pause() {
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
     }
 
     @Override
     public void resume() {
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
     }
 
     @Override
@@ -1096,6 +1108,9 @@ public class GameLevelScreen implements Screen {
         if (weaponPickupTexture != null) {
             weaponPickupTexture.dispose();
             weaponPickupTexture = null;
+        }
+        if (backgroundMusic != null) {
+            backgroundMusic.dispose();
         }
         weaponSounds.clear();
         attackEffects.clear();
