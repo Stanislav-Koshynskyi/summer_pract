@@ -14,7 +14,10 @@ Areas of responsibility:
 ### Koshynskyi Stanislav
     thn for playing
 
-### ABC 4 
+### Kravchuk Bohdan
+## Designer
+
+I created the game menu.
 
 ### ABC 5 
 
