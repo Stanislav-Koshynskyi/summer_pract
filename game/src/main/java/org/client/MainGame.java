@@ -13,8 +13,9 @@ public class MainGame extends Game {
     // Поле для збереження поточної мови інтерфейсу
     private LanguageUI currentLanguage = LanguageUI.UKRAINIAN;
 
-    private int maxUnlockedLevel = 1;
-
+    private int maxUnlockedLevel = 2;
+/// Changes
+    private static int currentLevel = 3;
 
     public LanguageUI getCurrentLanguage() {
         return currentLanguage;
@@ -40,6 +41,8 @@ public class MainGame extends Game {
 
         switchMenu.registerScreen(MenuStatus.SELECT_LEVEL_MENU, () -> new SelectLevelMenu(this, switchMenu));
 
+        switchMenu.registerScreen(MenuStatus.PAUSE_GAME_MENU, () -> new PauseMenu(this, switchMenu));
+
         // Передаємо базовий шлях та динамічно актуальну мову через метод getCurrentLanguage()
         switchMenu.registerScreen(MenuStatus.ABOUT_AUTHORS_MENU,
                 () -> new MarkdownMenuScreen(this, switchMenu, "markdownForMenu/aboutAuthors", getCurrentLanguage()));
@@ -60,6 +63,14 @@ public class MainGame extends Game {
 
     public void setMaxUnlockedLevel(int maxUnlockedLevel) {
         this.maxUnlockedLevel = maxUnlockedLevel;
+    }
+
+    public static int getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public static void setCurrentLevel(int currentLevel) {
+        MainGame.currentLevel = currentLevel;
     }
 
     @Override
