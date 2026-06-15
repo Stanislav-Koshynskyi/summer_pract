@@ -25,7 +25,7 @@ public class EnemyProfileRegistry {
         registerStatic(new EnemyProfile(
                 "Colombian",                     // enemyTypeId
                 40,                              // hp
-                50.0f,                           // patrolSpeed
+                75.0f,                           // patrolSpeed
                 230.0f,                          // chaseSpeed
                 300.0f,                          // visionRange
                 0.4f,                            // reactionTime
@@ -40,14 +40,14 @@ public class EnemyProfileRegistry {
                 16.0f,                           // width
                 16.0f,                           // height
                 20.0f,                           // closeRevealRadius
-                360.0f                           // turnRate
+                460.0f                           // turnRate
         ));
 
         // EGang: Slightly tougher, faster regular enemy
         registerStatic(new EnemyProfile(
                 "EGang",
                 80,
-                60.0f,
+                80.0f,
                 240.0f,
                 320.0f,
                 0.35f,
@@ -62,7 +62,7 @@ public class EnemyProfileRegistry {
                 16.0f,
                 16.0f,
                 20.0f,
-                400.0f
+                500f
         ));
 
         // 2. Bosses / Unique Enemies
@@ -70,7 +70,7 @@ public class EnemyProfileRegistry {
         registerStatic(new EnemyProfile(
                 "GangLeader",
                 250,
-                70.0f,
+                85.0f,
                 260.0f,
                 350.0f,
                 0.25f,
@@ -85,7 +85,7 @@ public class EnemyProfileRegistry {
                 16.0f,
                 16.0f,
                 25.0f,
-                480.0f
+                520
         ));
 
         // SwatBoss: Highly armored (high HP), slightly slower, extreme vision and reflexes
