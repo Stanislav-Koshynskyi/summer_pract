@@ -1,6 +1,8 @@
 package org.client;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +17,7 @@ import java.util.List;
 
 public class MainGame extends Game {
     public SpriteBatch batch;
+    private Music menuMusic;
 
     private SwitchMenu switchMenu;
     // Поле для збереження поточної мови інтерфейсу
@@ -82,6 +85,12 @@ public class MainGame extends Game {
                 () -> new DefeatMenu(this, switchMenu));
         switchMenu.registerScreen(MenuStatus.SELECT_PLAYER_MENU,
                 () -> new PlayerSelectScreen(this, switchMenu, allProfiles));
+
+        // Музика
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/menu.mp3"));
+        menuMusic.setLooping(true);
+        menuMusic.setVolume(0.01f);
+
         // Початковий запуск стартового меню
         switchMenu.switchMenu(MenuStatus.START_MENU);
     }
@@ -91,9 +100,24 @@ public class MainGame extends Game {
         if (getScreen() != null) {
             getScreen().dispose();
         }
+        if (menuMusic != null) {
+            menuMusic.dispose();
+        }
     }
     public void setMaxUnlockedLevel(int maxUnlockedLevel){
         this.maxUnlockedLevel = Math.max(this.maxUnlockedLevel, maxUnlockedLevel);
         saveManager.setMaxUnlockedLevel(maxUnlockedLevel);
+    }
+
+    public void playMenuMusic() {
+        if (menuMusic != null && !menuMusic.isPlaying()) {
+            menuMusic.play();
+        }
+    }
+
+    public void stopMenuMusic() {
+        if (menuMusic != null && menuMusic.isPlaying()) {
+            menuMusic.stop();
+        }
     }
 }

@@ -119,6 +119,8 @@ public class StartMenu implements Screen {
             btnX[i] = (WORLD_W - BTN_W) / 2f;
             btnY[i] = startY + (labels.length - 1 - i) * (BTN_H + BTN_GAP);
         }
+
+        ((MainGame) game).playMenuMusic();
     }
 
     @Override
