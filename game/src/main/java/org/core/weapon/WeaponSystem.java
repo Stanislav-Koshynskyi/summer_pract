@@ -5,6 +5,7 @@ import org.core.definition.WeaponDefinition;
 import org.core.entity.Entity;
 import org.core.enums.WeaponType;
 import org.core.event.GameEvent;
+import org.core.event.HitInfo;
 import org.core.event.MeleeAttackEvent;
 import org.core.event.ShotFiredEvent;
 import org.core.event.SoundEvent;
@@ -37,6 +38,17 @@ public class WeaponSystem {
         WeaponType type = def.getWeaponType();
         List<Vec2> hitPoints = hits.stream().map(RayCastResult::getPoint).collect(Collectors.toList());
 
+        // Build HitInfo list from raycast results
+        List<HitInfo> hitInfos = new ArrayList<>();
+        for (RayCastResult hit : hits) {
+            Vec2 hitPoint = hit.getPoint();
+            boolean hitEntity = hit.hitBlocker();
+            float dx = hitPoint.x - context.getOrigin().x;
+            float dy = hitPoint.y - context.getOrigin().y;
+            float angle = (float) Math.toDegrees(Math.atan2(dy, dx));
+            hitInfos.add(new HitInfo(hitPoint, hitEntity, angle));
+        }
+
         switch (type) {
             case HITSCAN -> {
                 events.add(new ShotFiredEvent(
@@ -44,7 +56,8 @@ public class WeaponSystem {
                         context.getOrigin().y,
                         hitPoints,
                         def.getId(),
-                        def.isSuppressed()
+                        def.isSuppressed(),
+                        hitInfos
                 ));
             }
             case MELEE -> {

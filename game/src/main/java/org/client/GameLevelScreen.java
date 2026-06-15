@@ -38,6 +38,7 @@ import org.core.enums.DoorState;
 import org.core.enums.GoalType;
 import org.core.enums.MovementMode;
 import org.core.event.*;
+import org.content.weapon_behavior.BulletVisualProfile;
 import org.core.math.Vec2;
 import org.core.state.GameStateView;
 import org.core.weapon.WeaponSystem;
@@ -80,6 +81,7 @@ public class GameLevelScreen implements Screen {
     private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
     private final List<BulletEffect> bulletEffects = new java.util.ArrayList<>();
     private final List<DeadBody> deadBodies = new ArrayList<>();
+    private final List<ImpactDecal> impactDecals = new ArrayList<>();
     private final Map<String, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
     private final EnemyAnimData playerAnimData = new EnemyAnimData();
     private final java.util.Map<Door, Float> doorAnimMap = new java.util.HashMap<>();
@@ -319,6 +321,15 @@ public class GameLevelScreen implements Screen {
             }
         }
 
+        Iterator<ImpactDecal> decalIt = impactDecals.iterator();
+        while (decalIt.hasNext()) {
+            ImpactDecal decal = decalIt.next();
+            decal.lifetime -= dt;
+            if (decal.lifetime <= 0) {
+                decalIt.remove();
+            }
+        }
+
         List<GameEvent> events = gameController.drainEvents();
         for (GameEvent event : events) {
             if (event instanceof ShotFiredEvent) {
@@ -374,7 +385,12 @@ public class GameLevelScreen implements Screen {
                     shooterAngle = gameStateView.getPlayerFacingAngle();
                 }
 
-                for (Vec2 targetPos : shot.getTargets()) {
+                BulletVisualProfile bulletVisual = WeaponRegistry.getBulletVisual(shot.weaponId);
+                float bulletSpeed = bulletVisual.getBulletSpeed();
+                float bulletSize = bulletVisual.getBulletSize();
+
+                for (int i = 0; i < shot.getTargets().size(); i++) {
+                    Vec2 targetPos = shot.getTargets().get(i);
                     float ddx = targetPos.x - shot.fromX;
                     float ddy = targetPos.y - shot.fromY;
                     float distanceToTarget = (float) Math.sqrt(ddx * ddx + ddy * ddy);
@@ -391,7 +407,6 @@ public class GameLevelScreen implements Screen {
                     float actualFromX = shot.fromX + spawnOffset.x;
                     float actualFromY = shot.fromY + spawnOffset.y;
 
-                    float bulletSpeed = 3000f;
                     float bulletLifetime = 1.2f;
 
                     bulletEffects.add(new BulletEffect(
@@ -400,8 +415,20 @@ public class GameLevelScreen implements Screen {
                             targetPos.x,
                             targetPos.y,
                             bulletSpeed,
-                            bulletLifetime
+                            bulletLifetime,
+                            bulletSize
                     ));
+
+                    // Spawn impact decal at hit point
+                    if (i < shot.getHitInfos().size()) {
+                        HitInfo hitInfo = shot.getHitInfos().get(i);
+                        impactDecals.add(new ImpactDecal(
+                                hitInfo.point.x,
+                                hitInfo.point.y,
+                                hitInfo.angle,
+                                hitInfo.hitEntity
+                        ));
+                    }
                 }
             }
 
@@ -589,8 +616,18 @@ public class GameLevelScreen implements Screen {
             float lerp = 10f * Gdx.graphics.getDeltaTime();
             Vec2 playerPos = gameStateView.getPlayerPosition();
 
-            camera.position.x += (playerPos.x - camera.position.x) * lerp;
-            camera.position.y += (playerPos.y - camera.position.y) * lerp;
+            // Ctrl look-ahead: shift camera in aiming direction (like Shift in Hotline Miami)
+            float targetX = playerPos.x;
+            float targetY = playerPos.y;
+            if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                float angle = gameStateView.getPlayerFacingAngle();
+                float lookAheadDist = 150f;
+                targetX += (float) Math.cos(Math.toRadians(angle)) * lookAheadDist;
+                targetY += (float) Math.sin(Math.toRadians(angle)) * lookAheadDist;
+            }
+
+            camera.position.x += (targetX - camera.position.x) * lerp;
+            camera.position.y += (targetY - camera.position.y) * lerp;
         }
 
         float exactCameraX = camera.position.x;
@@ -889,8 +926,8 @@ public class GameLevelScreen implements Screen {
         // Постріли
         spriteBatch.begin();
         for (BulletEffect effect : bulletEffects) {
-            float bulletW = 15f;
-            float bulletH = 15f;
+            float bulletW = effect.size;
+            float bulletH = effect.size;
             float originX = bulletW / 2f;
             float originY = bulletH / 2f;
 
@@ -908,6 +945,33 @@ public class GameLevelScreen implements Screen {
             );
         }
         spriteBatch.end();
+
+        // Impact decals (blood splatters and wall marks)
+        Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (ImpactDecal decal : impactDecals) {
+            // Fade out in the last 5 seconds
+            float alpha = decal.lifetime < 5f ? decal.lifetime / 5f : 1f;
+
+            for (int s = 0; s < decal.splatOffsetsX.length; s++) {
+                float sx = decal.x + decal.splatOffsetsX[s] * decal.scale;
+                float sy = decal.y + decal.splatOffsetsY[s] * decal.scale;
+                float sSize = decal.splatSizes[s] * decal.scale;
+
+                if (decal.isBlood) {
+                    // Blood: dark red splatter
+                    shapeRenderer.setColor(0.6f, 0f, 0f, alpha * 0.9f);
+                } else {
+                    // Wall: yellowish-white bullet hole mark
+                    shapeRenderer.setColor(0.9f, 0.85f, 0.5f, alpha * 0.7f);
+                }
+                shapeRenderer.circle(sx, sy, sSize);
+            }
+        }
+        shapeRenderer.end();
+        Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+
 
         // Знак оклику/питання над ворогами
         spriteBatch.begin();
@@ -1155,6 +1219,7 @@ public class GameLevelScreen implements Screen {
         alertEffects.clear();
         bulletEffects.clear();
         deadBodies.clear();
+        impactDecals.clear();
         enemyAnimMap.clear();
         doorAnimMap.clear();
         playerCorpse = null;
@@ -1166,6 +1231,7 @@ public class GameLevelScreen implements Screen {
         deadBodies.clear();
         attackEffects.clear();
         alertEffects.clear();
+        impactDecals.clear();
         enemyAnimMap.clear();
         doorAnimMap.clear();
         playerCorpse = null;

@@ -8,19 +8,22 @@ public class BulletEffect {
     public float angle;
     public float speed;
     public float lifetime;
+    @Getter
+    public float size;
 
     private float velX;
     private float velY;
     @Getter
     private boolean arrived = false;
 
-    public BulletEffect(float startX, float startY, float targetX, float targetY, float speed, float lifetime) {
+    public BulletEffect(float startX, float startY, float targetX, float targetY, float speed, float lifetime, float size) {
         this.x = startX;
         this.y = startY;
         this.targetX = targetX;
         this.targetY = targetY;
         this.speed = speed;
         this.lifetime = lifetime;
+        this.size = size;
 
         float dx = targetX - startX;
         float dy = targetY - startY;
@@ -31,6 +34,11 @@ public class BulletEffect {
             this.velX = (dx / distance) * speed;
             this.velY = (dy / distance) * speed;
         }
+    }
+
+    /** Backward-compatible constructor using default size */
+    public BulletEffect(float startX, float startY, float targetX, float targetY, float speed, float lifetime) {
+        this(startX, startY, targetX, targetY, speed, lifetime, 15f);
     }
 
     public void update(float dt) {

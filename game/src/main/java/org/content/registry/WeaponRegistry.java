@@ -1,5 +1,6 @@
 package org.content.registry;
 
+import org.content.weapon_behavior.BulletVisualProfile;
 import org.content.weapon_behavior.MeleeBehavior;
 import org.content.weapon_behavior.ShotgunBehavior;
 import org.core.definition.WeaponDefinition;
@@ -16,12 +17,14 @@ import java.util.Map;
  */
 public class WeaponRegistry {
     private static final Map<String, WeaponDefinition> weapons = new HashMap<>();
+    private static final Map<String, BulletVisualProfile> bulletVisuals = new HashMap<>();
 
     /**
      * Initializes and registers all weapons in the game.
      */
     public static void init() {
         weapons.clear();
+        bulletVisuals.clear();
 
         // 1. Melee Weapons
         // Knife: Quiet, fast, short range, high damage (instant kill if close)
@@ -99,6 +102,7 @@ public class WeaponRegistry {
                 10.0f,
                 0.05f
         ));
+        registerBulletVisual("9mm", new BulletVisualProfile(2500f, 12f));
 
         // Silencer: Quiet pistol, reduced damage and range
         registerStatic(new WeaponDefinition(
@@ -114,6 +118,7 @@ public class WeaponRegistry {
                 5.0f,
                 0.04f
         ));
+        registerBulletVisual("Silencer", new BulletVisualProfile(2200f, 10f));
 
         // Shotgun: Huge spread, massive damage, short range, slow reload/cooldown
         registerStatic(new WeaponDefinition(
@@ -129,6 +134,7 @@ public class WeaponRegistry {
                 30.0f,
                 0.3f
         ));
+        registerBulletVisual("Shotgun", new BulletVisualProfile(2000f, 8f));
 
         // Uzi: Rapid fire, high spread, low damage
         registerStatic(new WeaponDefinition(
@@ -144,6 +150,7 @@ public class WeaponRegistry {
                 4.0f,
                 0.15f
         ));
+        registerBulletVisual("Uzi", new BulletVisualProfile(2800f, 10f));
 
         // Famae: Automatic assault rifle, high damage, long range
         registerStatic(new WeaponDefinition(
@@ -159,6 +166,8 @@ public class WeaponRegistry {
                 15.0f,
                 0.08f
         ));
+        registerBulletVisual("Famae", new BulletVisualProfile(3500f, 14f));
+
         // Alias numeric IDs for TMX Map compatibility
         registerStatic("1", getStatic("Knife"));
         registerStatic("2", getStatic("9mm"));
@@ -183,6 +192,25 @@ public class WeaponRegistry {
      */
     public static void registerStatic(String alias, WeaponDefinition weapon) {
         weapons.put(alias, weapon);
+    }
+
+    /**
+     * Registers a bullet visual profile for a weapon.
+     * @param weaponId the weapon ID
+     * @param profile the bullet visual profile
+     */
+    public static void registerBulletVisual(String weaponId, BulletVisualProfile profile) {
+        bulletVisuals.put(weaponId, profile);
+    }
+
+    /**
+     * Gets the bullet visual profile for a weapon.
+     * Returns default profile if none is registered.
+     * @param weaponId the weapon ID
+     * @return the bullet visual profile
+     */
+    public static BulletVisualProfile getBulletVisual(String weaponId) {
+        return bulletVisuals.getOrDefault(weaponId, BulletVisualProfile.DEFAULT);
     }
 
     /**
