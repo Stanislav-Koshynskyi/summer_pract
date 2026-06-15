@@ -12,49 +12,74 @@ import java.util.Map;
  * Registry for managing and storing player profiles.
  */
 public class PlayerRegistry {
+    public static final String DEFAULT_PLAYER_ID = "Default";
     private static final Map<String, PlayerProfile> profiles = new HashMap<>();
 
     /**
      * Initializes and registers all player profiles based on available mask assets.
      */
     public static void init() {
+        WeaponRegistry.init();
         Map<String, WeaponDefinition> weaponRegistry = WeaponRegistry.getAllStatic();
 
         // 1. Default character
         // No mask. Starts with Silencer
         // No bonuses
-        registerStatic(new PlayerProfile("1",
+        registerStatic(new PlayerProfile("Default",
                 new Weapon(weaponRegistry.get("Silencer")),
                 new Weapon(weaponRegistry.get("Knife")),
-                0, 1, 1, 1, 0, 1
+                0, 1, 1, 1, 0, 1,
+                "Норміс", "Default",
+                "Збалансований боєць. Старт: Пістолет із глушником. Без бонусів.",
+                "Balanced fighter. Start: Silenced Pistol. No bonuses."
         ));
 
         // 2. Rusher
         // Starts with Uzi
         // More hp, more noise, more damage
-        registerStatic(new PlayerProfile("2",
+        registerStatic(new PlayerProfile("Rusher",
                 new Weapon(weaponRegistry.get("Uzi")),
                 new Weapon(weaponRegistry.get("Knife")),
-                2, 1, 1, 1, 10, 1.3f
+                1, 1, 1, 1, 20, 1.3f,
+                "Штурмовик", "Rusher",
+                "Створений для бою. Старт: Uzi. Підвищене здоров'я, шкода і шум.",
+                "Built for combat. Start: Uzi. Increased health, damage and noise."
         ));
 
         // 3. Stealther
         // No starting weapon
         // Less damage, less noise, long hands
-        registerStatic(new PlayerProfile("3",
-                new Weapon(weaponRegistry.get("Knife")),
-                new Weapon(weaponRegistry.get("Knife")),
-                0, 1, 1, 1.5f, -20, 0.6f
+        registerStatic(new PlayerProfile("Stealther",
+                new Weapon(weaponRegistry.get("Bat")),
+                new Weapon(weaponRegistry.get("Bat")),
+                0, 1.1f, 1, 1.5f, -20, 0.6f,
+                "Тінь", "Shadow",
+                "Майстер ближнього бою. Старт: Бита. Довші руки, менше шуму і шкоди.",
+                "Melee master. Start: Bat. Longer reach, less noise and damage."
         ));
 
         // 4. Risky
         // Starts with Shotgun
         // Much more health, more speed, more ammo, slightly less damage, less noise
-        registerStatic(new PlayerProfile("4",
+        registerStatic(new PlayerProfile("Risky",
                 new Weapon(weaponRegistry.get("Shotgun")),
                 new Weapon(weaponRegistry.get("Knife")),
-                4, 1.6f, 1.4f, 1, -5, 0.8f
+                2, 1.6f, 1.4f, 1, -5, 0.8f,
+                "Мужик з дробовиком", "Risky",
+                "Швидкий і смертоносний. Старт: Дробовик. Більше здоров'я, швидкість і патрони.",
+                "Fast and deadly. Start: Shotgun. More health, speed and ammo."
         ));
+        // 5. Ghost
+        registerStatic(new PlayerProfile("Ghost",
+                new Weapon(weaponRegistry.get("Knife")),
+                new Weapon(weaponRegistry.get("Knife")),
+                0, 1.5f, 1.0f, 1.0f, 0, 0.0f,
+                "Привид", "Ghost",
+                "Невидимий і нечутний. Старт: Ніж. Не може стріляти. Рухається безшумно.",
+                "Unseen and unheard. Start: Knife. Cannot shoot. Moves silently."
+        ));
+
+
     }
 
     /**

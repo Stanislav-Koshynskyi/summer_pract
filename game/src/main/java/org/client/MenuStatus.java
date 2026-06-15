@@ -1,4 +1,4 @@
-package org.core.enums;
+package org.client;
 
 public enum MenuStatus {
     START_MENU,
@@ -10,5 +10,6 @@ public enum MenuStatus {
     ABOUT_AUTHORS_MENU,
     PAUSE_GAME_MENU,
     DEFEAT_GAME_MENU,
-    WIN_GAME_MENU
+    WIN_GAME_MENU,
+    SELECT_PLAYER_MENU
 }
