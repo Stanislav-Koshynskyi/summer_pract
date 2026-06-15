@@ -6,9 +6,14 @@
  </properties>
  <tileset firstgid="1" source="tests/wallsTest.tsx"/>
  <tileset firstgid="2" source="tests/floorTest.tsx"/>
+ <tileset firstgid="5" source="tests/lowObstacleTest.tsx"/>
+ <tileset firstgid="6" source="level_3_low_obstacles.tsx"/>
+ <tileset firstgid="21" source="wooden_floor.tsx"/>
+ <tileset firstgid="177" source="carpet_floor.tsx"/>
+ <tileset firstgid="309" source="walls.tsx"/>
  <layer id="1" name="floor" width="61" height="46">
   <data encoding="base64" compression="zlib">
-   eJzt1FsOgCAMRNFG3P8aXKrxw4QQIygt5XEnmU9sjwZFyJ0gcmi01RyNfTBjxjym2eu9Yh7D/LZ/zlp7tmZWev6reTesxfMxYy79F81utvRhxoy5nfkqZswzmi3mY8aMGTNmzF5mzYxkXvE7a+73lBD1T3q+z0G5mDH3cp8x65njpE7N5Gbnzmiat4JazPcoZsxpvXfFPJa5l7S8z70E8xrm1XICQWebPg==
+   eJzt18sNwjAQRVG3QxWwpgNqgD5gA32mCxwJJLBC8Ngz/sT3SU+zQME+SLaCc+Sdk1JLraOxH8yYMfdprvW7Yu7DvLZ/aaTP5qwVPi81330fRnPO3vegODFjjr2Ltm629C3NJfPV9yaYmOuZp1dzzGffy8rEnH5vY/6eU0Ixt2d2EXsseW9jxrxVc2/vJJhl5hH/Y7Rq1kxP5qNCRzX/Srg3aSzOs5Y59r04tpgxt3KeMeuZP/Pv85ykfLeVeRdRi/VrFDPmsLX3irkvcyspeZ5bCeYxzKPlCb5eZtM=
   </data>
  </layer>
  <objectgroup id="2" name="objects">
@@ -258,12 +263,12 @@
  </objectgroup>
  <layer id="4" name="low_obstacles" width="61" height="46">
   <data encoding="base64" compression="zlib">
-   eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAgLcBK9gAAQ==
+   eJztz0sSgjAQRdGMRD6CAvtfK70EiFZiinOq7qwHr1MCAACAtszRUntEYX001B5RmJ/vwc9teURdRs/0nz/vJ27GaMrs9fvJX3lHn9ojClujrfYIAAAAAIALDimQAgo=
   </data>
  </layer>
  <layer id="5" name="walls" width="61" height="46">
   <data encoding="base64" compression="zlib">
-   eJztmFEOgCAMQ/X+l/YAisjWdov0JfworryEYfQ47pzgMQKdk1nP2zpXmTmrsfP8OjIDnfOVXZ1Xz51IRuQeC7TfKCNyj4Wd488/1cm8MxnzUb1buUcyNe28/jyTamf2O22Uyai54qzGzriadtbmV2QqzqEMdsbVtLM2vyLTzvr8ikw76/MrMu2sz6/IZDlH/tWovlWZzgh2da78B+h+1mBnXM3u/YxmZ2fkeYg+a9F072cGdp7P/QOsnumMnbWZ1ePrWhF02Fd2zs9T1cnQtZeYXJ9jAYM=
+   eJztmt0OgjAMhcdTGf+iUTQkvv/7eOMFwW1utKcd7pyEG2A9+wLtoBDCt05DCFel7TxEDAA+0vkcMvOsVS6Wpk+pUp5kxnho+5SqV+ZYHbn/OTPal8zlx1CSMs/z4rGIc/nsnzJr5fRj7C4xLnV+yTYKmT3vEUlMMtePR8qbGb2mpeaHiFkat6VnJmlMMtv6e3jWML86ZPYQmfVikjmtfYf53GPdJrONyKwXk8y2/h6eKGatbzLjhpi1rs+WrrPW+8jRuQfIfLYRmfViIpi13ke2xNx63Z7Xxlw9fFbUxtj3mjW1FtFLbj2fESJzXh59T4Ra74chRGYbefwHt1wLrPueLdxX1nWbzD66CZ6t1uaTt94/bl7D
   </data>
  </layer>
 </map>
