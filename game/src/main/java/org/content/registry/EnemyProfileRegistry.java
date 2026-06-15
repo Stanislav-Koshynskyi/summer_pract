@@ -25,8 +25,8 @@ public class EnemyProfileRegistry {
         registerStatic(new EnemyProfile(
                 "Colombian",                     // enemyTypeId
                 40,                              // hp
-                80.0f,                           // patrolSpeed
-                150.0f,                          // chaseSpeed
+                50.0f,                           // patrolSpeed
+                230.0f,                          // chaseSpeed
                 300.0f,                          // visionRange
                 0.4f,                            // reactionTime
                 0.2f,                            // shotCommitDuration
@@ -40,15 +40,15 @@ public class EnemyProfileRegistry {
                 16.0f,                           // width
                 16.0f,                           // height
                 20.0f,                           // closeRevealRadius
-                180.0f                           // turnRate
+                360.0f                           // turnRate
         ));
 
         // EGang: Slightly tougher, faster regular enemy
         registerStatic(new EnemyProfile(
                 "EGang",
                 80,
-                90.0f,
-                160.0f,
+                60.0f,
+                240.0f,
                 320.0f,
                 0.35f,
                 0.15f,
@@ -62,7 +62,7 @@ public class EnemyProfileRegistry {
                 16.0f,
                 16.0f,
                 20.0f,
-                200.0f
+                400.0f
         ));
 
         // 2. Bosses / Unique Enemies
@@ -70,8 +70,8 @@ public class EnemyProfileRegistry {
         registerStatic(new EnemyProfile(
                 "GangLeader",
                 250,
-                100.0f,
-                200.0f,
+                70.0f,
+                260.0f,
                 350.0f,
                 0.25f,
                 0.1f,
@@ -85,7 +85,7 @@ public class EnemyProfileRegistry {
                 16.0f,
                 16.0f,
                 25.0f,
-                240.0f
+                480.0f
         ));
 
         // SwatBoss: Highly armored (high HP), slightly slower, extreme vision and reflexes
@@ -107,7 +107,7 @@ public class EnemyProfileRegistry {
                 18.0f,
                 18.0f,
                 30.0f,
-                160.0f
+                320.0f
         ));
 
         // BearBoss: Giant tank, slower but lethal at close range
@@ -129,7 +129,7 @@ public class EnemyProfileRegistry {
                 24.0f,
                 24.0f,
                 40.0f,
-                120.0f
+                200.0f
         ));
         // Alias numeric IDs for TMX Map compatibility
         registerStatic("1", getStatic("Colombian"));
