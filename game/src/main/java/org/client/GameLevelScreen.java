@@ -1012,29 +1012,30 @@ public class GameLevelScreen implements Screen {
                 spriteBatch.end();
             }
         }
+        boolean isUa = game.getCurrentLanguage() == LanguageUI.UKRAINIAN;
         spriteBatch.begin();
         if (gameController != null) {
             String ammoText;
             float ammoX = camera.position.x - camera.viewportWidth / 4f + 30f;
             float ammoY = camera.position.y - camera.viewportHeight / 4f + 40f;
             int currentAmmo = gameController.getPlayer().getCurrentWeapon().getAmmo();
+            String ammoPrefix = isUa ? "Набої: " : "AMMO: ";
 
             if (currentAmmo == -1) {
-                ammoText = "AMMO: " + "INF";
+                ammoText = ammoPrefix + (isUa ? "Нескінченно" : "INF");
             } else {
-                ammoText = "AMMO: " + currentAmmo;
+                ammoText = ammoPrefix + currentAmmo;
             }
 
             font.draw(spriteBatch, ammoText, ammoX, ammoY);
         }
         spriteBatch.end();
-        String goalText = "no goal";
+        String goalText = isUa ? "немає цілі" : "no goal";
         GoalType goal = gameStateView.getGoalType();
-        boolean isUa = game.getCurrentLanguage() == LanguageUI.UKRAINIAN;
         switch (goal) {
-            case KILL_ALL -> goalText = "Goal: Kill All";
-            case ESCAPE -> goalText = "Goal: Escape";
-            case KILL_TARGET -> goalText = "Goal: Kill Target";
+            case KILL_ALL -> goalText = isUa ? "Ціль: Знищити всіх" : "Goal: Kill All";
+            case ESCAPE -> goalText = isUa ? "Ціль: Втекти" : "Goal: Escape";
+            case KILL_TARGET -> goalText = isUa ? "Ціль: Знищити ціль" : "Goal: Kill Target";
         }
 
         spriteBatch.begin();
