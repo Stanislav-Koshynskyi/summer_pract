@@ -68,6 +68,8 @@ public class SettingsMenu implements Screen {
 
         initFonts();
         initCategories();
+
+        ((MainGame) game).playMenuMusic();
     }
 
     // =========================================================================

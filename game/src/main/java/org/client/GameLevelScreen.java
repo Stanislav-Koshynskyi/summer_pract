@@ -102,6 +102,7 @@ public class GameLevelScreen implements Screen {
     public GameLevelScreen(MainGame game, SwitchMenu switchMenu) {
         this.game = game;
         this.switchMenu = switchMenu;
+        game.stopMenuMusic();
     }
 
     @Override

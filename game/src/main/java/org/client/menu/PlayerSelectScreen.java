@@ -88,6 +88,8 @@ public class PlayerSelectScreen implements Screen {
             cardX[i] = startX + i * (CARD_W + CARD_GAP);
         }
         cardY = (WORLD_H - CARD_H) / 2f + 20f;
+
+        ((MainGame) game).playMenuMusic();
     }
 
     private void initFonts() {

@@ -87,14 +87,14 @@ public class InteractionSystem {
         }
 
         if (nearestPickup != null) {
-            Optional<WeaponPickup> dropped = player.dropWeapon();
-            if (dropped.isPresent()) {
-                levelState.getPickups().add(dropped.get());
-            }
             if (nearestPickup.getWeapon().equals(player.getCurrentWeapon())){
                 player.getCurrentWeapon().refillAmmo(nearestPickup.getWeapon().getAmmo());
             }
             else {
+                Optional<WeaponPickup> dropped = player.dropWeapon();
+                if (dropped.isPresent()) {
+                    levelState.getPickups().add(dropped.get());
+                }
                 player.setCurrentWeapon(nearestPickup.getWeapon());
             }
             levelState.removeWeaponPickup(nearestPickup);

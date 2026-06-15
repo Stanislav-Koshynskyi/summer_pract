@@ -126,6 +126,8 @@ public class SelectLevelMenu implements Screen {
             levels[i].x = startX + i * (CARD_W + CARD_GAP);
             levels[i].y = cardY;
         }
+
+        ((MainGame) game).playMenuMusic();
     }
 
     private void generateFonts() {

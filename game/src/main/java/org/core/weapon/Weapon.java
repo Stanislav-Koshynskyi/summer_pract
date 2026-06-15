@@ -10,6 +10,7 @@ public class Weapon {
     @Getter
     private int ammo;
     private float cooldownTimer;
+    private int maxAmmo;
     // встановлюємо true якщо в ворога, щоб не тратились кулі
     private final boolean infinityAmmo;
 
@@ -19,6 +20,7 @@ public class Weapon {
         this.ammo = definition.getMaxAmmo();
         this.cooldownTimer = 0f;
         infinityAmmo = false;
+        this.maxAmmo = definition.getMaxAmmo();
     }
 
     public Weapon(WeaponDefinition definition, boolean infinityAmmo) {
@@ -65,7 +67,18 @@ public class Weapon {
     }
     public void refillAmmo(int amount) {
         if (!infinityAmmo && amount > 0) {
-            ammo = Math.min(ammo + amount, definition.getMaxAmmo());
+            ammo = Math.min(ammo + amount, maxAmmo);
         }
+    }
+    public void applyAmmoMultiplier(float multiplier) {
+        if (ammo == -1) return;
+        if (multiplier == 1.0f) return;
+
+        int newMax = Math.round(definition.getMaxAmmo() * multiplier);
+        maxAmmo = newMax;
+        if (newMax < 1) newMax = 0;
+
+        float ratio = (definition.getMaxAmmo() > 0) ? (float) ammo / definition.getMaxAmmo() : 1f;
+        ammo = Math.round(newMax * ratio);
     }
 }

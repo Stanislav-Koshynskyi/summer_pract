@@ -73,7 +73,7 @@ public class PlayerRegistry {
         registerStatic(new PlayerProfile("Ghost",
                 new Weapon(weaponRegistry.get("Knife")),
                 new Weapon(weaponRegistry.get("Knife")),
-                0, 1.5f, 1.0f, 1.0f, 0, 0.0f,
+                0, 1.5f, 0f, 1.0f, 0, 0.0f,
                 "Привид", "Ghost",
                 "Невидимий і нечутний. Старт: Ніж. Не може стріляти. Рухається безшумно.",
                 "Unseen and unheard. Start: Knife. Cannot shoot. Moves silently."

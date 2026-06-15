@@ -119,6 +119,8 @@ public class StartMenu implements Screen {
             btnX[i] = (WORLD_W - BTN_W) / 2f;
             btnY[i] = startY + (labels.length - 1 - i) * (BTN_H + BTN_GAP);
         }
+
+        ((MainGame) game).playMenuMusic();
     }
 
     @Override
@@ -267,8 +269,9 @@ public class StartMenu implements Screen {
             if (target == MenuStatus.SELECT_PLAYER_MENU) {
                 MainGame mainGame = (MainGame) game;
 
-                    // Якщо розблоковано 2 і більше — показуємо карту рівнів
-                    switchMenu.switchMenu(MenuStatus.SELECT_LEVEL_MENU);
+                // Якщо розблоковано 2 і більше — показуємо карту рівнів
+
+                switchMenu.switchMenu(MenuStatus.SELECT_LEVEL_MENU);
 
             } else {
                 // Для всіх інших кнопок (налаштування, автори тощо)
