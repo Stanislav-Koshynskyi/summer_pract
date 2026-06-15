@@ -134,10 +134,10 @@ public class WeaponRegistry {
         registerStatic(new WeaponDefinition(
                 "Uzi",
                 WeaponType.HITSCAN,
-                25,
+                15,
                 350.0f,
                 0.08f,
-                10,
+                25,
                 false,
                 true,
                 new SimpleRayCastBehavior(),
