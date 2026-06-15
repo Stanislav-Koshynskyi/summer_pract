@@ -245,7 +245,7 @@ public class MarkdownMenuScreen implements Screen {
 
         if (Gdx.input.justTouched()) {
             if (wx >= backBtnX && wx <= backBtnX + backBtnW && wy >= backBtnY && wy <= backBtnY + backBtnH) {
-                switchMenu.switchMenu(MenuStatus.START_MENU);
+                switchMenu.popScreen();
                 return;
             }
 

@@ -254,7 +254,7 @@ public class StartMenu implements Screen {
                 }
             } else {
                 // Для всіх інших кнопок (налаштування, автори тощо)
-                switchMenu.switchMenu(target);
+                switchMenu.pushScreen(target);
             }
         }
     }

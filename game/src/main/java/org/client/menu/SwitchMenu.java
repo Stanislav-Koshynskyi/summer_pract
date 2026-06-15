@@ -7,13 +7,14 @@ import org.core.enums.MenuStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.function.Supplier;
 
 public class SwitchMenu {
     private final Game game;
     // Реєстр фабрик для створення екранів
     private final Map<MenuStatus, Supplier<Screen>> screenRegistry = new HashMap<>();
-
+    private final Stack<Screen> screenStack = new Stack<>();
     public SwitchMenu(Game game) {
         this.game = game;
     }
@@ -46,5 +47,25 @@ public class SwitchMenu {
         } else {
             Gdx.app.error("SwitchMenu", "Екран для статусу " + status + " не зареєстрований!");
         }
+    }
+    public void pushScreen(MenuStatus status) {
+        Screen currentScreen = game.getScreen();
+        if (currentScreen != null) {
+            currentScreen.pause();
+            screenStack.push(currentScreen);
+        }
+        game.setScreen(screenRegistry.get(status).get());
+    }
+    public void popScreen() {
+        Screen currentScreen = game.getScreen();
+        if (!screenStack.isEmpty()) {
+            Screen previousScreen = screenStack.pop();
+            game.setScreen(previousScreen);
+            previousScreen.resume();
+        }
+        if (currentScreen != null) currentScreen.dispose();
+    }
+    public void clearStack(){
+        screenStack.clear();
     }
 }

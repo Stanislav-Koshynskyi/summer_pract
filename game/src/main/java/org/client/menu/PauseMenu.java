@@ -199,7 +199,16 @@ public class PauseMenu implements Screen {
         for (int i = 0; i < labels.length; i++) {
             if (wx >= btnX && wx <= btnX + BTN_W && wy >= btnY[i] && wy <= btnY[i] + BTN_H) {
                 if (i < TARGETS.length) {
-                    switchMenu.switchMenu(TARGETS[i]);
+                    if (i == 3) {
+                        switchMenu.switchMenu(TARGETS[i]);
+                        switchMenu.clearStack();
+                    }
+                    else if (i == 0){
+                        switchMenu.popScreen();
+                    }
+                    else {
+                        switchMenu.pushScreen(TARGETS[i]);
+                    }
                 }
                 return;
             }

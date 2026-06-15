@@ -90,6 +90,8 @@ public class GameLevelScreen implements Screen {
 
     private final SwitchMenu switchMenu;
 
+    private boolean initialized = false;
+
     public GameLevelScreen(MainGame game, SwitchMenu switchMenu) {
         this.game = game;
         this.switchMenu = switchMenu;
@@ -97,6 +99,8 @@ public class GameLevelScreen implements Screen {
 
     @Override
     public void show() {
+        if (initialized) return;
+        initialized = true;
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
@@ -167,6 +171,11 @@ public class GameLevelScreen implements Screen {
 
         if (playerCorpse != null) {
             playerCorpse.stateTime += dt;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+            switchMenu.pushScreen(MenuStatus.PAUSE_GAME_MENU);
+            return;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
@@ -965,7 +974,6 @@ public class GameLevelScreen implements Screen {
 
     @Override
     public void hide() {
-        dispose();
     }
 
     @Override

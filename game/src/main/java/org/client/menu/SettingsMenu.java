@@ -377,7 +377,7 @@ public class SettingsMenu implements Screen {
 
         // Клік по кнопці "Назад"
         if (mx > 20 && mx < 20 + backBtnW && my > 20 && my < 20 + backBtnH) {
-            switchMenu.switchMenu(MenuStatus.START_MENU);
+            switchMenu.popScreen();
             return;
         }
 
