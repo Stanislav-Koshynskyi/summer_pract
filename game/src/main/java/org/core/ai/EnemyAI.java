@@ -17,6 +17,7 @@ import org.core.math.Vec2;
 import org.core.raycast.RayCastResult;
 import org.core.raycast.RayCastSystem;
 import org.core.state.LevelState;
+import org.core.state.LevelStats;
 import org.core.weapon.Weapon;
 import org.core.weapon.WeaponFireContext;
 import org.core.weapon.WeaponSystem;
@@ -47,10 +48,12 @@ public class EnemyAI {
     private final Map<AimBehaviorType, AimBehavior> aimBehaviors;
     private final List<Door> doors;
     private final WorldGeometry worldGeometry;
+    private final LevelStats stats;
 
     public EnemyAI(VisionSystem visionSystem, List<Enemy> enemies, Player player, PathFinder pathfinder,
                    WeaponSystem weaponSystem, RayCastSystem rayCastSystem, Map<AimBehaviorType,
-                    AimBehavior> aimBehaviors, List<Door> doors, WorldGeometry worldGeometry) {
+                    AimBehavior> aimBehaviors, List<Door> doors, WorldGeometry worldGeometry,
+                   LevelStats stats) {
         this.visionSystem = visionSystem;
         this.enemies = enemies;
         this.player = player;
@@ -60,6 +63,7 @@ public class EnemyAI {
         this.aimBehaviors = aimBehaviors;
         this.doors = doors;
         this.worldGeometry = worldGeometry;
+        this.stats = stats;
     }
 
     public List<GameEvent> update(float delta, SoundEventQueue queue) {
@@ -234,6 +238,7 @@ public class EnemyAI {
                 return new ArrayList<>();
             }
         }
+        stats.recordEnemyEnteredSearchInvestigate(enemy.getEnemyId());
         enemy.setLastKnownPlayerPosition(soundEvent.getX(), soundEvent.getY());
         enemy.changeState(AIState.INVESTIGATE);
         enemy.setReactionTimer(0);
@@ -318,6 +323,7 @@ public class EnemyAI {
         enemy.changeState(AIState.ATTACK);
         enemy.resetReactionTimer();
         lastPathUpdate.remove(enemy); // негайно перебудувати шлях
+        stats.recordEnemyAlerted(enemy.getEnemyId());
     }
 
     private void enterSearch(Enemy enemy, List<GameEvent> events) {
@@ -327,6 +333,7 @@ public class EnemyAI {
         enemy.changeState(AIState.SEARCH);
         List<Vec2> path = pathfinder.findPath(enemy, player.getX(), player.getY(), List.of(player));
         if (!path.isEmpty()) enemy.setCurrentPath(path);
+        stats.recordEnemyEnteredSearchInvestigate(enemy.getEnemyId());
     }
 
     private void applyMemoryReaction(Enemy enemy) {
