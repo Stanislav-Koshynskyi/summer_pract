@@ -270,7 +270,6 @@ public class GameController {
         }
 
         // Крок 11. Оновити LevelStats і перевірити LevelGoal
-        // TODO: MVP-2 – розширити статистику (alerted enemies, silent kills тощо)
         checkLevelGoals();
         levelState.getStats().addElapsedTime(delta);
 
