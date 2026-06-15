@@ -99,6 +99,88 @@ public class AssetLoader {
                 "sprites/enemies/sprEGang/sprEGangAttackUzi/sprEGangAttackUzi_", 2, 0.05f
         );
 
+        // GangLeader
+        registerEnemy(
+                "GangLeader",
+                "Machete",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Pipe",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Knife",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Famae",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "9mm",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Shotgun",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Silencer",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Silencer",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
+        registerEnemy(
+                "GangLeader",
+                "Bat",
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 8, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderWalk/sprGangLeaderWalk_", 1, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderDie/sprGangLeaderDie_", 5, 0.1f,
+                "sprites/enemies/sprGangLeader/sprGangLeaderBang/sprGangLeaderBang_", 7, 0.05f
+        );
+
         registerPlayer(
                 "1",
                 "sprites/players/sprJacket/sprJacketWalkKalashnikov/sprJacketWalkKalashnikov_", 8, 0.1f,
