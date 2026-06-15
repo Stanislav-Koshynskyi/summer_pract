@@ -418,7 +418,7 @@ public class MarkdownMenuScreen implements Screen {
             switch (element.type) {
                 case H2:
                     font.getData().setScale(1.7f);
-                    font.setColor(Color.SKY);
+                    font.setColor(Color.valueOf("#26c256"));
                     font.draw(batch, element.text, contentLeft, currentY);
                     currentY -= 65;
                     break;

@@ -9,12 +9,31 @@ Areas of responsibility:
 - Creating game levels
 - Difficulty balance
 
-### ABC2
+### Hvozdik Roman
+## Frontend
+Worked on the following aspects:
+- Screen, player camera, animation system
+- Level parser
+- Player, enemies, map render
+- Menu/level music, weapon sounds
+- Debug menu
 
 ### Koshynskyi Stanislav
+## FullStack
+- Make Engine
+- Make Ai
+- Help Frontend
+- Help Menu
+- Help with content
+
+
     thn for playing
 
-### ABC 4 
+### Kravchuk Bohdan
+## Designer
+
+I created the game menu.
+Got sprite textures.
 
 ### ABC 5 
 

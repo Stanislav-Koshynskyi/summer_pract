@@ -267,6 +267,7 @@ public class GameController {
                         weapon.getDefinition().getSpread(),
                         levelState.getSoundEventQueue()
                 );
+                levelState.getStats().recordGunshot(player.getCurrentWeapon().getDefinition().isSuppressed());
                 List<GameEvent> weaponEvents = weaponSystem.useWeapon(context, weapon);
                 levelState.addAllGameEvent(weaponEvents);
             }

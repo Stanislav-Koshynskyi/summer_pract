@@ -5,7 +5,7 @@ WASD - player movement
 LMB - shoot  
 E - interact  
 SHIFT (hold) - run mode  
-C (утримання) - sneak mode  
+C (hold) - sneak mode  
 G - drop weapon  
 ESC - pause
 ## Menu

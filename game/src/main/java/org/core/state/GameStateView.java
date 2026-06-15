@@ -6,6 +6,7 @@ import org.core.entity.Player;
 import org.core.entity.WeaponPickup;
 import org.core.enums.DoorState;
 import org.core.enums.GamePhase;
+import org.core.enums.GoalType;
 import org.core.math.Vec2;
 
 public class GameStateView {
@@ -29,6 +30,7 @@ public class GameStateView {
         // Player.facingAngle буде додано коли А реалізує aim
         return state.getPlayer().getFacingAngle();
     }
+
     public int getEnemyCount() {
         return state.getEnemies().size();
     }
@@ -154,6 +156,7 @@ public class GameStateView {
             return e.getProfile().getEnemyTypeId();
         }
     }
+
     public static class DoorView {
         private final Door d;
 
@@ -225,16 +228,23 @@ public class GameStateView {
         public float getY() {
             return p.getY();
         }
+
         // порожню треба рендерити інакше, щоб було видно що не вийде підібрати
         public boolean isEmpty() {
             return p.isEmpty();
         }
     }
+
     public boolean isCurrentWeaponAutomatic() {
         return state.getPlayer().getCurrentWeapon().getDefinition().isAutomatic();
     }
-    public float getPlayerSpeed(){
+
+    public float getPlayerSpeed() {
         return state.getPlayer().getSpeed();
+    }
+
+    public GoalType getGoalType() {
+        return state.getGoalType();
     }
 
     public static class StatsView {

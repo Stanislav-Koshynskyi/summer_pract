@@ -2,7 +2,6 @@ package org.client;
 
 public enum MenuStatus {
     START_MENU,
-    INTRO_MENU,
     SELECT_LEVEL_MENU,
     PLAY_GAME_MENU,
     SETTINGS_MENU,

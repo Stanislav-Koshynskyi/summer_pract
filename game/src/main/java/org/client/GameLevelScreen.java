@@ -34,6 +34,7 @@ import org.core.entity.Enemy;
 import org.core.entity.WeaponPickup;
 import org.core.enums.AnimationState;
 import org.core.enums.DoorState;
+import org.core.enums.GoalType;
 import org.core.enums.MovementMode;
 import org.core.event.*;
 import org.core.math.Vec2;
@@ -165,7 +166,7 @@ public class GameLevelScreen implements Screen {
             case 3 -> backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_3.mp3"));
         }
         backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(0.02f);
+        backgroundMusic.setVolume(game.getMusicVolume());
         backgroundMusic.play();
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
@@ -208,7 +209,7 @@ public class GameLevelScreen implements Screen {
             return;
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             debugMode = !debugMode;
         }
 
@@ -235,7 +236,7 @@ public class GameLevelScreen implements Screen {
 
                         Sound currentSound = weaponSounds.get(weaponId);
                         if (currentSound != null) {
-                            currentSound.play(0.005f);
+                            currentSound.play(game.getSfxVolume());
                         }
 
                         playerAnimData.currentState = AnimationState.ATTACK;
@@ -358,7 +359,7 @@ public class GameLevelScreen implements Screen {
                         if (weaponId != null) {
                             Sound currentSound = weaponSounds.get(weaponId);
                             if (currentSound != null) {
-                                currentSound.play(0.005f);
+                                currentSound.play(game.getSfxVolume());
                             }
                         }
                     }
@@ -479,9 +480,17 @@ public class GameLevelScreen implements Screen {
             }
             if (event instanceof LevelCompletedEvent e) {
                 int currentLevelNum = game.getCurrentLevel();
-                int nextLevel = currentLevelNum < SelectLevelMenu.LEVEL_NUMBER ? currentLevelNum + 1 : currentLevelNum;
+                int nextLevel = 1;
+                int maxLevelToUnlock = 1;
+                if (currentLevelNum < SelectLevelMenu.LEVEL_NUMBER) {
+                    nextLevel = currentLevelNum + 1;
+                    maxLevelToUnlock = nextLevel;
+                } else {
+                    nextLevel = currentLevelNum;
+                    maxLevelToUnlock = currentLevelNum + 1;
+                }
                 game.setLevelResult(e.outcome, e.levelStats, nextLevel);
-                game.setMaxUnlockedLevel(nextLevel);
+                game.setMaxUnlockedLevel(maxLevelToUnlock);
                 switchMenu.switchMenu(MenuStatus.WIN_GAME_MENU);
                 return;
             }
@@ -998,7 +1007,6 @@ public class GameLevelScreen implements Screen {
                 spriteBatch.end();
             }
         }
-
         spriteBatch.begin();
         if (gameController != null) {
             String ammoText;
@@ -1014,6 +1022,20 @@ public class GameLevelScreen implements Screen {
 
             font.draw(spriteBatch, ammoText, ammoX, ammoY);
         }
+        spriteBatch.end();
+        String goalText = "no goal";
+        GoalType goal = gameStateView.getGoalType();
+        boolean isUa = game.getCurrentLanguage() == LanguageUI.UKRAINIAN;
+        switch (goal) {
+            case KILL_ALL -> goalText = "Goal: Kill All";
+            case ESCAPE -> goalText = "Goal: Escape";
+            case KILL_TARGET -> goalText = "Goal: Kill Target";
+        }
+
+        spriteBatch.begin();
+        float leftEdge = camera.position.x - camera.viewportWidth / 4f + 30f;
+        float topEdge = camera.position.y - camera.viewportHeight / 4f + 25f;
+        font.draw(spriteBatch, goalText, leftEdge, topEdge);
         spriteBatch.end();
     }
 
@@ -1144,5 +1166,11 @@ public class GameLevelScreen implements Screen {
         gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem, playerRegistry);
         gameController.loadLevel(levelData, game.getCurrentPlayerId());
         this.gameStateView = gameController.getStateView();
+    }
+
+    public void resumeLevelMusic() {
+        if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
+            backgroundMusic.play();
+        }
     }
 }

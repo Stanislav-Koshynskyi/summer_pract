@@ -12,7 +12,7 @@ public class Weapon {
     private float cooldownTimer;
     private int maxAmmo;
     // встановлюємо true якщо в ворога, щоб не тратились кулі
-    private final boolean infinityAmmo;
+    private boolean infinityAmmo;
 
 
     public Weapon(WeaponDefinition definition) {
@@ -24,7 +24,7 @@ public class Weapon {
     }
 
     public Weapon(WeaponDefinition definition, boolean infinityAmmo) {
-        this.definition = definition;
+        this(definition);
         this.infinityAmmo = infinityAmmo;
     }
 

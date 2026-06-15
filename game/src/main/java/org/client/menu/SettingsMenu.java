@@ -68,8 +68,6 @@ public class SettingsMenu implements Screen {
 
         initFonts();
         initCategories();
-
-        ((MainGame) game).playMenuMusic();
     }
 
     // =========================================================================
@@ -151,11 +149,13 @@ public class SettingsMenu implements Screen {
         private float value;
         private boolean isDragging = false;
         private final float sliderW = 350, sliderH = 15;
+        private final SliderType type;
 
-        public SliderItem(String tUa, String tEn, String dUa, String dEn, float defVal) {
+        public SliderItem(String tUa, String tEn, String dUa, String dEn, float defVal, SliderType type) {
             this.titleUa = tUa; this.titleEn = tEn;
             this.descUa = dUa; this.descEn = dEn;
             this.value = defVal;
+            this.type = type;
         }
 
         @Override public float getHeight() { return 170; }
@@ -174,6 +174,13 @@ public class SettingsMenu implements Screen {
                 value = (mx - startX) / sliderW;
                 if (value < 0) value = 0;
                 if (value > 1) value = 1;
+
+                if (type == SliderType.MUSIC) {
+                    mainGame.setMusicVolume(value * 0.1f);
+                    mainGame.updateMusicVolume();
+                } else if (type == SliderType.SFX) {
+                    mainGame.setSfxVolume(value * 0.01f);
+                }
             } else if (!it) {
                 isDragging = false;
             }
@@ -285,13 +292,13 @@ public class SettingsMenu implements Screen {
         // Сторінка "Музика"
         StandardPage musicPage = new StandardPage("Музика", "Music");
         musicPage.addItem(new SliderItem("Рівень гучності музики", "Music Volume Level",
-                "Фонова музика в меню та під час гри.", "Background music in menus and gameplay.", 0.7f));
+                "Фонова музика в меню та під час гри.", "Background music in menus and gameplay.", mainGame.getMusicVolume() * 10, SliderType.MUSIC));
         soundCategory.addPage(musicPage);
 
         // Сторінка "Звукові ефекти"
         StandardPage sfxPage = new StandardPage("Звукові ефекти", "Sound Effects");
         sfxPage.addItem(new SliderItem("Гучність ефектів", "Effects Volume",
-                "Звуки кроків, кліків та взаємодій.", "Sounds of footsteps, clicks, and interactions.", 0.8f));
+                "Звуки кроків, кліків та взаємодій.", "Sounds of footsteps, clicks, and interactions.", mainGame.getSfxVolume() * 100, SliderType.SFX));
         soundCategory.addPage(sfxPage);
 
         categories.add(soundCategory);
@@ -514,5 +521,10 @@ public class SettingsMenu implements Screen {
         if (fontLarge != null) fontLarge.dispose();
         if (fontMedium != null) fontMedium.dispose();
         if (fontSmall != null) fontSmall.dispose();
+    }
+
+    private enum SliderType {
+        MUSIC,
+        SFX
     }
 }

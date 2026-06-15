@@ -251,6 +251,14 @@ public class AssetLoader {
                 "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
                 "sprites/players/sprJacket/sprJacketAttackSilencer/sprJacketAttackSilencer_", 2, 0.05f
         );
+
+        registerPlayer(
+                "Machete",
+                "sprites/players/sprJacket/sprJacketWalkKnife/sprJacketWalkKnife_", 8, 0.1f,
+                "sprites/players/sprJacket/sprJacketWalkKnife/sprJacketWalkKnife_", 1, 0.1f,
+                "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
+                "sprites/players/sprJacket/sprJacketAttackKnife/sprJacketAttackKnife_", 9, 0.05f
+        );
     }
 
     private void registerEnemy(String typeName, String weaponId,
