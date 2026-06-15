@@ -165,7 +165,7 @@ public class GameLevelScreen implements Screen {
             case 3 -> backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_3.mp3"));
         }
         backgroundMusic.setLooping(true);
-        backgroundMusic.setVolume(0.02f);
+        backgroundMusic.setVolume(game.getMusicVolume());
         backgroundMusic.play();
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
@@ -235,7 +235,7 @@ public class GameLevelScreen implements Screen {
 
                         Sound currentSound = weaponSounds.get(weaponId);
                         if (currentSound != null) {
-                            currentSound.play(0.005f);
+                            currentSound.play(game.getSfxVolume());
                         }
 
                         playerAnimData.currentState = AnimationState.ATTACK;
@@ -358,7 +358,7 @@ public class GameLevelScreen implements Screen {
                         if (weaponId != null) {
                             Sound currentSound = weaponSounds.get(weaponId);
                             if (currentSound != null) {
-                                currentSound.play(0.005f);
+                                currentSound.play(game.getSfxVolume());
                             }
                         }
                     }
@@ -1145,5 +1145,11 @@ public class GameLevelScreen implements Screen {
         gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem, playerRegistry);
         gameController.loadLevel(levelData, game.getCurrentPlayerId());
         this.gameStateView = gameController.getStateView();
+    }
+
+    public void resumeLevelMusic() {
+        if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
+            backgroundMusic.play();
+        }
     }
 }

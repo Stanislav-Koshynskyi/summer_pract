@@ -38,6 +38,12 @@ public class MainGame extends Game {
     @Getter
     @Setter
     private String currentPlayerId = PlayerRegistry.DEFAULT_PLAYER_ID;
+    @Getter
+    @Setter
+    private float musicVolume = 0.02f;
+    @Getter
+    @Setter
+    private float sfxVolume = 0.005f;
 
     private SaveManager saveManager;
     public void setLevelResult(LevelOutcome o, LevelStats s, int next) {
@@ -87,7 +93,7 @@ public class MainGame extends Game {
         // Музика
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/menu.mp3"));
         menuMusic.setLooping(true);
-        menuMusic.setVolume(0.01f);
+        menuMusic.setVolume(musicVolume);
 
         // Початковий запуск стартового меню
         switchMenu.switchMenu(MenuStatus.START_MENU);
@@ -116,6 +122,12 @@ public class MainGame extends Game {
     public void stopMenuMusic() {
         if (menuMusic != null && menuMusic.isPlaying()) {
             menuMusic.stop();
+        }
+    }
+
+    public void updateMusicVolume() {
+        if (menuMusic != null) {
+            menuMusic.setVolume(musicVolume);
         }
     }
 }
