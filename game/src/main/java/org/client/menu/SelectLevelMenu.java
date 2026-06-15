@@ -112,9 +112,9 @@ public class SelectLevelMenu implements Screen {
 
         // Динамічна ініціалізація рівнів на основі maxUnlocked
         levels = new LevelData[] {
-                new LevelData("01", maxUnlocked > 1 ? LevelState.DONE : LevelState.ACTIVE, "Вхід / 1F", "Entrance / 1F", 2),
-                new LevelData("02", maxUnlocked >= 2 ? (maxUnlocked > 2 ? LevelState.DONE : LevelState.ACTIVE) : LevelState.LOCKED, "Коридори / 2F", "Halls / 2F", 0),
-                new LevelData("03", maxUnlocked >= 3 ? LevelState.ACTIVE : LevelState.LOCKED, "Вечірка / 3F", "Party / 3F", 0)
+                new LevelData("01", maxUnlocked > 1 ? LevelState.DONE : LevelState.ACTIVE, "", "", 2),
+                new LevelData("02", maxUnlocked >= 2 ? (maxUnlocked > 2 ? LevelState.DONE : LevelState.ACTIVE) : LevelState.LOCKED, "", "", 0),
+                new LevelData("03", maxUnlocked >= 3 ? LevelState.ACTIVE : LevelState.LOCKED, "", "", 0)
         };
 
         // Розрахунок позицій карток (центрування ряду)
