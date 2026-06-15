@@ -65,10 +65,10 @@
    </properties>
    <point/>
   </object>
-  <object id="16" name="UpperDoorGuard" type="EnemySpawn" x="720" y="48">
+  <object id="16" name="UpperDoorGuard" type="EnemySpawn" x="720" y="96">
    <properties>
     <property name="enemyType" type="int" value="1"/>
-    <property name="facingAngle" type="float" value="135"/>
+    <property name="facingAngle" type="float" value="160"/>
     <property name="patrolPath" type="int" value="0"/>
     <property name="weaponId" type="int" value="1"/>
    </properties>
