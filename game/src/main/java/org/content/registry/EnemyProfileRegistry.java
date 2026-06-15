@@ -69,9 +69,9 @@ public class EnemyProfileRegistry {
         // GangLeader: Very fast, fast reaction time, high danger
         registerStatic(new EnemyProfile(
                 "GangLeader",
-                200,
+                250,
                 100.0f,
-                180.0f,
+                200.0f,
                 350.0f,
                 0.25f,
                 0.1f,
