@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import lombok.Getter;
 import lombok.Setter;
 import org.client.menu.*;
+import org.core.enums.LevelOutcome;
 import org.core.enums.MenuStatus;
 import org.core.enums.LanguageUI;
+import org.core.state.LevelStats;
 
 public class MainGame extends Game {
     public SpriteBatch batch;
@@ -21,7 +23,18 @@ public class MainGame extends Game {
     @Getter
     @Setter
     private int currentLevel = 1;
+    @Getter
+    private LevelOutcome lastOutcome;
+    @Getter
+    private LevelStats lastStats;
+    @Getter
+    private int nextLevelId;
 
+    public void setLevelResult(LevelOutcome o, LevelStats s, int next) {
+        lastOutcome = o;
+        lastStats = s;
+        nextLevelId = next;
+    }
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -48,7 +61,8 @@ public class MainGame extends Game {
 
         switchMenu.registerScreen(MenuStatus.RULES_MENU,
                 () -> new MarkdownMenuScreen(this, switchMenu, "markdownForMenu/rules", getCurrentLanguage()));
-
+        switchMenu.registerScreen(MenuStatus.WIN_GAME_MENU,
+                () -> new LevelCompletedMenu(this, switchMenu, lastOutcome, lastStats, nextLevelId));
         // Початковий запуск стартового меню
         switchMenu.switchMenu(MenuStatus.START_MENU);
     }

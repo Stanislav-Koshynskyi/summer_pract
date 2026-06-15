@@ -322,8 +322,10 @@ public class EnemyAI {
         events.add(new EnemyAlertedEvent(enemy.getEnemyId(), enemy.getX(), enemy.getY(), AIState.ATTACK));
         enemy.changeState(AIState.ATTACK);
         enemy.resetReactionTimer();
+        enemy.resetAimMemoryTimer();
         lastPathUpdate.remove(enemy); // негайно перебудувати шлях
         stats.recordEnemyAlerted(enemy.getEnemyId());
+        stats.recordEnemyEnteredAttack(enemy.getEnemyId());
     }
 
     private void enterSearch(Enemy enemy, List<GameEvent> events) {

@@ -87,4 +87,34 @@ public class LevelStats {
         silentKillCount = 0;
         elapsedTime = 0f;
     }
+    public int calculateScore() {
+        int score = 0;
+
+        score += killCount * 100;
+        score += silentKillCount * 200;
+
+        int parTime = 300;
+        int seconds = (int) elapsedTime;
+        if (seconds < parTime) {
+            score += (parTime - seconds) * 10;
+        }
+
+        if (getUniqueEnemiesAlerted() == 0) {
+            score += 500;
+        }
+
+        int aggressiveKills = getUniqueEnemiesEnteredAttack();
+        if (aggressiveKills >= 3) {
+            score += aggressiveKills * 150;
+        }
+
+        if (gunshotFired) {
+            score -= 50;
+            if (!suppressedShotFired) {
+                score -= 100;
+            }
+        }
+
+        return Math.max(0, score);
+    }
 }

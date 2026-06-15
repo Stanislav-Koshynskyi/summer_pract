@@ -72,6 +72,8 @@ public class SelectLevelMenu implements Screen {
     private final SwitchMenu switchMenu;
     private final LevelData[] levels;
 
+    public static final int LEVEL_NUMBER = 3;
+
 
     // Клас для збереження даних кожного рівня
     private static class LevelData {

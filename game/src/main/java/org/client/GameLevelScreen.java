@@ -19,18 +19,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import lombok.Setter;
+import org.client.menu.SelectLevelMenu;
 import org.client.menu.SwitchMenu;
 import org.content.registry.ContentRegistries;
 import org.content.registry.EnemyProfileRegistry;
 import org.content.registry.WeaponRegistry;
 import org.core.controller.GameController;
 import org.core.data.LevelData;
-import org.core.definition.EnemyProfile;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.WeaponPickup;
-import org.core.enums.AimBehaviorType;
 import org.core.enums.DoorState;
+import org.core.enums.MenuStatus;
 import org.core.enums.MovementMode;
 import org.core.event.*;
 import org.core.math.Vec2;
@@ -187,7 +187,7 @@ public class GameLevelScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             gameController.interact();
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.G)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
             gameController.drop();
         }
 
@@ -402,6 +402,17 @@ public class GameLevelScreen implements Screen {
                     }
                 }
             }
+            if (event instanceof LevelCompletedEvent e) {
+                int currentLevelNum = game.getCurrentLevel();
+                int nextLevel = currentLevelNum < SelectLevelMenu.LEVEL_NUMBER ? currentLevelNum + 1 : currentLevelNum;
+                game.setLevelResult(e.outcome, e.levelStats, nextLevel);
+                game.setMaxUnlockedLevel(nextLevel);
+                switchMenu.switchMenu(MenuStatus.WIN_GAME_MENU);
+                return;
+            }
+            if (event instanceof PlayerDiedEvent) {
+                switchMenu.switchMenu(MenuStatus.DEFEAT_GAME_MENU);
+            }
         }
 
         for (Enemy enemy : gameController.getEnemies()) {
@@ -485,6 +496,7 @@ public class GameLevelScreen implements Screen {
     }
 
     private void draw() {
+        if (renderer == null || gameStateView == null) return;
         ScreenUtils.clear(Color.BLUE);
 
         if (gameStateView != null) {
@@ -612,19 +624,19 @@ public class GameLevelScreen implements Screen {
             for (WeaponPickup pickup : gameController.getPickups()) {
                 if (!pickup.canPick()) continue;
 
-                if (pickup.getWeaponId().equals("Famae")){
+                if (pickup.getWeaponId().equals("Famae")) {
                     weaponPickupTexture = famaeTexture;
                 }
-                if (pickup.getWeaponId().equals("Uzi")){
+                if (pickup.getWeaponId().equals("Uzi")) {
                     weaponPickupTexture = uziTexture;
                 }
-                if (pickup.getWeaponId().equals("Shotgun")){
+                if (pickup.getWeaponId().equals("Shotgun")) {
                     weaponPickupTexture = shotgunTexture;
                 }
-                if (pickup.getWeaponId().equals("9mm")){
+                if (pickup.getWeaponId().equals("9mm")) {
                     weaponPickupTexture = ninemmTexture;
                 }
-                if (pickup.getWeaponId().equals("Knife")){
+                if (pickup.getWeaponId().equals("Knife")) {
                     weaponPickupTexture = knifeTexture;
                 }
 
@@ -642,7 +654,7 @@ public class GameLevelScreen implements Screen {
             }
             spriteBatch.end();
 
-            if(gameStateView != null && playerCorpse == null) {
+            if (gameStateView != null && playerCorpse == null) {
                 // Гравець
                 String playerWeaponId = gameController.getPlayer().getCurrentWeapon().getDefinition().getId();
                 EnemyAnimationSet playerAnimSet = assetLoader.getPlayerAnimationSet(playerWeaponId);
@@ -815,10 +827,8 @@ public class GameLevelScreen implements Screen {
 
             Texture statusTexture;
             switch (enemy.getCurrentState()) {
-                case ATTACK ->
-                        statusTexture = alertTexture;
-                case SEARCH ->
-                        statusTexture = searchTexture;
+                case ATTACK -> statusTexture = alertTexture;
+                case SEARCH -> statusTexture = searchTexture;
                 default -> statusTexture = null;
             }
 
@@ -940,31 +950,99 @@ public class GameLevelScreen implements Screen {
         camera.update();
     }
 
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() { dispose(); }
+    @Override
+    public void pause() {
+    }
 
     @Override
-    public void dispose () {
-        map.dispose();
-        renderer.dispose();
-        shapeRenderer.dispose();
-        spriteBatch.dispose();
-        if (font != null) font.dispose();
-        doorHorizontalTexture.dispose();
-        doorVerticalTexture.dispose();
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
+        dispose();
+    }
+
+    @Override
+    public void dispose() {
+        if (renderer != null) {
+            renderer.dispose();
+            renderer = null;
+        }
+        if (map != null) {
+            map.dispose();
+            map = null;
+        }
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+            shapeRenderer = null;
+        }
+        if (spriteBatch != null) {
+            spriteBatch.dispose();
+            spriteBatch = null;
+        }
+        if (font != null) {
+            font.dispose();
+            font = null;
+        }
+        if (doorHorizontalTexture != null) {
+            doorHorizontalTexture.dispose();
+            doorHorizontalTexture = null;
+        }
+        if (doorVerticalTexture != null) {
+            doorVerticalTexture.dispose();
+            doorVerticalTexture = null;
+        }
+        if (alertTexture != null) {
+            alertTexture.dispose();
+            alertTexture = null;
+        }
+        if (searchTexture != null) {
+            searchTexture.dispose();
+            searchTexture = null;
+        }
+        if (bulletTexture != null) {
+            bulletTexture.dispose();
+            bulletTexture = null;
+        }
+        if (famaeTexture != null) {
+            famaeTexture.dispose();
+            famaeTexture = null;
+        }
+        if (uziTexture != null) {
+            uziTexture.dispose();
+            uziTexture = null;
+        }
+        if (knifeTexture != null) {
+            knifeTexture.dispose();
+            knifeTexture = null;
+        }
+        if (shotgunTexture != null) {
+            shotgunTexture.dispose();
+            shotgunTexture = null;
+        }
+        if (ninemmTexture != null) {
+            ninemmTexture.dispose();
+            ninemmTexture = null;
+        }
+        if (assetLoader != null) {
+            assetLoader.dispose();
+            assetLoader = null;
+        }
+        if (weaponPickupTexture != null) {
+            weaponPickupTexture.dispose();
+            weaponPickupTexture = null;
+        }
+
         attackEffects.clear();
         alertEffects.clear();
-        alertTexture.dispose();
+        bulletEffects.clear();
         deadBodies.clear();
-        famaeTexture.dispose();
-        uziTexture.dispose();
-        knifeTexture.dispose();
-        shotgunTexture.dispose();
-        ninemmTexture.dispose();
-        if (bulletTexture != null) bulletTexture.dispose();
-        if (assetLoader != null) assetLoader.dispose();
-        if (weaponPickupTexture != null) weaponPickupTexture.dispose();
+        enemyAnimMap.clear();
+        doorAnimMap.clear();
+        playerCorpse = null;
+        gameStateView = null;
+        gameController = null;
     }
 
     private void restart() {

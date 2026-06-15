@@ -348,7 +348,7 @@ public class GameController {
 
         if (completed) {
             levelState.setPhase(GamePhase.LEVEL_COMPLETED);
-            levelState.addGameEvent(new LevelCompletedEvent(outcome));
+            levelState.addGameEvent(new LevelCompletedEvent(outcome, levelState.getStats()));
         }
 
     }
