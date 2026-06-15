@@ -192,7 +192,7 @@ public class IntroMenu implements Screen {
             videoPlayer.stop();
         }
         // Переходимо на ігровий рівень (назва статусу з твого MainGame.java)
-        switchMenu.switchMenu(MenuStatus.PLAY_GAME_MENU);
+        switchMenu.switchMenu(MenuStatus.SELECT_PLAYER_MENU);
     }
 
     private boolean isMouseOver() {

@@ -264,7 +264,7 @@ public class StartMenu implements Screen {
             MenuStatus target = BUTTON_TARGETS[index];
 
             // Якщо гравець натиснув "Грати"
-            if (target == MenuStatus.SELECT_LEVEL_MENU) {
+            if (target == MenuStatus.SELECT_PLAYER_MENU) {
                 MainGame mainGame = (MainGame) game;
 
                 // Якщо розблоковано лише 1 рівень — відправляємо в інтро
