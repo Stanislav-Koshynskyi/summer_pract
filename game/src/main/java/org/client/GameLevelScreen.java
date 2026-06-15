@@ -209,7 +209,7 @@ public class GameLevelScreen implements Screen {
             return;
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             debugMode = !debugMode;
         }
 
