@@ -1,4 +1,4 @@
-package org.client;
+package org.core.enums;
 
 public enum AnimationState {
     IDLE,

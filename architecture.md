@@ -45,7 +45,7 @@
 - Фреймворк: LibGDX desktop
 - Редактор рівнів: Tiled Map Editor
 - Формат рівнів: .tmx
-- Збереження: JSON
+- Збереження: Preferences
 - Фізика: власна AABB-логіка, без Box2D
 - Pathfinding: grid-based A* у core
 

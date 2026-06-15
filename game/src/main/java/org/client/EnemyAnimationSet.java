@@ -2,6 +2,7 @@ package org.client;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import org.core.enums.AnimationState;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -3,6 +3,7 @@ package org.client;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,6 +30,7 @@ import org.core.data.LevelData;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.WeaponPickup;
+import org.core.enums.AnimationState;
 import org.core.enums.DoorState;
 import org.core.enums.MenuStatus;
 import org.core.enums.MovementMode;
@@ -37,10 +39,7 @@ import org.core.math.Vec2;
 import org.core.state.GameStateView;
 import org.core.weapon.WeaponSystem;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameLevelScreen implements Screen {
     private final MainGame game;
@@ -80,7 +79,9 @@ public class GameLevelScreen implements Screen {
     private final Map<String, EnemyAnimData> enemyAnimMap = new java.util.HashMap<>();
     private final EnemyAnimData playerAnimData = new EnemyAnimData();
     private final java.util.Map<Door, Float> doorAnimMap = new java.util.HashMap<>();
+    private final Map<String, Sound> weaponSounds = new HashMap<>();
     private boolean isShooting = false;
+    private float shootCooldownTimer = 0f;
 
     private float stateTime;
     private boolean isPlayerMoving = false;
@@ -147,6 +148,11 @@ public class GameLevelScreen implements Screen {
         ninemmTexture = new Texture(Gdx.files.internal("textures/weapons/9mm/9mm_1.png"));
         knifeTexture = new Texture(Gdx.files.internal("textures/weapons/knife/knife_2.png"));
         silencerTexture = new Texture(Gdx.files.internal("textures/weapons/allWeapons/silenced_9mm_1.png"));
+        weaponSounds.put("Silencer", Gdx.audio.newSound(Gdx.files.internal("sounds/silenced.wav")));
+        weaponSounds.put("9mm", Gdx.audio.newSound(Gdx.files.internal("sounds/9mm-pistol-shot-6349.ogg")));
+        weaponSounds.put("Shotgun", Gdx.audio.newSound(Gdx.files.internal("sounds/shotgun-39753.ogg")));
+        weaponSounds.put("Uzi", Gdx.audio.newSound(Gdx.files.internal("sounds/9mm-pistol-shot-6349.ogg")));
+        weaponSounds.put("Famae", Gdx.audio.newSound(Gdx.files.internal("sounds/famae.wav")));
         //playerSprite.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         assetLoader = new AssetLoader();
@@ -192,17 +198,39 @@ public class GameLevelScreen implements Screen {
             debugMode = !debugMode;
         }
 
+        if (shootCooldownTimer > 0f) {
+            shootCooldownTimer -= Gdx.graphics.getDeltaTime();
+        }
+
         if (gameStateView.isCurrentWeaponAutomatic()) {
             isShooting = Gdx.input.isButtonPressed(Input.Buttons.LEFT);
         } else {
             isShooting = Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
         }
 
-        if (isShooting) {
-            gameController.shoot();
+        if (isShooting && playerCorpse == null) {
+            var player = gameController.getPlayer();
+            if (player != null && player.getCurrentWeapon() != null) {
+                var currentWeapon = player.getCurrentWeapon();
+                String weaponId = currentWeapon.getDefinition().getId();
+                int ammo = currentWeapon.getAmmo();
 
-            playerAnimData.currentState = AnimationState.ATTACK;
-            playerAnimData.stateTime = 0f;
+                if (ammo > 0 || ammo == -1) {
+                    if (shootCooldownTimer <= 0f) {
+                        gameController.shoot();
+
+                        Sound currentSound = weaponSounds.get(weaponId);
+                        if (currentSound != null) {
+                            currentSound.play(0.005f);
+                        }
+
+                        playerAnimData.currentState = AnimationState.ATTACK;
+                        playerAnimData.stateTime = 0f;
+
+                        shootCooldownTimer = currentWeapon.getDefinition().getCooldown();
+                    }
+                }
+            }
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -308,6 +336,17 @@ public class GameLevelScreen implements Screen {
                         EnemyAnimData data = enemyAnimMap.computeIfAbsent(shooter.getEnemyId(), k -> new EnemyAnimData());
                         data.currentState = AnimationState.ATTACK;
                         data.stateTime = 0f;
+
+                        String weaponId = shooter.getCurrentWeapon() != null
+                                ? shooter.getCurrentWeapon().getDefinition().getId()
+                                : null;
+
+                        if (weaponId != null) {
+                            Sound currentSound = weaponSounds.get(weaponId);
+                            if (currentSound != null) {
+                                currentSound.play(0.005f);
+                            }
+                        }
                     }
                 }
 
@@ -752,7 +791,7 @@ public class GameLevelScreen implements Screen {
                     width = 46f;
                     height = 46f;
                     originX = 18f;
-                    originY = 16f;
+                    originY = 30f;
                 }
 
                 float drawX = enemy.getX() - originX;
@@ -1058,7 +1097,7 @@ public class GameLevelScreen implements Screen {
             weaponPickupTexture.dispose();
             weaponPickupTexture = null;
         }
-
+        weaponSounds.clear();
         attackEffects.clear();
         alertEffects.clear();
         bulletEffects.clear();
