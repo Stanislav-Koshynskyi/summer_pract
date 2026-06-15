@@ -755,6 +755,20 @@ public class GameLevelScreen implements Screen {
                 float pH = 32f;
                 float originX = 15f;
                 float originY = pH / 2;
+
+                if (playerWeaponId.equals("Knife")) {
+                    pW = 32f;
+                    pH = 44f;
+                    originX = 10f;
+                    originY = 32f;
+                }
+
+                if (playerWeaponId.equals("Bat")) {
+                    pW = 48f;
+                    pH = 48f;
+                    originX = 19f;
+                    originY = 38f;
+                }
                 float drawX = playerPos.x - originX;
                 float drawY = playerPos.y - originY;
                 float angle = gameStateView.getPlayerFacingAngle();
