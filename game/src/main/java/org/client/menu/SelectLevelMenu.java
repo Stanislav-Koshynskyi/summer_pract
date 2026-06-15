@@ -14,8 +14,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.client.MainGame;
 import org.core.enums.LevelState;
-import org.core.enums.MenuStatus;
-import org.core.enums.LanguageUI;
+import org.client.MenuStatus;
+import org.client.LanguageUI;
 
 /**
  * Маленька підказка на майбутнє:

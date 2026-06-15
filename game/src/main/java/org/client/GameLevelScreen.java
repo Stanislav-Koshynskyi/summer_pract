@@ -25,6 +25,7 @@ import org.client.menu.SelectLevelMenu;
 import org.client.menu.SwitchMenu;
 import org.content.registry.ContentRegistries;
 import org.content.registry.EnemyProfileRegistry;
+import org.content.registry.PlayerRegistry;
 import org.content.registry.WeaponRegistry;
 import org.core.controller.GameController;
 import org.core.data.LevelData;
@@ -33,7 +34,6 @@ import org.core.entity.Enemy;
 import org.core.entity.WeaponPickup;
 import org.core.enums.AnimationState;
 import org.core.enums.DoorState;
-import org.core.enums.MenuStatus;
 import org.core.enums.MovementMode;
 import org.core.event.*;
 import org.core.math.Vec2;
@@ -68,6 +68,7 @@ public class GameLevelScreen implements Screen {
     private GameController gameController;
     private WeaponSystem weaponSystem;
     private WeaponRegistry weaponRegistry;
+    private PlayerRegistry playerRegistry;
     private EnemyProfileRegistry enemyProfileRegistry;
     private DeadBody playerCorpse;
     private AssetLoader assetLoader;
@@ -125,12 +126,13 @@ public class GameLevelScreen implements Screen {
         weaponSystem = new WeaponSystem();
         ContentRegistries.initAll();
         weaponRegistry = new WeaponRegistry();
+        playerRegistry = new PlayerRegistry();
         enemyProfileRegistry = new EnemyProfileRegistry();
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
 
-        gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
-        gameController.loadLevel(levelData);
+        gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem, playerRegistry);
+        gameController.loadLevel(levelData, game.getCurrentPlayerId());
 
         this.gameStateView = gameController.getStateView();
 
@@ -1139,8 +1141,8 @@ public class GameLevelScreen implements Screen {
 
         LevelTmxLoader levelLoader = new LevelTmxLoader();
         LevelData levelData = levelLoader.parseMapObjects(map);
-        gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem);
-        gameController.loadLevel(levelData);
+        gameController = new GameController(weaponRegistry, enemyProfileRegistry, new java.util.HashMap<>(), weaponSystem, playerRegistry);
+        gameController.loadLevel(levelData, game.getCurrentPlayerId());
         this.gameStateView = gameController.getStateView();
     }
 }

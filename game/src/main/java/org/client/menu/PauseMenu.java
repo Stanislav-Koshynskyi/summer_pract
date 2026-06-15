@@ -13,10 +13,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.sun.tools.javac.Main;
 import org.client.MainGame;
-import org.core.enums.LanguageUI;
-import org.core.enums.MenuStatus;
+import org.client.LanguageUI;
+import org.client.MenuStatus;
 
 public class PauseMenu implements Screen {
 

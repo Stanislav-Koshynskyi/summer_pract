@@ -13,9 +13,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.client.MainGame;
-import org.core.enums.LanguageUI;
+import org.client.LanguageUI;
 import org.core.enums.LevelOutcome;
-import org.core.enums.MenuStatus;
+import org.client.MenuStatus;
 import org.core.state.LevelStats;
 
 public class LevelCompletedMenu implements Screen {

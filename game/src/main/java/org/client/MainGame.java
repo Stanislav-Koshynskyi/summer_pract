@@ -2,14 +2,16 @@ package org.client;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.sun.tools.javac.Main;
 import lombok.Getter;
 import lombok.Setter;
 import org.client.menu.*;
+import org.content.registry.PlayerRegistry;
+import org.core.definition.PlayerProfile;
 import org.core.enums.LevelOutcome;
-import org.core.enums.MenuStatus;
-import org.core.enums.LanguageUI;
 import org.core.state.LevelStats;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainGame extends Game {
     public SpriteBatch batch;
@@ -30,6 +32,9 @@ public class MainGame extends Game {
     private LevelStats lastStats;
     @Getter
     private int nextLevelId;
+    @Getter
+    @Setter
+    private String currentPlayerId = PlayerRegistry.DEFAULT_PLAYER_ID;
 
     private SaveManager saveManager;
     public void setLevelResult(LevelOutcome o, LevelStats s, int next) {
@@ -43,6 +48,11 @@ public class MainGame extends Game {
         int maxLevel = saveManager.getMaxUnlockedLevel();
         maxUnlockedLevel = maxLevel;
         batch = new SpriteBatch();
+
+        PlayerRegistry playerRegistry = new PlayerRegistry();
+        playerRegistry.init();
+
+        List<PlayerProfile> allProfiles = new ArrayList<>(playerRegistry.getAll().values());
 
         // Ініціалізуємо менеджер перемикання екранів
         switchMenu = new SwitchMenu(this);
@@ -70,6 +80,8 @@ public class MainGame extends Game {
                 () -> new LevelCompletedMenu(this, switchMenu, lastOutcome, lastStats, nextLevelId));
         switchMenu.registerScreen(MenuStatus.DEFEAT_GAME_MENU,
                 () -> new DefeatMenu(this, switchMenu));
+        switchMenu.registerScreen(MenuStatus.SELECT_PLAYER_MENU,
+                () -> new PlayerSelectScreen(this, switchMenu, allProfiles));
         // Початковий запуск стартового меню
         switchMenu.switchMenu(MenuStatus.START_MENU);
     }

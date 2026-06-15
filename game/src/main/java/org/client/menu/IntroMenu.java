@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
 import org.client.MainGame;
-import org.core.enums.LanguageUI;
-import org.core.enums.MenuStatus;
+import org.client.LanguageUI;
+import org.client.MenuStatus;
 
 import java.io.FileNotFoundException;
 

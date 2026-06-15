@@ -13,8 +13,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.client.MainGame;
-import org.core.enums.LanguageUI;
-import org.core.enums.MenuStatus;
+import org.client.LanguageUI;
+import org.client.MenuStatus;
 
 public class StartMenu implements Screen {
 
@@ -58,7 +58,7 @@ public class StartMenu implements Screen {
     private final float[] btnY;
 
     private static final MenuStatus[] BUTTON_TARGETS = {
-            MenuStatus.SELECT_LEVEL_MENU,
+            MenuStatus.SELECT_PLAYER_MENU,
             MenuStatus.ABOUT_AUTHORS_MENU,
             MenuStatus.SETTINGS_MENU,
             MenuStatus.RULES_MENU

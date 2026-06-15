@@ -3,7 +3,7 @@ package org.client.menu;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
-import org.core.enums.MenuStatus;
+import org.client.MenuStatus;
 
 import java.util.HashMap;
 import java.util.Map;

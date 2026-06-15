@@ -3,6 +3,7 @@ package org.core.controller;
 import lombok.Getter;
 import org.content.aim_behavior.StandardAim;
 import org.content.registry.EnemyProfileRegistry;
+import org.content.registry.PlayerRegistry;
 import org.content.registry.WeaponRegistry;
 import org.content.weapon_behavior.SimpleRayCastBehavior;
 import org.core.ai.EnemyAI;
@@ -59,21 +60,24 @@ public class GameController {
     private final WeaponRegistry weaponRegistry;
     private final EnemyProfileRegistry enemyProfileRegistry;
     private final Map<AimBehaviorType, ?> aimBehaviors;
+    private final PlayerRegistry playerRegistry;
 
     private final static float FALL_BODY_SOUND = 250;
 
     public GameController(WeaponRegistry weaponRegistry,
                           EnemyProfileRegistry enemyProfileRegistry,
-                          Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem) {
+                          Map<AimBehaviorType, ?> aimBehaviors, WeaponSystem weaponSystem,
+                          PlayerRegistry playerRegistry) {
         this.weaponRegistry = weaponRegistry;
         this.enemyProfileRegistry = enemyProfileRegistry;
         this.aimBehaviors = aimBehaviors;
         this.pendingMovementMode = MovementMode.WALK;
         this.weaponSystem = weaponSystem;
+        this.playerRegistry = playerRegistry;
     }
 
 
-    public void loadLevel(LevelData data) {
+    public void loadLevel(LevelData data, String playerId) {
 
         List<Door> doors = new ArrayList<>();
         List<Blocker> blockers = new ArrayList<>();
@@ -132,14 +136,21 @@ public class GameController {
             ));
         }
         rayCastSystem = new RayCastSystem(data.worldGeometry, blockers);
+        PlayerProfile playerProfile = null;
+        try {
+            playerProfile = playerRegistry.get(playerId);
+        }catch (Exception e){
+            playerProfile = new PlayerProfile("1",
+                    new Weapon(weaponRegistry.get("Silencer")),
+                    new Weapon(weaponRegistry.get("Knife")),
+                    0, 1, 1, 1, 0, 1,
+                    "", "", "", "");
+        }
         Player player = new Player(
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
-                new PlayerProfile("1",
-                        new Weapon(weaponRegistry.get("Silencer")),
-                        new Weapon(weaponRegistry.get("Knife")),
-                        0, 1, 1, 1, 0, 1
-                ));
+                playerProfile
+                );
         player.setMovementMode(pendingMovementMode);
         blockers.add(player);
 

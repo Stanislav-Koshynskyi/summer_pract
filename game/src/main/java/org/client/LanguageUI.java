@@ -1,4 +1,4 @@
-package org.core.enums;
+package org.client;
 
 public enum LanguageUI {
     UKRAINIAN,

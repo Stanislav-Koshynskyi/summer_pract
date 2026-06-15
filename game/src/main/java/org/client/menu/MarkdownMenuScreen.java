@@ -18,10 +18,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import org.client.MainGame;
 import org.core.enums.ElementType;
-import org.core.enums.MenuStatus;
-import org.core.enums.LanguageUI;
+import org.client.LanguageUI;
 
 import java.util.ArrayList;
 import java.util.List;
