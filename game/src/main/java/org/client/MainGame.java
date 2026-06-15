@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import lombok.Getter;
 import lombok.Setter;
 import org.client.menu.*;
+import org.client.menu.settings.SettingsMenu;
 import org.content.registry.PlayerRegistry;
 import org.core.definition.PlayerProfile;
 import org.core.enums.LevelOutcome;
