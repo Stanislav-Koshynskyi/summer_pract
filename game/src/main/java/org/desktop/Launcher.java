@@ -8,7 +8,7 @@ public class Launcher {
     public static void main(String[] args) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setWindowedMode(1280, 720);
-        config.setTitle("Test");
+        config.setTitle("One By One");
 
         new Lwjgl3Application(new MainGame(), config);
     }

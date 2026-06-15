@@ -53,7 +53,7 @@ public class StartMenu implements Screen {
     private final float[] btnY;
 
     private static final MenuStatus[] BUTTON_TARGETS = {
-            MenuStatus.INTRO_MENU,
+            MenuStatus.SELECT_LEVEL_MENU,
             MenuStatus.ABOUT_AUTHORS_MENU,
             MenuStatus.SETTINGS_MENU,
             MenuStatus.RULES_MENU
@@ -239,7 +239,23 @@ public class StartMenu implements Screen {
 
     private void onButtonClick(int index) {
         if (index >= 0 && index < BUTTON_TARGETS.length) {
-            switchMenu.switchMenu(BUTTON_TARGETS[index]);
+            MenuStatus target = BUTTON_TARGETS[index];
+
+            // Якщо гравець натиснув "Грати"
+            if (target == MenuStatus.SELECT_LEVEL_MENU) {
+                MainGame mainGame = (MainGame) game;
+
+                // Якщо розблоковано лише 1 рівень — відправляємо в інтро
+                if (mainGame.getMaxUnlockedLevel() <= 1) {
+                    switchMenu.switchMenu(MenuStatus.INTRO_MENU);
+                } else {
+                    // Якщо розблоковано 2 і більше — показуємо карту рівнів
+                    switchMenu.switchMenu(MenuStatus.SELECT_LEVEL_MENU);
+                }
+            } else {
+                // Для всіх інших кнопок (налаштування, автори тощо)
+                switchMenu.switchMenu(target);
+            }
         }
     }
 

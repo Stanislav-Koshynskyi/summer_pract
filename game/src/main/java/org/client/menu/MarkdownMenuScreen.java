@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import org.client.MainGame;
+import org.core.enums.ElementType;
 import org.core.enums.MenuStatus;
 import org.core.enums.LanguageUI;
 
@@ -26,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MarkdownMenuScreen implements Screen {
-
-    private enum ElementType { H2, H4, H5, H6, PARAGRAPH, IMAGE }
 
     private static class MenuElement {
         ElementType type;
@@ -63,6 +62,7 @@ public class MarkdownMenuScreen implements Screen {
     private final float backBtnY = WORLD_H - 160;
     private final float backBtnW = 140;
     private final float backBtnH = 60; // Збільшили висоту з 45 до 60, щоб вмістити 2 рядки тексту
+    private static final int   RADIUS    = 18;
 
     // Чіткі межі вікна прокручування контенту
     private final float contentLeft = 100;
