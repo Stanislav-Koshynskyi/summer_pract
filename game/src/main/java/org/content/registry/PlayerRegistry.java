@@ -40,7 +40,7 @@ public class PlayerRegistry {
         registerStatic(new PlayerProfile("Rusher",
                 new Weapon(weaponRegistry.get("Uzi")),
                 new Weapon(weaponRegistry.get("Knife")),
-                1, 1, 1, 1, 20, 1.3f,
+                1, 1, 1, 1, 10, 1.3f,
                 "Штурмовик", "Rusher",
                 "Створений для бою. Старт: Uzi. Підвищене здоров'я, шкода і шум.",
                 "Built for combat. Start: Uzi. Increased health, damage and noise."
@@ -64,7 +64,7 @@ public class PlayerRegistry {
         registerStatic(new PlayerProfile("Risky",
                 new Weapon(weaponRegistry.get("Shotgun")),
                 new Weapon(weaponRegistry.get("Knife")),
-                2, 1.6f, 1.4f, 1, -5, 0.8f,
+                2, 1.4f, 1.4f, 1, -5, 0.8f,
                 "Мужик з дробовиком", "Risky",
                 "Швидкий і смертоносний. Старт: Дробовик. Більше здоров'я, швидкість і патрони.",
                 "Fast and deadly. Start: Shotgun. More health, speed and ammo."
