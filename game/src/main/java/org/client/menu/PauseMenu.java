@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.sun.tools.javac.Main;
 import org.client.MainGame;
 import org.core.enums.LanguageUI;
 import org.core.enums.MenuStatus;
@@ -170,7 +171,7 @@ public class PauseMenu implements Screen {
         layout.setText(titleFont, t1);
         titleFont.draw(batch, t1, (WORLD_W - layout.width) / 2f, panelY + PANEL_H - 40f);
 
-        String t2 = "РІВЕНЬ "+ MainGame.getCurrentLevel(); // Можна зробити динамічним
+        String t2 = "РІВЕНЬ "+ ((MainGame)game).getCurrentLevel(); // Можна зробити динамічним
         layout.setText(levelFont, t2);
         levelFont.draw(batch, t2, (WORLD_W - layout.width) / 2f, panelY + PANEL_H - 120f);
 

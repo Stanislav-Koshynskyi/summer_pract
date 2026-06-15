@@ -2,6 +2,8 @@ package org.client;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import lombok.Getter;
+import lombok.Setter;
 import org.client.menu.*;
 import org.core.enums.MenuStatus;
 import org.core.enums.LanguageUI;
@@ -11,19 +13,15 @@ public class MainGame extends Game {
 
     private SwitchMenu switchMenu;
     // Поле для збереження поточної мови інтерфейсу
+    @Setter
+    @Getter
     private LanguageUI currentLanguage = LanguageUI.UKRAINIAN;
-
+    @Setter
+    @Getter
     private int maxUnlockedLevel = 2;
-/// Changes
-    private static int currentLevel = 1;
-
-    public LanguageUI getCurrentLanguage() {
-        return currentLanguage;
-    }
-
-    public void setCurrentLanguage(LanguageUI currentLanguage) {
-        this.currentLanguage = currentLanguage;
-    }
+    @Getter
+    @Setter
+    private int currentLevel = 1;
 
     @Override
     public void create() {
@@ -55,23 +53,6 @@ public class MainGame extends Game {
         // Початковий запуск стартового меню
         switchMenu.switchMenu(MenuStatus.START_MENU);
     }
-
-    public int getMaxUnlockedLevel() {
-        return maxUnlockedLevel;
-    }
-
-    public void setMaxUnlockedLevel(int maxUnlockedLevel) {
-        this.maxUnlockedLevel = maxUnlockedLevel;
-    }
-
-    public static int getCurrentLevel() {
-        return currentLevel;
-    }
-
-    public static void setCurrentLevel(int currentLevel) {
-        MainGame.currentLevel = currentLevel;
-    }
-
     @Override
     public void dispose() {
         batch.dispose();

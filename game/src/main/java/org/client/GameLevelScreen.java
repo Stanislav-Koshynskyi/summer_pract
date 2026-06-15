@@ -99,7 +99,8 @@ public class GameLevelScreen implements Screen {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        map = new TmxMapLoader().load("maps/level_02.tmx");
+        map = new TmxMapLoader().load("maps/level_" +
+                String.format("%02d", game.getCurrentLevel()) + ".tmx");
         float unitScale = 1f;
         renderer = new OrthogonalTiledMapRenderer(map, unitScale);
 

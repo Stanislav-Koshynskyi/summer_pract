@@ -285,8 +285,8 @@ public class SelectLevelMenu implements Screen {
             if (wx >= level.x && wx <= level.x + CARD_W && wy >= level.y && wy <= level.y + CARD_H) {
                 if (level.state != LevelState.LOCKED) {
                     System.out.println("Завантаження рівня: " + level.id);
-                    /// !
-                    // Тут логіка запуску гри: switchMenu.switchToGame(level.id);
+                    ((MainGame)game).setCurrentLevel(Integer.parseInt(level.id));
+                    switchMenu.switchMenu(MenuStatus.PLAY_GAME_MENU);
                 }
                 return;
             }
