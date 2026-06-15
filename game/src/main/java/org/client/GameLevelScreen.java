@@ -155,7 +155,12 @@ public class GameLevelScreen implements Screen {
         weaponSounds.put("Shotgun", Gdx.audio.newSound(Gdx.files.internal("sounds/shotgun-39753.ogg")));
         weaponSounds.put("Uzi", Gdx.audio.newSound(Gdx.files.internal("sounds/9mm-pistol-shot-6349.ogg")));
         weaponSounds.put("Famae", Gdx.audio.newSound(Gdx.files.internal("sounds/famae.wav")));
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_3.mp3"));
+
+        switch (game.getCurrentLevel()) {
+            case 1 -> backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_1.mp3"));
+            case 2 -> backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_2.mp3"));
+            case 3 -> backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/background_3.mp3"));
+        }
         backgroundMusic.setLooping(true);
         backgroundMusic.setVolume(0.02f);
         backgroundMusic.play();
