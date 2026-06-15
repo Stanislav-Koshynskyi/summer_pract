@@ -139,7 +139,7 @@ public class GameController {
         PlayerProfile playerProfile = null;
         try {
             playerProfile = playerRegistry.get(playerId);
-        }catch (Exception e){
+        } catch (Exception e) {
             playerProfile = new PlayerProfile("1",
                     new Weapon(weaponRegistry.get("Silencer")),
                     new Weapon(weaponRegistry.get("Knife")),
@@ -150,7 +150,15 @@ public class GameController {
                 data.playerSpawn.x, data.playerSpawn.y,
                 16f, 16f,
                 playerProfile
-                );
+        );
+        for (WeaponPickup weaponPickup : pickups){
+            weaponPickup.getWeapon().applyAmmoMultiplier(player.getAmmoMultiplayer());
+        }
+        for (Enemy enemy : enemies){
+            enemy.getCurrentWeapon().applyAmmoMultiplier(player.getAmmoMultiplayer());
+        }
+        player.getCurrentWeapon().applyAmmoMultiplier(player.getAmmoMultiplayer());
+
         player.setMovementMode(pendingMovementMode);
         blockers.add(player);
 
@@ -173,8 +181,6 @@ public class GameController {
         enemyAI = new EnemyAI(visionSystem, levelState.getEnemies(), levelState.getPlayer(), pathfinder, weaponSystem, rayCastSystem,
                 aimBehaviorMap, doors, levelState.getWorldGeometry(), levelState.getStats());
         clearPendingCommands();
-
-
     }
 
     public void update(float delta) {
@@ -419,10 +425,9 @@ public class GameController {
             );
             levelState.getStats().recordKill(false);
             if (enemy.getCurrentWeapon() != null) {
-                WeaponDefinition definition = enemy.getCurrentWeapon().getDefinition();
-                Weapon weapon = new Weapon(definition);
+                Weapon weapon = enemy.getCurrentWeapon();
                 WeaponPickup pickup = new WeaponPickup(enemy.getX(), enemy.getY(),
-                        definition.getId(), weapon, false, UUID.randomUUID().toString());
+                        weapon.getDefinition().getId(), weapon, false, UUID.randomUUID().toString());
                 levelState.getPickups().add(pickup);
             }
         }
