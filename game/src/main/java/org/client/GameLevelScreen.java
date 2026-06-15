@@ -387,6 +387,8 @@ public class GameLevelScreen implements Screen {
                     );
                     playerCorpse.stateTime = 0f;
                 }
+                switchMenu.switchMenu(MenuStatus.DEFEAT_GAME_MENU);
+                return;
             }
 
             if (event instanceof MeleeAttackEvent) {
@@ -420,9 +422,6 @@ public class GameLevelScreen implements Screen {
                 game.setMaxUnlockedLevel(nextLevel);
                 switchMenu.switchMenu(MenuStatus.WIN_GAME_MENU);
                 return;
-            }
-            if (event instanceof PlayerDiedEvent) {
-                switchMenu.switchMenu(MenuStatus.DEFEAT_GAME_MENU);
             }
         }
 

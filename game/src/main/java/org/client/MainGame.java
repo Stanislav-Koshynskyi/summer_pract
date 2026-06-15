@@ -63,6 +63,8 @@ public class MainGame extends Game {
                 () -> new MarkdownMenuScreen(this, switchMenu, "markdownForMenu/rules", getCurrentLanguage()));
         switchMenu.registerScreen(MenuStatus.WIN_GAME_MENU,
                 () -> new LevelCompletedMenu(this, switchMenu, lastOutcome, lastStats, nextLevelId));
+        switchMenu.registerScreen(MenuStatus.DEFEAT_GAME_MENU,
+                () -> new DefeatMenu(this, switchMenu));
         // Початковий запуск стартового меню
         switchMenu.switchMenu(MenuStatus.START_MENU);
     }
