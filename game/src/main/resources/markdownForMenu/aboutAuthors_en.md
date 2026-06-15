@@ -28,6 +28,7 @@ Areas of responsibility:
 ## Designer
 
 I created the game menu.
+Got sprite textures.
 
 ### ABC 5 
 
