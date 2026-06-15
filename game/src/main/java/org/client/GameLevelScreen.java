@@ -1055,8 +1055,11 @@ public class GameLevelScreen implements Screen {
 
     @Override
     public void resume() {
-        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
-            backgroundMusic.pause();
+        if (backgroundMusic != null) {
+            backgroundMusic.setVolume(game.getMusicVolume());
+            if (!backgroundMusic.isPlaying()) {
+                backgroundMusic.play();
+            }
         }
     }
 
@@ -1168,9 +1171,4 @@ public class GameLevelScreen implements Screen {
         this.gameStateView = gameController.getStateView();
     }
 
-    public void resumeLevelMusic() {
-        if (backgroundMusic != null && !backgroundMusic.isPlaying()) {
-            backgroundMusic.play();
-        }
-    }
 }

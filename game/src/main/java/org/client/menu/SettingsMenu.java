@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import org.client.GameLevelScreen;
 import org.client.MainGame;
 import org.client.LanguageUI;
 
@@ -177,7 +178,7 @@ public class SettingsMenu implements Screen {
 
                 if (type == SliderType.MUSIC) {
                     mainGame.setMusicVolume(value * 0.1f);
-                    mainGame.updateMusicVolume();
+                    mainGame.updateMenuMusicVolume();
                 } else if (type == SliderType.SFX) {
                     mainGame.setSfxVolume(value * 0.01f);
                 }

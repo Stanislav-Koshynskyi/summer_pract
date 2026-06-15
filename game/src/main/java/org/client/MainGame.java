@@ -125,7 +125,7 @@ public class MainGame extends Game {
         }
     }
 
-    public void updateMusicVolume() {
+    public void updateMenuMusicVolume() {
         if (menuMusic != null) {
             menuMusic.setVolume(musicVolume);
         }
