@@ -122,7 +122,7 @@ public class WeaponRegistry {
                 30,
                 250.0f,
                 0.8f,
-                3,
+                6,
                 false,
                 false,
                 new ShotgunBehavior(),
