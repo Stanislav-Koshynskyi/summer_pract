@@ -267,13 +267,9 @@ public class StartMenu implements Screen {
             if (target == MenuStatus.SELECT_PLAYER_MENU) {
                 MainGame mainGame = (MainGame) game;
 
-                // Якщо розблоковано лише 1 рівень — відправляємо в інтро
-                if (mainGame.getMaxUnlockedLevel() <= 1) {
-                    switchMenu.switchMenu(MenuStatus.INTRO_MENU);
-                } else {
                     // Якщо розблоковано 2 і більше — показуємо карту рівнів
                     switchMenu.switchMenu(MenuStatus.SELECT_LEVEL_MENU);
-                }
+
             } else {
                 // Для всіх інших кнопок (налаштування, автори тощо)
                 switchMenu.pushScreen(target);

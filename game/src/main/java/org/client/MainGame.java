@@ -60,8 +60,6 @@ public class MainGame extends Game {
         // РЕЄСТРАЦІЯ ЕКРАНІВ
         switchMenu.registerScreen(MenuStatus.START_MENU, () -> new StartMenu(this, switchMenu));
 
-        switchMenu.registerScreen(MenuStatus.INTRO_MENU, () -> new IntroMenu(this, switchMenu));
-
         switchMenu.registerScreen(MenuStatus.PLAY_GAME_MENU, () -> new GameLevelScreen(this, switchMenu));
 
         switchMenu.registerScreen(MenuStatus.SELECT_LEVEL_MENU, () -> new SelectLevelMenu(this, switchMenu));
