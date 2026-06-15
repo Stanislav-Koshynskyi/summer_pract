@@ -9,9 +9,19 @@ Areas of responsibility:
 - Creating game levels
 - Difficulty balance
 
-### ABC2
+### Roma
+## Frontend
+    make frontend
 
 ### Koshynskyi Stanislav
+## FullStack
+- Make Engine
+- Make Ai
+- Help Frontend
+- Help Menu
+- Help with content
+
+
     thn for playing
 
 ### Kravchuk Bohdan
