@@ -11,7 +11,8 @@ Areas of responsibility:
 
 ### ABC2
 
-### ABC 3
+### Koshynskyi Stanislav
+    thn for playing
 
 ### ABC 4 
 
