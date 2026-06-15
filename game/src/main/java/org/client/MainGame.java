@@ -18,7 +18,7 @@ public class MainGame extends Game {
     private LanguageUI currentLanguage = LanguageUI.UKRAINIAN;
     @Setter
     @Getter
-    private int maxUnlockedLevel = 2;
+    private int maxUnlockedLevel = 1;
     @Getter
     @Setter
     private int currentLevel = 1;
