@@ -9,9 +9,14 @@ Areas of responsibility:
 - Creating game levels
 - Difficulty balance
 
-### Roma
+### Hvozdik Roman
 ## Frontend
-    make frontend
+Worked on the following aspects:
+- Screen, player camera, animation system
+- Level parser
+- Player, enemies, map render
+- Menu/level music, weapon sounds
+- Debug menu
 
 ### Koshynskyi Stanislav
 ## FullStack
