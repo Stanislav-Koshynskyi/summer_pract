@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
@@ -140,9 +141,13 @@ public class GameLevelScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
-        font = new BitmapFont();
-        font.getData().setScale(1.0f);
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.characters = FreeTypeFontGenerator.DEFAULT_CHARS + "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя";
+        parameter.size = 15;
+        font = generator.generateFont(parameter);
         font.setColor(Color.WHITE);
+        generator.dispose();
         doorVerticalTexture = new Texture(Gdx.files.internal("textures/door_closed_vertical.png"));
         doorHorizontalTexture = new Texture(Gdx.files.internal("textures/door_closed_horizontal.png"));
         alertTexture = new Texture(Gdx.files.internal("textures/AlertEnemy.png"));
@@ -486,7 +491,7 @@ public class GameLevelScreen implements Screen {
                     nextLevel = currentLevelNum + 1;
                     maxLevelToUnlock = nextLevel;
                 } else {
-                    nextLevel = currentLevelNum;
+                    nextLevel = -1;
                     maxLevelToUnlock = currentLevelNum + 1;
                 }
                 game.setLevelResult(e.outcome, e.levelStats, nextLevel);

@@ -89,6 +89,8 @@ public class MainGame extends Game {
                 () -> new DefeatMenu(this, switchMenu));
         switchMenu.registerScreen(MenuStatus.SELECT_PLAYER_MENU,
                 () -> new PlayerSelectScreen(this, switchMenu, allProfiles));
+        switchMenu.registerScreen(MenuStatus.END_TITLE_SCREEN,
+                () -> new EndTitleScreen(this, switchMenu));
 
         // Музика
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/menu.mp3"));

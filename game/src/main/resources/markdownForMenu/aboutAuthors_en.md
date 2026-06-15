@@ -34,6 +34,11 @@ Worked on the following aspects:
 
 I created the game menu.
 Got sprite textures.
-
-### ABC 5 
-
+### Riznyk Nikita
+## Developer C (Content + Core systems)
+Areas of responsibility:
+- Creating interaction systems: opening doors, weapon pickups, and silent kills
+- Enemy hearing system (HearingSystem, SoundEventQueue) taking obstacles (walls and doors) into account
+- Player footstep noise emission system (FootstepEmitter) based on movement modes
+- Saving and loading game progress in JSON format (SaveManager)
+- Level selection menu, campaign progression, and walkthrough statistics

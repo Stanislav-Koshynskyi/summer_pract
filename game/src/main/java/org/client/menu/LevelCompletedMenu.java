@@ -130,8 +130,11 @@ public class LevelCompletedMenu implements Screen {
 
         boolean isUa = ((MainGame) game).getCurrentLanguage() == LanguageUI.UKRAINIAN;
 
+        boolean isFinal = nextLevel == -1;
         boolean hasNextLevel = nextLevel > 0;
-        float totalBtnW = hasNextLevel ? (BTN_W * 2 + BTN_GAP) : BTN_W;
+        boolean showCreditsBtn = isFinal;
+        boolean twoButtons = hasNextLevel || showCreditsBtn;
+        float totalBtnW = twoButtons ? (BTN_W * 2 + BTN_GAP) : BTN_W;
         float startBtnX = (WORLD_W - totalBtnW) / 2f;
         float btnY = panelY - BTN_H - 20f;
 
@@ -139,8 +142,11 @@ public class LevelCompletedMenu implements Screen {
         if (hasNextLevel) {
             boolean nextHover = isMouseOver(startBtnX, btnY, BTN_W, BTN_H);
             drawRoundRect(startBtnX, btnY, BTN_W, BTN_H, RADIUS, nextHover ? GOLD : GREEN);
+        } else if (showCreditsBtn) {
+            boolean creditsHover = isMouseOver(startBtnX, btnY, BTN_W, BTN_H);
+            drawRoundRect(startBtnX, btnY, BTN_W, BTN_H, RADIUS, creditsHover ? GOLD : GREEN);
         }
-        float menuBtnX = hasNextLevel ? startBtnX + BTN_W + BTN_GAP : startBtnX;
+        float menuBtnX = twoButtons ? startBtnX + BTN_W + BTN_GAP : startBtnX;
         boolean menuHover = isMouseOver(menuBtnX, btnY, BTN_W, BTN_H);
         drawRoundRect(menuBtnX, btnY, BTN_W, BTN_H, RADIUS, menuHover ? GOLD : RED);
         shapes.end();
@@ -207,8 +213,11 @@ public class LevelCompletedMenu implements Screen {
         layout.setText(scoreFont, scoreStr);
         scoreFont.draw(batch, scoreStr, centerX - layout.width / 2f, y);
 
+        boolean isFinal = nextLevel == -1;
         boolean hasNextLevel = nextLevel > 0;
-        float totalBtnW = hasNextLevel ? (BTN_W * 2 + BTN_GAP) : BTN_W;
+        boolean showCreditsBtn = isFinal;
+        boolean twoButtons = hasNextLevel || showCreditsBtn;
+        float totalBtnW = twoButtons ? (BTN_W * 2 + BTN_GAP) : BTN_W;
         float startBtnX = (WORLD_W - totalBtnW) / 2f;
         float btnY = panelY - BTN_H - 20f;
 
@@ -217,9 +226,13 @@ public class LevelCompletedMenu implements Screen {
             String next = isUa ? "ДАЛІ" : "NEXT";
             layout.setText(labelFont, next);
             labelFont.draw(batch, next, startBtnX + (BTN_W - layout.width) / 2f, btnY + (BTN_H + layout.height) / 2f);
+        } else if (showCreditsBtn) {
+            String credits = isUa ? "ТИТРИ" : "CREDITS";
+            layout.setText(labelFont, credits);
+            labelFont.draw(batch, credits, startBtnX + (BTN_W - layout.width) / 2f, btnY + (BTN_H + layout.height) / 2f);
         }
         String menu = isUa ? "МЕНЮ" : "MENU";
-        float menuBtnX = hasNextLevel ? startBtnX + BTN_W + BTN_GAP : startBtnX;
+        float menuBtnX = twoButtons ? startBtnX + BTN_W + BTN_GAP : startBtnX;
         layout.setText(labelFont, menu);
         labelFont.draw(batch, menu, menuBtnX + (BTN_W - layout.width) / 2f, btnY + (BTN_H + layout.height) / 2f);
 
@@ -237,8 +250,11 @@ public class LevelCompletedMenu implements Screen {
         float wy = (my - viewport.getBottomGutterHeight()) * scaleY;
 
         float panelY = (WORLD_H - 500f) / 2f;
+        boolean isFinal = nextLevel == -1;
         boolean hasNextLevel = nextLevel > 0;
-        float totalBtnW = hasNextLevel ? (BTN_W * 2 + BTN_GAP) : BTN_W;
+        boolean showCreditsBtn = isFinal;
+        boolean twoButtons = hasNextLevel || showCreditsBtn;
+        float totalBtnW = twoButtons ? (BTN_W * 2 + BTN_GAP) : BTN_W;
         float startBtnX = (WORLD_W - totalBtnW) / 2f;
         float btnY = panelY - BTN_H - 20f;
 
@@ -246,9 +262,12 @@ public class LevelCompletedMenu implements Screen {
             ((MainGame)game).setCurrentLevel(nextLevel);
             switchMenu.switchMenu(MenuStatus.PLAY_GAME_MENU);
             return;
+        } else if (showCreditsBtn && wx >= startBtnX && wx <= startBtnX + BTN_W && wy >= btnY && wy <= btnY + BTN_H) {
+            switchMenu.switchMenu(MenuStatus.END_TITLE_SCREEN);
+            return;
         }
 
-        float menuBtnX = hasNextLevel ? startBtnX + BTN_W + BTN_GAP : startBtnX;
+        float menuBtnX = twoButtons ? startBtnX + BTN_W + BTN_GAP : startBtnX;
         if (wx >= menuBtnX && wx <= menuBtnX + BTN_W && wy >= btnY && wy <= btnY + BTN_H) {
             switchMenu.switchMenu(MenuStatus.SELECT_LEVEL_MENU);
         }
