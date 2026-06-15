@@ -583,7 +583,7 @@ public class GameLevelScreen implements Screen {
 
     private void draw() {
         if (renderer == null || gameStateView == null) return;
-        ScreenUtils.clear(Color.BLUE);
+        ScreenUtils.clear(Color.DARK_GRAY);
 
         if (gameStateView != null) {
             float lerp = 10f * Gdx.graphics.getDeltaTime();
