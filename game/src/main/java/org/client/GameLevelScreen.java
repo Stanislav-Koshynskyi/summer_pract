@@ -92,6 +92,9 @@ public class GameLevelScreen implements Screen {
 
     private boolean initialized = false;
 
+    private float deathTimer = -1f;
+    private static float DEATH_DURATION = 0.5f;
+
     public GameLevelScreen(MainGame game, SwitchMenu switchMenu) {
         this.game = game;
         this.switchMenu = switchMenu;
@@ -157,6 +160,13 @@ public class GameLevelScreen implements Screen {
     }
 
     private void logic() {
+        if (deathTimer != -1){
+            deathTimer -= Gdx.graphics.getDeltaTime();
+            if (deathTimer <= 0){
+                switchMenu.switchMenu(MenuStatus.DEFEAT_GAME_MENU);
+                return;
+            }
+        }
         if (gameController == null) return;
 
         Vector2 movement = new Vector2();
@@ -387,8 +397,7 @@ public class GameLevelScreen implements Screen {
                     );
                     playerCorpse.stateTime = 0f;
                 }
-                switchMenu.switchMenu(MenuStatus.DEFEAT_GAME_MENU);
-                return;
+                deathTimer = DEATH_DURATION;
             }
 
             if (event instanceof MeleeAttackEvent) {
