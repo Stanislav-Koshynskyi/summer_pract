@@ -1,5 +1,7 @@
 package org.client;
 
+import org.core.enums.AnimationState;
+
 public class EnemyAnimData {
     float stateTime = 0f;
     float lastX;

@@ -29,6 +29,7 @@ import org.core.data.LevelData;
 import org.core.entity.Door;
 import org.core.entity.Enemy;
 import org.core.entity.WeaponPickup;
+import org.core.enums.AnimationState;
 import org.core.enums.DoorState;
 import org.core.enums.MenuStatus;
 import org.core.enums.MovementMode;
