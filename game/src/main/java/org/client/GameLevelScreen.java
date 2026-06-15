@@ -480,9 +480,17 @@ public class GameLevelScreen implements Screen {
             }
             if (event instanceof LevelCompletedEvent e) {
                 int currentLevelNum = game.getCurrentLevel();
-                int nextLevel = currentLevelNum < SelectLevelMenu.LEVEL_NUMBER ? currentLevelNum + 1 : currentLevelNum;
+                int nextLevel = 1;
+                int maxLevelToUnlock = 1;
+                if (currentLevelNum < SelectLevelMenu.LEVEL_NUMBER) {
+                    nextLevel = currentLevelNum + 1;
+                    maxLevelToUnlock = nextLevel;
+                } else {
+                    nextLevel = currentLevelNum;
+                    maxLevelToUnlock = currentLevelNum + 1;
+                }
                 game.setLevelResult(e.outcome, e.levelStats, nextLevel);
-                game.setMaxUnlockedLevel(nextLevel);
+                game.setMaxUnlockedLevel(maxLevelToUnlock);
                 switchMenu.switchMenu(MenuStatus.WIN_GAME_MENU);
                 return;
             }
