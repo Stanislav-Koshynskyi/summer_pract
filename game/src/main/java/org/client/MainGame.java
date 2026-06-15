@@ -60,4 +60,7 @@ public class MainGame extends Game {
             getScreen().dispose();
         }
     }
+    public void setMaxUnlockedLevel(int maxUnlockedLevel){
+        this.maxUnlockedLevel = Math.max(this.maxUnlockedLevel, maxUnlockedLevel);
+    }
 }
