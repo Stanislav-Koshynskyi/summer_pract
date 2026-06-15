@@ -2,6 +2,7 @@ package org.client;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.sun.tools.javac.Main;
 import lombok.Getter;
 import lombok.Setter;
 import org.client.menu.*;
@@ -19,7 +20,7 @@ public class MainGame extends Game {
     @Getter
     private LanguageUI currentLanguage = LanguageUI.UKRAINIAN;
     @Getter
-    private int maxUnlockedLevel = 1;
+    private int maxUnlockedLevel;
     @Getter
     @Setter
     private int currentLevel = 1;
@@ -30,6 +31,7 @@ public class MainGame extends Game {
     @Getter
     private int nextLevelId;
 
+    private SaveManager saveManager;
     public void setLevelResult(LevelOutcome o, LevelStats s, int next) {
         lastOutcome = o;
         lastStats = s;
@@ -37,6 +39,9 @@ public class MainGame extends Game {
     }
     @Override
     public void create() {
+        saveManager = new SaveManager();
+        int maxLevel = saveManager.getMaxUnlockedLevel();
+        maxUnlockedLevel = maxLevel;
         batch = new SpriteBatch();
 
         // Ініціалізуємо менеджер перемикання екранів
@@ -77,5 +82,6 @@ public class MainGame extends Game {
     }
     public void setMaxUnlockedLevel(int maxUnlockedLevel){
         this.maxUnlockedLevel = Math.max(this.maxUnlockedLevel, maxUnlockedLevel);
+        saveManager.setMaxUnlockedLevel(maxUnlockedLevel);
     }
 }
