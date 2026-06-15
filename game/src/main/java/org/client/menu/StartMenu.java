@@ -267,11 +267,7 @@ public class StartMenu implements Screen {
 
             // Якщо гравець натиснув "Грати"
             if (target == MenuStatus.SELECT_PLAYER_MENU) {
-                MainGame mainGame = (MainGame) game;
-
-                // Якщо розблоковано 2 і більше — показуємо карту рівнів
-
-                switchMenu.switchMenu(MenuStatus.SELECT_LEVEL_MENU);
+                switchMenu.switchMenu(MenuStatus.SELECT_PLAYER_MENU);
 
             } else {
                 // Для всіх інших кнопок (налаштування, автори тощо)
