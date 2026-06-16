@@ -20,14 +20,15 @@ Worked on the following aspects:
 
 ### Koshynskyi Stanislav
 ## FullStack
-- Make Engine
-- Make Ai
-- Help Frontend
-- Help Menu
-- Help with content
-
-
-    thn for playing
+Areas of responsibility
+- Engine
+- Ai
+- Help other teammate
+  ~=~=~=~=~=~=~=~=~=,------,
+  ~=~=~=~=~=~=~=~=~=|   /\_/\
+  ~=~=~=~=~=~=~=~=~^|__( ^ .^)
+  ~=~=~=~=~=~=~=~=~  ""  ""
+    thx for playing
 
 ### Kravchuk Bohdan
 ## Designer
