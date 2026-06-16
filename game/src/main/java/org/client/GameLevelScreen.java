@@ -76,6 +76,7 @@ public class GameLevelScreen implements Screen {
     private DeadBody playerCorpse;
     private AssetLoader assetLoader;
     private boolean debugMode = false;
+    private boolean cheatGodMode = false;
     private final Vector3 mouseInWorld = new Vector3();
     private final List<VisualAttackEffect> attackEffects = new ArrayList<>();
     private final List<VisualAlertEffect> alertEffects = new java.util.ArrayList<>();
@@ -196,6 +197,42 @@ public class GameLevelScreen implements Screen {
             }
         }
         if (gameController == null) return;
+
+        // Cheat Codes
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F8)) {
+            int currentLevelNum = game.getCurrentLevel();
+            int nextLevel = 1;
+            int maxLevelToUnlock = 1;
+            if (currentLevelNum < SelectLevelMenu.LEVEL_NUMBER) {
+                nextLevel = currentLevelNum + 1;
+                maxLevelToUnlock = nextLevel;
+            } else {
+                nextLevel = -1;
+                maxLevelToUnlock = currentLevelNum + 1;
+            }
+            game.setLevelResult(org.core.enums.LevelOutcome.FULL_STEALTH, new org.core.state.LevelStats(), nextLevel);
+            game.setMaxUnlockedLevel(maxLevelToUnlock);
+            switchMenu.switchMenu(MenuStatus.WIN_GAME_MENU);
+            return;
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F9)) {
+            cheatGodMode = !cheatGodMode;
+            if (!cheatGodMode && gameController.getPlayer() != null) {
+                org.core.entity.Player player = gameController.getPlayer();
+                player.setHp(player.getPlayerProfile().getBonusHp() + 1);
+                player.setSpeedMultiplayer(player.getPlayerProfile().getSpeedMultiplier());
+            }
+        }
+
+        if (cheatGodMode && gameController.getPlayer() != null) {
+            org.core.entity.Player player = gameController.getPlayer();
+            player.setHp(999999);
+            player.setSpeedMultiplayer(3.0f);
+            if (player.getCurrentWeapon() != null) {
+                player.getCurrentWeapon().refillAmmo(9999);
+            }
+        }
 
         Vector2 movement = new Vector2();
         float speed = gameStateView.getPlayerSpeed();
@@ -1106,6 +1143,12 @@ public class GameLevelScreen implements Screen {
         float leftEdge = camera.position.x - camera.viewportWidth / 4f + 30f;
         float topEdge = camera.position.y - camera.viewportHeight / 4f + 25f;
         font.draw(spriteBatch, goalText, leftEdge, topEdge);
+        if (cheatGodMode) {
+            font.setColor(Color.GOLD);
+            String cheatText = isUa ? "[ БЕЗСМЕРТЯ УВІМКНЕНО ]" : "[ GOD MODE ACTIVE ]";
+            font.draw(spriteBatch, cheatText, leftEdge, topEdge - 20f);
+            font.setColor(Color.WHITE);
+        }
         spriteBatch.end();
     }
 
