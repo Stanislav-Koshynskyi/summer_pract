@@ -1,11 +1,8 @@
 package org.content.registry;
 
-import org.content.weapon_behavior.BulletVisualProfile;
-import org.content.weapon_behavior.MeleeBehavior;
-import org.content.weapon_behavior.ShotgunBehavior;
+import org.content.weapon_behavior.*;
 import org.core.definition.WeaponDefinition;
 import org.core.enums.WeaponType;
-import org.content.weapon_behavior.SimpleRayCastBehavior;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,7 +79,7 @@ public class WeaponRegistry {
                 -1,
                 true,
                 false,
-                new MeleeBehavior(),
+                new MacheteBehavior(),
                 8.0f,
                 0.0f
         ));
@@ -146,7 +143,7 @@ public class WeaponRegistry {
                 25,
                 false,
                 true,
-                new SimpleRayCastBehavior(),
+                new UziBehavior(),
                 4.0f,
                 0.15f
         ));
@@ -162,7 +159,7 @@ public class WeaponRegistry {
                 25,
                 false,
                 true,
-                new SimpleRayCastBehavior(),
+                new FamaeBehavior(),
                 15.0f,
                 0.08f
         ));
