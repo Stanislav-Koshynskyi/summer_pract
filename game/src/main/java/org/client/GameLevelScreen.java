@@ -766,8 +766,8 @@ public class GameLevelScreen implements Screen {
                 if (playerWeaponId.equals("Bat")) {
                     pW = 48f;
                     pH = 48f;
-                    originX = 19f;
-                    originY = 38f;
+                    originX = 18f;
+                    originY = 26f;
                 }
                 float drawX = playerPos.x - originX;
                 float drawY = playerPos.y - originY;

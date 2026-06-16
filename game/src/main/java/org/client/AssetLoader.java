@@ -241,7 +241,7 @@ public class AssetLoader {
                 "sprites/players/sprJacket/sprJacketWalkBat/sprJacketWalkBat_", 8, 0.1f,
                 "sprites/players/sprJacket/sprJacketWalkBat/sprJacketWalkBat_", 1, 0.1f,
                 "sprites/players/sprJacket/sprJacketDeadCut/sprJacketDeadCut_", 3, 0.1f,
-                "sprites/players/sprJacket/sprJacketAttackBat/sprJacketAttackBat_", 9, 0.05f
+                "sprites/players/sprJacket/sprJacketAttackBat/sprJacketAttackBat_", 8, 0.05f
         );
 
         registerPlayer(
