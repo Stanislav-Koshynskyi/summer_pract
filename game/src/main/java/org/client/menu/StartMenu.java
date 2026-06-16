@@ -65,12 +65,12 @@ public class StartMenu implements Screen {
     };
 
     private final SwitchMenu switchMenu;
-
+    /** конструктор для startMenu*/
     public StartMenu(com.badlogic.gdx.Game game, SwitchMenu switchMenu) {
         this.game = game;
         this.switchMenu = switchMenu;
 
-        // Визначаємо тексти кнопок залежно від обраної мови гри
+        // кнопки меню
         MainGame mainGame = (MainGame) game;
         if (mainGame.getCurrentLanguage() == LanguageUI.ENGLISH) {
             labels = new String[]{"Start Game", "About Authors", "Settings", "Rules"};
@@ -80,7 +80,7 @@ public class StartMenu implements Screen {
 
         btnX = new float[labels.length];
         btnY = new float[labels.length];
-
+        //маштабування вікна
         camera = new OrthographicCamera();
         viewport = new FitViewport(WORLD_W, WORLD_H, camera);
         camera.setToOrtho(false, WORLD_W, WORLD_H);
@@ -88,7 +88,7 @@ public class StartMenu implements Screen {
         shapes = new ShapeRenderer();
         batch = new SpriteBatch();
         layout = new GlyphLayout();
-
+        // шрифт укр
         if (Gdx.files.internal("fonts/Roboto-Regular.ttf").exists()) {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
             FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -126,7 +126,7 @@ public class StartMenu implements Screen {
     @Override
     public void show() {
     }
-
+    /**Малювання вікна*/
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BG_COLOR);
@@ -138,7 +138,7 @@ public class StartMenu implements Screen {
         drawText();
         handleInput();
     }
-
+    /**Малювання кнопок*/
     private void drawButtons() {
         shapes.setProjectionMatrix(camera.combined);
         shapes.begin(ShapeRenderer.ShapeType.Filled);
@@ -175,7 +175,7 @@ public class StartMenu implements Screen {
         Gdx.gl.glLineWidth(1f);
 
     }
-
+    /** метод малювання кнопок із заокругленими краями */
     private void drawRoundRect(float x, float y, float w, float h, int r, Color color) {
         shapes.setColor(color);
         shapes.rect(x + r, y, w - 2 * r, h);
@@ -197,7 +197,7 @@ public class StartMenu implements Screen {
         shapes.arc(x + r, y + h - r, r, 90, 90, 12);
         shapes.arc(x + w - r, y + h - r, r, 0, 90, 12);
     }
-
+    /** Малювання тексту*/
     private void drawText() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -223,7 +223,7 @@ public class StartMenu implements Screen {
 
         batch.end();
     }
-
+    /**Обробка кліків перемикання мови та вихід*/
     private void handleInput() {
         if (!Gdx.input.justTouched()) return;
 
@@ -260,7 +260,7 @@ public class StartMenu implements Screen {
             }
         }
     }
-
+    /** Обробка кліків на кнопці*/
     private void onButtonClick(int index) {
         if (index >= 0 && index < BUTTON_TARGETS.length) {
             MenuStatus target = BUTTON_TARGETS[index];
@@ -295,7 +295,7 @@ public class StartMenu implements Screen {
         float wy = (my - viewport.getBottomGutterHeight()) * scaleY;
         return wx >= langBtnX && wx <= langBtnX + langBtnW && wy >= langBtnY && wy <= langBtnY + langBtnH;
     }
-
+    /**Маштабування екрану*/
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
@@ -312,7 +312,7 @@ public class StartMenu implements Screen {
     @Override
     public void hide() {
     }
-
+    /**Видалення екрану*/
     @Override
     public void dispose() {
         shapes.dispose();

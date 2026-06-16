@@ -17,17 +17,8 @@ import org.core.enums.LevelState;
 import org.client.MenuStatus;
 import org.client.LanguageUI;
 
-/**
- * Маленька підказка на майбутнє:
- * Коли гравець буде проходити IntroMenu
- * або завершувати перший рівень у вашому GameLevelScreen,
- * просто викличте код
- * ((MainGame) Gdx.app.getApplicationListener()).setMaxUnlockedLevel(2);,
- * і після цього при натисканні кнопку "Грати"
- * головне меню вже автоматично відкриватиме екран вибору рівнів замість інтро відео!**/
 public class SelectLevelMenu implements Screen {
 
-    // Палітра кольорів з HTML
     private static final Color BG_COLOR      = Color.valueOf("12121aff");
     private static final Color SURFACE       = Color.valueOf("1e1e2eff");
     private static final Color SURFACE2      = Color.valueOf("2a2a3eff");
@@ -43,14 +34,14 @@ public class SelectLevelMenu implements Screen {
 
     private static final float WORLD_W   = 1280f;
     private static final float WORLD_H   = 720f;
-    private static final int   RADIUS    = 12; // Менше заокруглення для ретро-стилю
+    private static final int   RADIUS    = 12;
 
-    // Параметри карток
+
     private static final float CARD_W    = 200f;
     private static final float CARD_H    = 240f;
     private static final float CARD_GAP  = 60f;
 
-    // Параметри кнопки "Назад"
+
     private static final float BACK_BTN_W = 220f;
     private static final float BACK_BTN_H = 60f;
     private static final float BACK_BTN_X = (WORLD_W - BACK_BTN_W) / 2f;
@@ -63,7 +54,7 @@ public class SelectLevelMenu implements Screen {
     private final SpriteBatch batch;
     private final GlyphLayout layout;
 
-    // Шрифти різних розмірів
+
     private BitmapFont titleFont;
     private BitmapFont subtitleFont;
     private BitmapFont numberFont;
@@ -74,8 +65,6 @@ public class SelectLevelMenu implements Screen {
 
     public static final int LEVEL_NUMBER = 3;
 
-
-    // Клас для збереження даних кожного рівня
     private static class LevelData {
         String id;
         LevelState state;
@@ -83,7 +72,7 @@ public class SelectLevelMenu implements Screen {
         String labelEn;
         int stars;
         float x, y;
-
+/** Дані рівня*/
         LevelData(String id, LevelState state, String labelUa, String labelEn, int stars) {
             this.id = id;
             this.state = state;
@@ -110,7 +99,7 @@ public class SelectLevelMenu implements Screen {
 
         int maxUnlocked = ((MainGame) game).getMaxUnlockedLevel();
 
-        // Динамічна ініціалізація рівнів на основі maxUnlocked
+        // Рівні
         levels = new LevelData[] {
                 new LevelData("01", maxUnlocked > 1 ? LevelState.DONE : LevelState.ACTIVE, "", "", 2),
                 new LevelData("02", maxUnlocked > 2 ? LevelState.DONE : (maxUnlocked == 2 ? LevelState.ACTIVE : LevelState.LOCKED), "", "", 0),
@@ -129,7 +118,7 @@ public class SelectLevelMenu implements Screen {
 
         ((MainGame) game).playMenuMusic();
     }
-
+    /**шрифти*/
     private void generateFonts() {
         if (Gdx.files.internal("fonts/Roboto-Regular.ttf").exists()) {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Roboto-Regular.ttf"));
@@ -153,7 +142,7 @@ public class SelectLevelMenu implements Screen {
 
             generator.dispose();
         } else {
-            // Фолбек якщо шрифту немає
+
             titleFont = new BitmapFont(); subtitleFont = new BitmapFont();
             numberFont = new BitmapFont(); labelFont = new BitmapFont();
             Gdx.app.error("FontError", "Шрифт не знайдено!");
@@ -161,7 +150,7 @@ public class SelectLevelMenu implements Screen {
     }
 
     @Override public void show() {}
-
+    /**Малювання екрану*/
     @Override
     public void render(float delta) {
         ScreenUtils.clear(BG_COLOR);
@@ -173,11 +162,11 @@ public class SelectLevelMenu implements Screen {
         drawText();
         handleInput();
     }
-
+    /**Малювання рівня*/
     private void drawShapes() {
         shapes.setProjectionMatrix(camera.combined);
 
-        // --- 1. Малювання з'єднувальних ліній між картками ---
+        //  Малювання з'єднувальних ліній між картками
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         for (int i = 0; i < levels.length - 1; i++) {
             float lineX = levels[i].x + CARD_W;
@@ -187,7 +176,7 @@ public class SelectLevelMenu implements Screen {
         }
         shapes.end();
 
-        // --- 2. Малювання фону карток та кнопки "Назад" ---
+        //  Малювання фону карток та кнопки "Назад"
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         for (LevelData level : levels) {
             boolean hovered = isMouseOver(level.x, level.y, CARD_W, CARD_H) && level.state != LevelState.LOCKED;
@@ -201,7 +190,7 @@ public class SelectLevelMenu implements Screen {
         drawRoundRect(BACK_BTN_X, BACK_BTN_Y, BACK_BTN_W, BACK_BTN_H, RADIUS, backHovered ? SURFACE_HOVER : SURFACE2);
         shapes.end();
 
-        // --- 3. Малювання обводок карток (Border) ---
+        //  Малювання обводок карток (Border)
         shapes.begin(ShapeRenderer.ShapeType.Line);
         Gdx.gl.glLineWidth(3f);
         for (LevelData level : levels) {
@@ -219,7 +208,7 @@ public class SelectLevelMenu implements Screen {
         shapes.end();
         Gdx.gl.glLineWidth(1f);
     }
-
+    /**Малювання тексту*/
     private void drawText() {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -233,7 +222,7 @@ public class SelectLevelMenu implements Screen {
         titleFont.draw(batch, title, (WORLD_W - layout.width) / 2f, WORLD_H - 60f);
 
 
-        // Текст на картках
+
         for (LevelData level : levels) {
             // Номер рівня
             String numStr = level.id;
@@ -307,7 +296,7 @@ public class SelectLevelMenu implements Screen {
         return wx >= x && wx <= x + w && wy >= y && wy <= y + h;
     }
 
-    // Допоміжні методи малювання заокруглених прямокутників (взяті з вашого StartMenu)
+    // Допоміжні методи малювання заокруглених прямокутників
     private void drawRoundRect(float x, float y, float w, float h, int r, Color color) {
         shapes.setColor(color);
         shapes.rect(x + r, y, w - 2 * r, h);

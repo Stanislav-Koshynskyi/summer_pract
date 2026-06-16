@@ -33,14 +33,14 @@ public class SwitchMenu {
         Supplier<Screen> supplier = screenRegistry.get(status);
 
         if (supplier != null) {
-            // 1. Спочатку запам'ятовуємо посилання на поточний активний екран
+
             Screen currentScreen = game.getScreen();
 
-            // 2. Створюємо та встановлюємо НОВИЙ екран (це безпечно перемикає контекст двигуна)
+
             Screen nextScreen = supplier.get();
             game.setScreen(nextScreen);
 
-            // 3. Тільки ТЕПЕР безпечно очищаємо ресурси старого екрана, який вже не рендериться
+
             if (currentScreen != null) {
                 currentScreen.dispose();
             }
@@ -48,6 +48,7 @@ public class SwitchMenu {
             Gdx.app.error("SwitchMenu", "Екран для статусу " + status + " не зареєстрований!");
         }
     }
+    /**Для того щоб поставити гра на паузу*/
     public void pushScreen(MenuStatus status) {
         Screen currentScreen = game.getScreen();
         if (currentScreen != null) {
@@ -56,6 +57,7 @@ public class SwitchMenu {
         }
         game.setScreen(screenRegistry.get(status).get());
     }
+    /** відновити гру закрити вікно паузи*/
     public void popScreen() {
         Screen currentScreen = game.getScreen();
         if (!screenStack.isEmpty()) {
@@ -65,6 +67,7 @@ public class SwitchMenu {
         }
         if (currentScreen != null) currentScreen.dispose();
     }
+    /**Очищення списку екранів*/
     public void clearStack(){
         screenStack.clear();
     }
